@@ -2692,6 +2692,14 @@ class DazOptimizer:
                     old_daz_bone = daz_bone.head.copy()
                     daz_bone.head = ue5_bone
                     daz_bone.tail += ue5_bone-old_daz_bone
+            bpy.ops.object.mode_set(mode='POSE')
+            for bone in rig.data.bones:
+                bone.inherit_scale = 'FULL'
+            for bone in rig.pose.bones:
+                bone.rotation_mode = 'QUATERNION'
+                for c in list(bone.constraints):
+                    bone.constraints.remove(c)
+
             # r_thigh = rig.data.edit_bones.get('thigh_r')
             # spine_01 = rig.data.edit_bones.get('spine_01')
             # if r_thigh is not None and pelvis is not None:
@@ -2878,6 +2886,14 @@ class DazOptimizer:
         bpy.context.scene.unit_settings.scale_length = 0.01
         z = s / 0.01
         self.scale(z)
+        for workspace in bpy.data.workspaces:
+            for screen in workspace.screens:
+                for area in screen.areas:
+                    if area.type == 'VIEW_3D':
+                        for space in area.spaces:
+                            if space.type == 'VIEW_3D':
+                                space.clip_start = 0.01
+                                space.clip_end *= 1000
 
     def scale_to_quinn(self):
         mesh = self.get_body_mesh()
@@ -4103,7 +4119,7 @@ class AddUe5IkBones(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [AddUe5IkBones])
+        return UNLOCK or check_stage(context, [DazConvertToUe5Skeleton_operator], [AddUe5IkBones])
 
     def execute(self, context):
         DazOptimizer().add_ue5_ik_bones()
