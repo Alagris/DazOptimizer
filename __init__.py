@@ -2696,6 +2696,8 @@ class DazOptimizer:
             for bone in rig.data.bones:
                 bone.inherit_scale = 'FULL'
             for bone in rig.pose.bones:
+                bone.lock_rotation = (False, False, False)
+                bone.lock_location = (False, False, False)
                 bone.rotation_mode = 'QUATERNION'
                 for c in list(bone.constraints):
                     bone.constraints.remove(c)
