@@ -2889,7 +2889,7 @@ class DazOptimizer:
                         for space in area.spaces:
                             if space.type == 'VIEW_3D':
                                 space.clip_start = 0.01
-                                space.clip_end *= 1000
+                                space.clip_end = 1000
 
     def scale_to_quinn(self):
         mesh = self.get_body_mesh()
