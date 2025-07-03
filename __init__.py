@@ -947,8 +947,16 @@ def get_rig_of(obj):
 
 
 def translate(obj, t):
+    apply_recursive(obj, location=t)
+
+def apply_recursive(obj, location=None, rotation=None, scale=None):
     select_object(obj)
-    obj.location = t
+    if location is not None:
+        obj.location = location
+    if rotation is not None:
+        obj.rotation = rotation
+    if scale is not None:
+        obj.scale = scale
     stack = [obj]
     visited = {obj}
     while len(stack) > 0:
@@ -956,12 +964,11 @@ def translate(obj, t):
         obj = stack.pop()
         obj.select_set(True)
         bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
+        bpy.ops.object.transform_apply(location=location is not None, rotation=rotation is not None, scale=scale is not None)
         for child in obj.children:
             if child not in visited:
                 visited.add(child)
                 stack.append(child)
-
 
 def scale_in_edit_mode(obj, z):
     stack = [obj]
@@ -979,20 +986,7 @@ def scale_in_edit_mode(obj, z):
 
 
 def scale(obj, z):
-    select_object(obj)
-    obj.scale = z
-    stack = [obj]
-    visited = {obj}
-    while len(stack)>0:
-        bpy.ops.object.select_all(action='DESELECT')
-        obj = stack.pop()
-        obj.select_set(True)
-        bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-        for child in obj.children:
-            if child not in visited:
-                visited.add(child)
-                stack.append(child)
+    apply_recursive(obj, scale=z)
 
 def bind_surf_deform(body_obj, clothes_obj, name=None):
     if name is None:
@@ -2901,10 +2895,6 @@ class DazOptimizer:
         mesh = self.get_body_mesh()
         height = mesh.dimensions[2]
         ue5_height = QUINN_HEIGHT if self.is_female() else MANNY_HEIGHT
-        self.scale(ue5_height/height)
-        self.match_quinn_pelvis()
-
-    def match_quinn_pelvis(self):
         rig = self.get_body_rig()
         select_object(rig)
         if 'hip' in rig.data.bones:
@@ -2912,10 +2902,16 @@ class DazOptimizer:
         elif 'pelvis' in rig.data.bones:
             root = rig.data.bones['pelvis']
         else:
-            return
-        hierarchy = self.get_hierarchy()
-        ue5_pevis_pos = hierarchy['pelvis'][0]
-        self.translate((0,ue5_pevis_pos[1]/100 - root.head.y,0))
+            root = None
+        if root is None:
+            loc = None
+        else:
+            hierarchy = self.get_hierarchy()
+            ue5_pevis_pos = hierarchy['pelvis'][0]
+            loc = (0,ue5_pevis_pos[1]/100 - root.head.y,0)
+        scl = ue5_height / height
+        scl = (scl, scl, scl)
+        apply_recursive(rig, location=loc, scale=scl)
 
     def scale(self, z):
         rig = self.get_body_rig()
