@@ -473,6 +473,7 @@ MORPHS = {
         }
     }
 }
+# euelr rotation order 'YZX'
 DAZ_TO_UE5_POSE_ROTATIONS = {
     'upperarm_l': [0.03490658849477768, -0.0, -0.10471975803375244],
     'upperarm_twist_01_l': [0,0,0],
@@ -2720,12 +2721,32 @@ class DazOptimizer:
             children.extend(o.children)
 
     def align_pose_to_ue5(self):
+        import mathutils
         body_rig = self.get_body_rig()
         body_rig.location.y = -0.02
         select_object(body_rig)
         bpy.ops.object.mode_set(mode='POSE')
-        for bone, rotation in DAZ_TO_UE5_POSE_ROTATIONS.items():
-            body_rig.pose.bones[bone].rotation_euler = rotation
+        bpy.ops.pose.select_all(action='SELECT')
+        bpy.ops.pose.transforms_clear()
+        hierarchy = self.get_hierarchy()
+
+        def recursion(bone, parent_rotation):
+            bone_name = bone.name
+            if bone_name in DAZ_TO_UE5_POSE_ROTATIONS:
+                _, _, x_axis, y_axis, z_axis, _, _ = hierarchy[bone_name]
+                ue5_y_axis = mathutils.Vector(y_axis)
+                daz_y_axis = mathutils.Vector(bone.y_axis)
+                daz_y_axis.rotate(parent_rotation)
+                quat = daz_y_axis.rotation_difference(ue5_y_axis)
+                l, r, s = bone.matrix.decompose()
+                r.rotate(quat)
+                bone.matrix = mathutils.Matrix.LocRotScale(l, r, s)
+                sum_quat = parent_rotation @ quat
+                for child_bone in bone.children:
+                    recursion(child_bone, sum_quat)
+        bn = 'upperarm_'
+        recursion(body_rig.pose.bones[bn+'l'], mathutils.Quaternion())
+        recursion(body_rig.pose.bones[bn+'r'], mathutils.Quaternion())
 
     def apply_pose(self):
         body_rig = self.get_body_rig()
@@ -4147,10 +4168,10 @@ class DazAlignPoseQuinn(bpy.types.Operator):
     bl_idname = "dazoptim.align_pose_to_quinn"
     bl_label = "ALign pose to quinn"
     bl_options = {"REGISTER", "UNDO"}
-    stage_id = 'N'
+    stage_id = ';'
     @classmethod
     def poll(cls, context):
-        return UNLOCK
+        return UNLOCK or check_stage(context, [DazConvertToUe5Skeleton_operator], [])
 
     def execute(self, context):
         DazOptimizer().align_pose_to_ue5()
@@ -4162,10 +4183,10 @@ class DazApplyPose(bpy.types.Operator):
     bl_idname = "dazoptim.apply_pose"
     bl_label = "Apply pose"
     bl_options = {"REGISTER", "UNDO"}
-    stage_id = 'O'
+    stage_id = ':'
     @classmethod
     def poll(cls, context):
-        return UNLOCK
+        return UNLOCK or check_stage(context, [DazAlignPoseQuinn], [DazApplyPose])
 
     def execute(self, context):
         DazOptimizer().apply_pose()
@@ -4471,8 +4492,6 @@ operators = [
     (TransferMorphsToClothes, "Transfer morphs to clothes"),
     (DazScaleToQuinn, "Scale to Manny height"),
     (DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
-    # (DazAlignPoseQuinn, "Align pose to ue5 quinn"),
-    # (DazApplyPose, "Apply pose"),
     (DazReorientBones_operator, "Reorient bones"),
     (DazOptimizeHair_operator, "Optimize hair"),
     (DazDetachHairFromSkeleton_operator, "Detach hair from skeleton"),
@@ -4489,6 +4508,8 @@ util_operators = [
     (HideAllClothes, "Hide all clothes"),
     (ShowAllClothes, "Show all clothes"),
     (UnlockEverything, "Unlock everything"),
+    (DazAlignPoseQuinn, "Align pose to ue5"),
+    (DazApplyPose, "Apply pose"),
 
 ]
 classes = [
