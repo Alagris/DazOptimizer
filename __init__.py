@@ -2693,9 +2693,11 @@ class DazOptimizer:
             for bone in rig.pose.bones:
                 bone.lock_rotation = (False, False, False)
                 bone.lock_location = (False, False, False)
-                bone.rotation_mode = 'QUATERNION'
+                if not bone.name.endswith("(drv)"):
+                    bone.rotation_mode = 'QUATERNION'
                 for c in list(bone.constraints):
-                    bone.constraints.remove(c)
+                    if isinstance(c, bpy.types.LimitRotationConstraint):
+                        bone.constraints.remove(c)
 
             # r_thigh = rig.data.edit_bones.get('thigh_r')
             # spine_01 = rig.data.edit_bones.get('spine_01')
@@ -2755,6 +2757,10 @@ class DazOptimizer:
         bpy.ops.pose.armature_apply(selected=True)
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
+
+
+    def add_toon_outline(self):
+        pass
 
     # def reorient_bones(self):
     #     import mathutils
@@ -2909,8 +2915,8 @@ class DazOptimizer:
                     if area.type == 'VIEW_3D':
                         for space in area.spaces:
                             if space.type == 'VIEW_3D':
-                                space.clip_start = 0.01
-                                space.clip_end = 1000
+                                space.clip_start = 1
+                                space.clip_end = 100000
 
     def scale_to_quinn(self):
         mesh = self.get_body_mesh()
