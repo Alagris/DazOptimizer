@@ -1,7 +1,7 @@
 # How to install 
 
 Install blender, DAZ and Diffeomorphic.
-Then open blender go to Scripting tab, create a new file paste there the contents of `blender_export_script.py` and then click the arrow button to run the script.
+Then open blender go to Scripting tab, create a new file paste there the contents of `__init__.py` and then click the arrow button to run the script.
 You should now see `DazOptim` appear right bar in the 3d view.
 Go to Window>Toggle System Console and look for a line more or less like this (should be somewhere on top. It appears when you execute the script)
 ```bash
