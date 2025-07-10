@@ -145,13 +145,28 @@ class NodesUtils:
     def gen_simple_material(node_tree, filepaths, output_socket=None, shift_x=0, uvs=None):
         ns = node_tree.nodes
         ls = node_tree.links
-        bsdf_node = ns.new('ShaderNodeBsdfPrincipled')
-        bsdf_node.location = (shift_x, 0)
-        bsdf_node.name = 'simple_material_bsdf'
         if output_socket is None:
             output_node = ns.new('ShaderNodeOutputMaterial')
             output_node.location = (shift_x+400, 0)
             output_socket = output_node.inputs['Surface']
+        if bpy.context.scene.get('daz_optim_toon'):
+            bsdf_node = ns.new('ShaderNodeGroup')
+            bsdf_node.node_tree = bpy.data.node_groups['DAZ Toon Diffuse']
+            if 'DAZ Toon Light' in bpy.data.node_groups:
+                light_node = ns.new('ShaderNodeGroup')
+                light_node.node_tree = bpy.data.node_groups['DAZ Toon Light']
+                light_node.location = (shift_x+200, 0)
+                ls.new(light_node.inputs['Input'], bsdf_node.outputs['Output'])
+                ls.new(output_socket, light_node.outputs['Output'])
+            else:
+                ls.new(output_socket, bsdf_node.outputs['Output'])
+            channels = ['Color', 'Normal']
+        else:
+            bsdf_node = ns.new('ShaderNodeBsdfPrincipled')
+            ls.new(output_socket, bsdf_node.outputs['BSDF'])
+            channels = ['Base Color', 'Roughness', 'Normal']
+        bsdf_node.location = (shift_x, 0)
+        bsdf_node.name = 'simple_material_bsdf'
         if isinstance(uvs, str):
             uv_node = ns.new('ShaderNodeUVMap')
             uv_node.location = (-900 + shift_x, 0)
@@ -159,12 +174,13 @@ class NodesUtils:
             uvs = uv_node
         if isinstance(uvs, bpy.types.ShaderNodeUVMap):
             uvs = uvs.outputs['UV']
-        for idx, channel in enumerate(['Base Color', 'Roughness', 'Normal']):
-            if channel in filepaths:
+        for idx, channel in enumerate(channels):
+            filepath_channel = 'Base Color' if channel == "Color" else 'Color'
+            if filepath_channel in filepaths:
                 tex_node = ns.new('ShaderNodeTexImage')
                 tex_node.name = 'simple_material_'+channel
                 tex_node.location = (-600 + shift_x, -(idx - 1) * 300)
-                filepath = filepaths[channel]
+                filepath = filepaths[filepath_channel]
                 if isinstance(filepath, list):
                     if len(filepath) > 0:
                         filepath = filepath[0]
@@ -184,7 +200,7 @@ class NodesUtils:
                     ls.new(norm_map_node.inputs['Color'], tex_node.outputs['Color'])
                 else:
                     ls.new(bsdf_node.inputs[channel], tex_node.outputs['Color'])
-        ls.new(output_socket, bsdf_node.outputs['BSDF'])
+
 
 def install_libraries():
     pil_missing = False
@@ -574,6 +590,27 @@ CLOTHES = {
     'White Witch Hat': ClothesMeta('6987-13875-6903', -1, False),
     'White Witch Sleeves': ClothesMeta('19852-39574-19726', -1, False),
     'DCKA Guard Vest': ClothesMeta('31098-60151-29196', -1, False),
+    'Urban Kunoichi Glove': ClothesMeta('7894-15692-7800', -1, False),
+    'Urban Kunoichi Heels': ClothesMeta('6524-12840-6320', -1, False),
+    'Urban Kunoichi Jacket': ClothesMeta('4682-9316-4632', -1, False),
+    'Urban Kunoichi Mask': ClothesMeta('1207-2328-1120', -1, False),
+    'Urban Kunoichi Pants': ClothesMeta('3763-7429-3675', -1, False),
+    'Urban Kunoichi Top': ClothesMeta('840-1626-784', -1, False),
+    'PPSS Boots': ClothesMeta('17589-35086-17501', -1, False),
+    'PPSS Jacket': ClothesMeta('49380-98350-48997', -1, False),
+    'PPSS Skirt': ClothesMeta('11467-22703-11232', -1, False),
+    'PPSS Stockings': ClothesMeta('10912-21736-10824', CLOTHES_MIN_DIST_TO_SKIN, False),
+    'PPSS Tshirt': ClothesMeta('12234-24008-11773', -1, False),
+    'Nirv Zero\'s Bra': ClothesMeta('1954-3838-1884', -1, False),
+    'Nirv Zero\'s Cat Slippers': ClothesMeta('1940-3848-1932', -1, False),
+    'Nirv Zero\'s Underwear': ClothesMeta('3003-5896-2892', -1, False),
+    'dForce Nirv Zero\'s Dresses': ClothesMeta('10859-21641-10780', -1, False),
+    'SS14 TOON': ClothesMeta('11797-23057-11281', -1, False),
+    'SS35 BRA TOON': ClothesMeta('23787-47090-23306', -1, False),
+    'SS35 THONG TOON': ClothesMeta('16038-31713-15680', CLOTHES_MIN_DIST_TO_SKIN, True),
+    'SXS25 PANTS TOON': ClothesMeta('1702-3278-1574', CLOTHES_MIN_DIST_TO_SKIN, True),
+    'SXS25 TOP TOON': ClothesMeta('2639-5079-2436', CLOTHES_MIN_DIST_TO_SKIN, False),
+    'SXS29G9TOON': ClothesMeta('7299-13864-6532', CLOTHES_MIN_DIST_TO_SKIN, False),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -1120,10 +1157,14 @@ class DazOptimizer:
         return self.body_rig
 
     def get_eyes_mesh(self):
-        return bpy.data.objects['Genesis 9 Eyes Mesh']
+        for b in bpy.data.objects:
+            if b.daz_importer.DazMesh == 'Eyes9':
+                return b
 
     def get_eyelashes_mesh(self):
-        return bpy.data.objects['Genesis 9 Eyelashes Mesh']
+        for b in bpy.data.objects:
+            if b.name.endswith('Eyelashes Mesh'):
+                return b
 
     def get_base_uv_layer(self, layer_name='Base Multi UDIM'):
         return self.get_body_mesh().data.uv_layers[layer_name]
@@ -1476,10 +1517,13 @@ class DazOptimizer:
                     iris_img = image
                 elif 'sclera' in image.filepath.lower():
                     sclera_img = image
-            if iris_img is not None and sclera_img is not None:
-                eye_map = EyeMapType(sclera_img, iris_img, simplified_texture)
-                eye_map.join()
-                body_part_filepaths[channel] = eye_map.simplified_texture
+            if iris_img is not None:
+                if sclera_img is not None:
+                    eye_map = EyeMapType(sclera_img, iris_img, simplified_texture)
+                    eye_map.join()
+                    body_part_filepaths[channel] = eye_map.simplified_texture
+                else:
+                    body_part_filepaths[channel] = iris_img
 
 
 
@@ -1555,6 +1599,76 @@ class DazOptimizer:
         return all_eyes_textures
 
     def find_body_parts_textures(self):
+
+        def find_textures(input_socket, outputs):
+            for link in input_socket.links:
+                node = link.from_node
+                if node not in outputs:
+                    if isinstance(node, bpy.types.ShaderNodeTexImage):
+                        outputs.add(node.image)
+                        continue
+                    elif isinstance(node, bpy.types.ShaderNodeGroup):
+                        nt = node.node_tree
+                        fs = link.from_socket
+                        for group_output in NodesUtils.find_all_by_type(nt, bpy.types.NodeGroupOutput):
+                            find_textures(group_output.inputs[fs.name], outputs)
+                    elif isinstance(node, bpy.types.ShaderNodeMix):
+                        l_a = node.inputs['A'].links
+                        l_b = node.inputs['B'].links
+                        l_f = node.inputs['Factor'].links
+                        if len(l_a)==1 and len(l_b)==1 and len(l_f)==1 \
+                            and isinstance(l_a[0].from_node, bpy.types.ShaderNodeTexImage) \
+                            and isinstance(l_b[0].from_node, bpy.types.ShaderNodeTexImage)\
+                            and isinstance(l_f[0].from_node, bpy.types.ShaderNodeTexImage)\
+                            and l_f[0].from_socket.name == 'Alpha':
+                            i_a = l_a[0].from_node.image
+                            i_b = l_b[0].from_node.image
+                            i_f = l_f[0].from_node.image
+
+                            from PIL import Image
+                            pa: str = bpy.path.abspath(i_a.filepath)
+                            pb: str = bpy.path.abspath(i_b.filepath)
+                            img_a: np.ndarray = np.array(Image.open(pa))/np.float32(255)
+                            img_b: np.ndarray = np.array(Image.open(pb))/np.float32(255)
+                            if i_f == i_a:
+                                img_f = img_a
+                                primary_path = pa
+                                secondary_path = pb
+                            elif i_f == i_b:
+                                img_f = img_b
+                                primary_path = pb
+                                secondary_path = pa
+                            else:
+                                img_f = np.array(Image.open(i_f.filepath))/np.float32(255)
+                                primary_path = pa
+                                secondary_path = pb
+                            alpha = img_f[:, :, -1]
+                            a = img_a[:, :, :3]
+                            b = img_b[:, :, :3]
+                            if node.blend_type == 'MIX':
+                                img_c = a.T * (1-alpha.T) + b * alpha.T
+                                img_c = img_c.T
+                            elif node.blend_type == 'MULTIPLY':
+                                img_c = a.T * (b.T * alpha.T+1-alpha.T)
+                                img_c = img_c.T
+                            else:
+                                img_c = None
+                            if img_c is not None:
+                                suffix = os.path.basename(secondary_path)
+                                suffix = suffix.rsplit('.', maxsplit=1)[0]
+                                prefix, extension = primary_path.rsplit('.', maxsplit=1)
+                                pc = prefix + suffix + node.blend_type + '.' + extension
+                                img_c *= 255
+                                img_c = Image.fromarray(img_c.astype(np.uint8))
+                                img_c.save(pc)
+                                i_c = bpy.data.images.load(pc)
+                                outputs.add(i_c)
+                                continue
+
+                    for in_soc in node.inputs:
+                        find_textures(in_soc, outputs)
+            return outputs
+
         BODY_M = self.get_body_mesh()
 
         all_filepaths: {str: {str: [bpy.types.Image]}} = {}
@@ -1570,27 +1684,27 @@ class DazOptimizer:
                 for bsdf in NodesUtils.from_socket_backwards_search_for(output_node.inputs['Surface'], (bpy.types.ShaderNodeBsdfPrincipled, bpy.types.ShaderNodeGroup), set()):
                     if isinstance(bsdf, bpy.types.ShaderNodeBsdfPrincipled):
                         for channel in ['Base Color', 'Roughness', 'Normal']:
-                            for img_node in NodesUtils.from_socket_backwards_search_for(bsdf.inputs[channel],
-                                                                                        bpy.types.ShaderNodeTexImage,
-                                                                                        set()):
+                            for img_node in find_textures(bsdf.inputs[channel], set()):
                                 body_part_filepaths[channel].add(img_node.image)
                                 print(body_part, channel, img_node.image)
                     elif bsdf.node_tree.name == 'DAZ Dual Lobe PBR':
-                        for img_node in NodesUtils.from_socket_backwards_search_for(bsdf.inputs['Roughness 1'],
-                                                                                    bpy.types.ShaderNodeTexImage,
-                                                                                    set()):
-                            body_part_filepaths['Roughness'].add(img_node.image)
-                            print(body_part,"Roughness",img_node.image)
-                        for img_node in NodesUtils.from_socket_backwards_search_for(bsdf.inputs['Roughness 2'],
-                                                                                    bpy.types.ShaderNodeTexImage,
-                                                                                    set()):
-                            body_part_filepaths['Roughness'].add(img_node.image)
-                            print(body_part, "Roughness", img_node.image)
-                        for img_node in NodesUtils.from_socket_backwards_search_for(bsdf.inputs['Normal'],
-                                                                                    bpy.types.ShaderNodeTexImage,
-                                                                                    set()):
-                            body_part_filepaths['Normal'].add(img_node.image)
-                            print(body_part, "Normal", img_node.image)
+                        for image in find_textures(bsdf.inputs['Roughness 1'], set()):
+                            body_part_filepaths['Roughness'].add(image)
+                            print(body_part, "Roughness", image)
+                        for image in find_textures(bsdf.inputs['Roughness 2'], set()):
+                            body_part_filepaths['Roughness'].add(image)
+                            print(body_part, "Roughness", image)
+                        for image in find_textures(bsdf.inputs['Normal'], set()):
+                            body_part_filepaths['Normal'].add(image)
+                            print(body_part, "Normal", image)
+                    elif bsdf.node_tree.name == 'DAZ Toon Diffuse':
+                        bpy.context.scene['daz_optim_toon'] = True
+                        for image in find_textures(bsdf.inputs['Color'], set()):
+                            body_part_filepaths['Base Color'].add(image)
+                            print(body_part,"Base Color",image)
+                        for image in find_textures(bsdf.inputs['Normal'], set()):
+                            body_part_filepaths['Normal'].add(image)
+                            print(body_part, "Normal", image)
         for body_part_name, body_part_filepaths in all_filepaths.items():
             occurrences = {}
             filenames = []
@@ -1614,8 +1728,6 @@ class DazOptimizer:
     def simplify_materials(self):
         BODY_M = self.get_body_mesh()
         all_filepaths = self.find_body_parts_textures()
-
-
 
         mats = list(BODY_M.data.materials)
         for n in BREAST_GEOGRAFTS+MALE_ONLY_GEOGRAFTS:
@@ -2139,7 +2251,7 @@ class DazOptimizer:
         sk.value = 1
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.transform.shrink_fatten(value=CLOTHES_MIN_DIST_TO_SKIN)
+        bpy.ops.transform.shrink_fatten(value=CLOTHES_MIN_DIST_TO_SKIN/bpy.context.scene.unit_settings.scale_length)
         bpy.ops.object.mode_set(mode='OBJECT')
         sk.value = 0
         clothes = find_all_non_skin_tight_clothes()
@@ -3491,7 +3603,7 @@ class DazOptimizeEyelashes_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazOptimizeEyelashes_operator])
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazOptimizeEyelashes_operator]) and not bpy.context.scene.get('daz_optim_toon')
 
     def execute(self, context):
         DazOptimizer().optimize_eyelashes()
@@ -3524,7 +3636,7 @@ class DazOptimizeEyebrows_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazOptimizeEyebrows_operator])
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazOptimizeEyebrows_operator]) and not bpy.context.scene.get('daz_optim_toon')
 
     def execute(self, context):
         DazOptimizer().optimize_eyebrows()
