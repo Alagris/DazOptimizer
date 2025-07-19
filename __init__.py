@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import shutil
 import sys
 
@@ -291,17 +292,20 @@ FIGURE_ANY = "TG"
 FIGURE_G9 = "G"
 MorphMeta = namedtuple('MorphMeta', ['category', 'title', 'figure'])
 
-CAT_BREAST = "Breasts"
-CAT_HEAD = "Head"
-CAT_ARMS = "Arms"
-CAT_LEGS = "Legs"
-CAT_BODY = "Body"
-CAT_ASS = "Ass"
-CAT_GENITALS = "Genitals"
-CAT_SPECIAL = "SPECIAL"
-CAT_FACS = "FACS"
+CAT_BREAST = "Custom/Breasts"
+CAT_HEAD = "Custom/Head"
+CAT_ARMS = "Custom/Arms"
+CAT_LEGS = "Custom/Legs"
+CAT_BODY = "Custom/Body"
+CAT_ASS = "Custom/Ass"
+CAT_GENITALS = "Custom/Genitals"
+CAT_SPECIAL = "Custom/Special"
+CAT_FACS = "Facs"
+CAT_FACSEXPR = "Facsexpr"
+CAT_FACSDET = "Facsdetails"
 CAT_JCM = "JCM"
 CATS_BODY = {CAT_BREAST,CAT_HEAD,CAT_ARMS,CAT_LEGS,CAT_BODY,CAT_ASS,CAT_GENITALS,CAT_SPECIAL}
+CATS_FACS = {CAT_FACS, CAT_FACSDET, CAT_FACSEXPR}
 MORPHS = {
     "Wet Kitty TOON":{
         "path": "data\RuDy Studio\WTKT TOON\WTKT TOON\Morphs\RuDy Studio\Base",
@@ -434,46 +438,9 @@ MORPHS = {
             "facs_bs_EyeLookOutRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
         }}
     },
-    "__base__": {
+    "Nirv Zero": {
         "path": "data/DAZ 3D/Genesis 9/Base/Morphs/",
-        "shapes": {
-            "female": {
-                "body_bs_AnimeBodyHeavyFeminine":MorphMeta(CAT_BODY, "Heavy", FIGURE_TOON),
-                "body_bs_AnimeBodyMuscularFeminine":MorphMeta(CAT_BODY, "Muscular", FIGURE_TOON),
-                "body_bs_BreastsLargeExtra":MorphMeta(CAT_BREAST, "Breasts Large Extra", FIGURE_TOON),
-                "body_bs_BreastsPoint":MorphMeta(CAT_BREAST, "Breasts Point", FIGURE_TOON),
-                "body_bs_BreastsTipDown":MorphMeta(CAT_BREAST, "Breasts Tip Down", FIGURE_TOON),
-                "body_bs_BreastsTipIn":MorphMeta(CAT_BREAST, "Breasts Tip In", FIGURE_TOON),
-                "body_bs_BreastsTipOut":MorphMeta(CAT_BREAST, "Breasts Tip Out", FIGURE_TOON),
-                "body_bs_BreastsTipUp":MorphMeta(CAT_BREAST, "Breasts Tip Up", FIGURE_TOON),
-                "body_bs_BreastsWidth":MorphMeta(CAT_BREAST, "Breasts Width", FIGURE_TOON),
-                "body_bs_BodyPearFigure":MorphMeta(CAT_BODY,"Pear Figure", FIGURE_ANY),
-                "body_bs_BodyVoluptuous":MorphMeta(CAT_BODY,"Voluptuous", FIGURE_ANY),
-                "body_bs_BreastsCleavage":MorphMeta(CAT_BREAST,"Breasts Cleavage", FIGURE_ANY),
-                "body_bs_BreastsDiameter":MorphMeta(CAT_BREAST,"Breasts Diameter", FIGURE_ANY),
-                "body_bs_BreastsDownwardSlope":MorphMeta(CAT_BREAST,"Breasts Downward Slope", FIGURE_ANY),
-                "body_bs_BreastsFullnessLower":MorphMeta(CAT_BREAST,"Breasts Fullness Lower", FIGURE_ANY),
-                "body_bs_BreastsFullnessUpper":MorphMeta(CAT_BREAST,"Breasts Fullness Upper", FIGURE_ANY),
-                "body_bs_BreastsGone":MorphMeta(CAT_BREAST,"Breasts Gone", FIGURE_ANY),
-                "body_bs_BreastsHeavy":MorphMeta(CAT_BREAST,"Breasts Heavy", FIGURE_ANY),
-                "body_bs_BreastsLarge":MorphMeta(CAT_BREAST,"Breasts Large", FIGURE_ANY),
-                "body_bs_BreastsLargeHigh":MorphMeta(CAT_BREAST,"Breasts Large High", FIGURE_ANY),
-                "body_bs_BreastsNatural":MorphMeta(CAT_BREAST,"Breasts Natural", FIGURE_ANY),
-                "body_bs_BreastsPerkSide":MorphMeta(CAT_BREAST,"Breasts Perk Side", FIGURE_ANY),
-                "body_bs_BreastsShape01":MorphMeta(CAT_BREAST,"Breasts Shape 01", FIGURE_ANY),
-                "body_bs_BreastsShape02":MorphMeta(CAT_BREAST,"Breasts Shape 02", FIGURE_ANY),
-                "body_bs_BreastsShape03":MorphMeta(CAT_BREAST,"Breasts Shape 03", FIGURE_ANY),
-                "body_bs_BreastsShape04":MorphMeta(CAT_BREAST,"Breasts Shape 04", FIGURE_ANY),
-                "body_bs_BreastsShape05":MorphMeta(CAT_BREAST,"Breasts Shape 05", FIGURE_ANY),
-                "body_bs_BreastsShape06":MorphMeta(CAT_BREAST,"Breasts Shape 06", FIGURE_ANY),
-                "body_bs_BreastsSidesDepth":MorphMeta(CAT_BREAST,"Breasts Sides Depth", FIGURE_ANY),
-                "body_bs_BreastsSmall":MorphMeta(CAT_BREAST,"Breasts Small", FIGURE_ANY),
-                "body_bs_NipplesAreolaeDepthFeminine":MorphMeta(CAT_BREAST,"Nipples Areolae Depth Feminine", FIGURE_ANY),
-                "body_bs_NipplesAreolaeDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Areolae Diameter Feminine", FIGURE_ANY),
-                "body_bs_NipplesDepthFeminine_HD3":MorphMeta(CAT_BREAST,"Nipples Depth Feminine", FIGURE_ANY),
-                "body_bs_NipplesDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Diameter Feminine", FIGURE_ANY),
-                "body_bs_Pregnant":MorphMeta(CAT_SPECIAL,"Pregnant", FIGURE_ANY),
-                "Nire_zero_body_cbs_pinky1_z95n_l": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+        "shapes": {"female": {
                 "Nirv_Hip_Back_Dimples": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Nirv_Zero_BaseAnime_facs_cbs_JawOpen": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Nirv_Zero_BaseAnime_facs_cbs_JawOpenWide": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
@@ -493,6 +460,7 @@ MORPHS = {
                 "Nirv_Zero_Right_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Nirv_Zero_Slanted_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Nirv_Zero_body_bs_Body": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Nire_zero_body_cbs_pinky1_z95n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
                 "Nirv_Zero_body_cbs_Thumb_z45p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
                 "Nirv_Zero_body_cbs_Thumb_z45p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
                 "Nirv_Zero_body_cbs_foot_x45n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
@@ -650,6 +618,48 @@ MORPHS = {
                 "Nirv_zero_body_cbs_upperarm_z90p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
                 "alias_head_Nirv_Zero_Pseudo_Anime_Canine_Teeth_Left": MorphMeta(CAT_HEAD, "", FIGURE_TOON),
                 "alias_head_Nirv_Zero_Pseudo_Anime_Canine_Teeth_Right": MorphMeta(CAT_HEAD, "", FIGURE_TOON),
+        }}
+    },
+    "__base__": {
+        "path": "data/DAZ 3D/Genesis 9/Base/Morphs/",
+        "shapes": {
+            "female": {
+                "body_bs_AnimeBodyHeavyFeminine":MorphMeta(CAT_BODY, "Heavy", FIGURE_TOON),
+                "body_bs_AnimeBodyMuscularFeminine":MorphMeta(CAT_BODY, "Muscular", FIGURE_TOON),
+                "body_bs_BreastsLargeExtra":MorphMeta(CAT_BREAST, "Breasts Large Extra", FIGURE_TOON),
+                "body_bs_BreastsPoint":MorphMeta(CAT_BREAST, "Breasts Point", FIGURE_TOON),
+                "body_bs_BreastsTipDown":MorphMeta(CAT_BREAST, "Breasts Tip Down", FIGURE_TOON),
+                "body_bs_BreastsTipIn":MorphMeta(CAT_BREAST, "Breasts Tip In", FIGURE_TOON),
+                "body_bs_BreastsTipOut":MorphMeta(CAT_BREAST, "Breasts Tip Out", FIGURE_TOON),
+                "body_bs_BreastsTipUp":MorphMeta(CAT_BREAST, "Breasts Tip Up", FIGURE_TOON),
+                "body_bs_BreastsWidth":MorphMeta(CAT_BREAST, "Breasts Width", FIGURE_TOON),
+                "body_bs_BodyPearFigure":MorphMeta(CAT_BODY,"Pear Figure", FIGURE_ANY),
+                "body_bs_BodyVoluptuous":MorphMeta(CAT_BODY,"Voluptuous", FIGURE_ANY),
+                "body_bs_BreastsCleavage":MorphMeta(CAT_BREAST,"Breasts Cleavage", FIGURE_ANY),
+                "body_bs_BreastsDiameter":MorphMeta(CAT_BREAST,"Breasts Diameter", FIGURE_ANY),
+                "body_bs_BreastsDownwardSlope":MorphMeta(CAT_BREAST,"Breasts Downward Slope", FIGURE_ANY),
+                "body_bs_BreastsFullnessLower":MorphMeta(CAT_BREAST,"Breasts Fullness Lower", FIGURE_ANY),
+                "body_bs_BreastsFullnessUpper":MorphMeta(CAT_BREAST,"Breasts Fullness Upper", FIGURE_ANY),
+                "body_bs_BreastsGone":MorphMeta(CAT_BREAST,"Breasts Gone", FIGURE_ANY),
+                "body_bs_BreastsHeavy":MorphMeta(CAT_BREAST,"Breasts Heavy", FIGURE_ANY),
+                "body_bs_BreastsLarge":MorphMeta(CAT_BREAST,"Breasts Large", FIGURE_ANY),
+                "body_bs_BreastsLargeHigh":MorphMeta(CAT_BREAST,"Breasts Large High", FIGURE_ANY),
+                "body_bs_BreastsNatural":MorphMeta(CAT_BREAST,"Breasts Natural", FIGURE_ANY),
+                "body_bs_BreastsPerkSide":MorphMeta(CAT_BREAST,"Breasts Perk Side", FIGURE_ANY),
+                "body_bs_BreastsShape01":MorphMeta(CAT_BREAST,"Breasts Shape 01", FIGURE_ANY),
+                "body_bs_BreastsShape02":MorphMeta(CAT_BREAST,"Breasts Shape 02", FIGURE_ANY),
+                "body_bs_BreastsShape03":MorphMeta(CAT_BREAST,"Breasts Shape 03", FIGURE_ANY),
+                "body_bs_BreastsShape04":MorphMeta(CAT_BREAST,"Breasts Shape 04", FIGURE_ANY),
+                "body_bs_BreastsShape05":MorphMeta(CAT_BREAST,"Breasts Shape 05", FIGURE_ANY),
+                "body_bs_BreastsShape06":MorphMeta(CAT_BREAST,"Breasts Shape 06", FIGURE_ANY),
+                "body_bs_BreastsSidesDepth":MorphMeta(CAT_BREAST,"Breasts Sides Depth", FIGURE_ANY),
+                "body_bs_BreastsSmall":MorphMeta(CAT_BREAST,"Breasts Small", FIGURE_ANY),
+                "body_bs_NipplesAreolaeDepthFeminine":MorphMeta(CAT_BREAST,"Nipples Areolae Depth Feminine", FIGURE_ANY),
+                "body_bs_NipplesAreolaeDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Areolae Diameter Feminine", FIGURE_ANY),
+                "body_bs_NipplesDepthFeminine_HD3":MorphMeta(CAT_BREAST,"Nipples Depth Feminine", FIGURE_ANY),
+                "body_bs_NipplesDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Diameter Feminine", FIGURE_ANY),
+                "body_bs_Pregnant":MorphMeta(CAT_SPECIAL,"Pregnant", FIGURE_ANY),
+
             },
             "male": {
                 "body_bs_AnimeBodyHeavyMasculine":MorphMeta(CAT_BODY, "Heavy", FIGURE_TOON),
@@ -2440,16 +2450,10 @@ class DazOptimizer:
                 bone.parent = original.data.edit_bones[parent]
         bpy.ops.object.mode_set(mode='OBJECT')
 
-    def make_fav_morphs_list(self, categories_to_include=None):
+    def collet_fav_shape_keys(self, categories_to_include=None)->({str:MorphMeta},{str:{}}):
         is_female = self.is_female()
-        settingsDir = bpy.context.preferences.addons['bl_ext.user_default.import_daz'].preferences.settingsDir
-        settings = os.path.join(settingsDir, 'import_daz_settings.json')
-        settings = io.open(settings, 'r', encoding='utf-8-sig')
-        settings = json.load(settings)
-        settings = settings['daz-settings']
-        content_dirs = settings["contentDirs"]
         morphs_and_objects = {}
-        shape_keys = []
+        shape_keys = {}
         figure = FIGURE_TOON if bpy.context.scene.get('daz_optim_toon') else FIGURE_G9
         for mesh_name, morphs in MORPHS.items():
             mesh = None
@@ -2462,42 +2466,70 @@ class DazOptimizer:
                     mesh = bpy.data.objects[mesh_name]
             if mesh is not None:
                 morphs['mesh'] = mesh
-                morphs_and_objects[mesh_name] = morphs
+                if mesh_name in morphs_and_objects:
+                    assert morphs_and_objects[mesh_name]['path'] == morphs['path']
+                else:
+                    morphs_and_objects[mesh_name] = morphs
                 shapes = morphs['shapes']
                 for key in ['unisex', 'female' if is_female else 'male']:
                     if key in shapes:
                         for shake_key, meta in shapes[key].items():
-                            if figure in meta.figure and (categories_to_include is None or meta.category in categories_to_include):
-                                shape_keys.append(shake_key)
+                            if figure in meta.figure and (
+                                    categories_to_include is None or meta.category in categories_to_include):
+                                shape_keys[shake_key] = meta
+        return shape_keys, morphs_and_objects
+
+
+    def make_fav_morphs_list(self, categories_to_include=None):
+        settingsDir = bpy.context.preferences.addons['bl_ext.user_default.import_daz'].preferences.settingsDir
+        settings = os.path.join(settingsDir, 'import_daz_settings.json')
+        settings = io.open(settings, 'r', encoding='utf-8-sig')
+        settings = json.load(settings)
+        settings = settings['daz-settings']
+        content_dirs = settings["contentDirs"]
+        shape_keys, morphs_and_objects = self.collet_fav_shape_keys(categories_to_include)
         ext = '.dsf'
-        shape_keys = {m + ext for m in shape_keys}
         fav_morphs = {
             "filetype": "favo_morphs",
             "root_paths": content_dirs,
 
         }
+        facs_regex = re.compile('.*_(facs_c?bs_.+)')
         for morphs in morphs_and_objects.values():
             morphs_path = morphs['path']
             mesh = morphs['mesh']
-            custom_shapes_list = []
             mesh_url = urllib.parse.quote(mesh.daz_importer.DazUrl)
+            morphs_dict = {}
             fav_morphs[mesh_url] = {
                 "finger_print": mesh.data.daz_importer.DazFingerPrint,
-                "morphs": {
-                    "Custom/Shapes": custom_shapes_list
-                }
+                "morphs": morphs_dict
             }
+
             for contentDir in content_dirs:
                 morphs_dir_path = os.path.join(contentDir, morphs_path)
                 if os.path.isdir(morphs_dir_path):
                     for root, dirs, files in os.walk(morphs_dir_path):
                         for file in files:
-                            if file in shape_keys:
-                                filepath = os.path.join(root, file)
-                                filepath = os.path.relpath(filepath, contentDir)
-                                filepath = filepath.replace("\\", "/")
-                                shape_key = file[:-len(ext)]
-                                custom_shapes_list.append([filepath, shape_key, "Custom"])
+                            if file.endswith(ext):
+                                file_no_ext = file[:-len(ext)]
+                                meta: MorphMeta = shape_keys.get(file_no_ext)
+                                if meta is not None:
+                                    shape_key = file_no_ext
+                                    filepath = os.path.join(root, file)
+                                    filepath = os.path.relpath(filepath, contentDir)
+                                    filepath = filepath.replace("\\", "/")
+                                    category = "Custom"
+                                    if meta.category.startswith("Facs"):
+                                        m = facs_regex.fullmatch(shape_key)
+                                        if m:
+                                            shape_key = m.group(1)
+                                        category = "Face"
+
+                                    if meta.category not in morphs_dict:
+                                        shapes_list = morphs_dict[meta.category] = []
+                                    else:
+                                        shapes_list = morphs_dict[meta.category]
+                                    shapes_list.append([filepath, shape_key, category])
         fav_morphs_path = self.get_fav_morphs_path()
         with open(fav_morphs_path, 'w+') as f:
             json.dump(fav_morphs, f, indent=2)
@@ -2506,6 +2538,89 @@ class DazOptimizer:
         body = self.get_body_mesh()
         select_object(body)
         bpy.ops.daz.load_favo_morphs(filepath=self.get_fav_morphs_path())
+
+    def rebind_loaded_fav_morphs(self):
+        shape_keys, _ = self.collet_fav_shape_keys(CATS_FACS)
+        body = self.get_body_mesh()
+        rig = self.get_body_rig()
+        facs_regex = re.compile('.*_((facs|head|body)_c?bs_.+)')
+        ugly_hex_regex = re.compile('(.*)-0x[a-f0-9]+')
+        data_path_regex = re.compile('key_blocks\["(.*)"\].value')
+        body_drivers = {}
+        for fcurve in body.data.shape_keys.animation_data.drivers:
+            m = data_path_regex.fullmatch(fcurve.data_path)
+            if m:
+                m = m.group(1)
+                body_drivers[m] = fcurve.driver.variables[0].targets[0].data_path
+        for obj in bpy.data.objects:
+            mesh = obj.data
+            if isinstance(mesh, bpy.types.Mesh) and mesh.shape_keys is not None:
+                print(mesh.name)
+                to_replace = {}
+                for sk in mesh.shape_keys.key_blocks:
+                    ugly_name = sk.name
+                    m = ugly_hex_regex.match(ugly_name)
+                    if m:
+                        nice_name = m.group(1)
+                        m = facs_regex.match(nice_name)
+                        if m:
+                            nice_name_tmp = m.group(1)
+                            if nice_name_tmp not in to_replace:
+                                nice_name = nice_name_tmp
+                        if nice_name in to_replace:
+                            print("Conflicting shape keys", to_replace[nice_name], "and", ugly_name, "for", nice_name)
+                        to_replace[nice_name] = ugly_name
+                for nice_name, ugly_name in to_replace.items():
+                    ugly_sk = mesh.shape_keys.key_blocks[ugly_name]
+                    nice_sk = mesh.shape_keys.key_blocks.get(nice_name)
+                    if nice_sk is None:
+                        ugly_sk.name = nice_name
+                        print('    ',ugly_name, "#>", nice_name)
+                    else:
+                        obj.shape_key_remove(nice_sk)
+                        # mesh.shape_keys.key_blocks.remove(nice_sk)
+                        ugly_sk.name = nice_name
+                        driver_path = body_drivers.get(nice_name)
+                        if driver_path is not None:
+                            ugly_sk.driver_remove('value')
+                            driver = ugly_sk.driver_add('value').driver
+                            driver.type = "SCRIPTED"
+                            driver.expression = "x"
+                            driver_var = driver.variables.new()
+                            driver_var.name = "x"
+                            driver_target = driver_var.targets[0]
+                            driver_target.id_type = 'ARMATURE'
+                            driver_target.id = rig.data
+                            driver_target.data_path = driver_path
+                            print('    ',ugly_name, "->", nice_name, ',', driver_path)
+                        else:
+                            print('    ',ugly_name, "->", nice_name)
+
+
+        # for facs in rig.daz_importer.DazFacs:
+        #     fav_facs_name = facs.name
+        #     meta = shape_keys.get(facs.text)
+        #     if meta is not None:
+        #         m = facs_regex.fullmatch(facs.text)
+        #         if m:
+        #             facs_name = m.group(1)
+        #             print("attempting", fav_facs_name, "->", facs_name)
+        #             if facs_name in rig.daz_importer.DazFacs:
+        #                 for mesh in bpy.data.meshes:
+        #                     if mesh.shape_keys is not None:
+        #                         sk = mesh.shape_keys.key_blocks.get(fav_facs_name)
+        #                         if sk is not None:
+        #                             print("rebinding", fav_facs_name, "in", mesh)
+        #                             sk.driver_remove('value')
+        #                             driver = sk.driver_add('value').driver
+        #                             driver.type = "SCRIPTED"
+        #                             driver.expression = "x"
+        #                             driver_var = driver.variables.new()
+        #                             driver_var.name = "x"
+        #                             driver_target = driver_var.targets[0]
+        #                             driver_target.id_type = 'ARMATURE'
+        #                             driver_target.id = rig.data
+        #                             driver_target.data_path = '["'+facs_name+'(fin)"]'
 
     def merge_eyes(self):
         EYES_M = self.get_eyes_mesh()
@@ -4848,7 +4963,7 @@ class SaveMorphsWithFACS(bpy.types.Operator):
         return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
 
     def execute(self, context):
-        DazOptimizer().make_fav_morphs_list(CATS_BODY.union({CAT_FACS}))
+        DazOptimizer().make_fav_morphs_list(CATS_BODY.union(CATS_FACS))
         pass_stage(self)
         return {'FINISHED'}
 
@@ -4868,6 +4983,21 @@ class LoadMorphs(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class RebindFavMorphs(bpy.types.Operator):
+    """ rebind fav morphs """
+    bl_idname = "dazoptim.rebind_fav_morphs"
+    bl_label = "Rebind fav morphs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = ')'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [LoadMorphs], [DazMergeGrografts_operator])
+
+    def execute(self, context):
+        DazOptimizer().rebind_loaded_fav_morphs()
+        pass_stage(self)
+        return {'FINISHED'}
 
 class TransferMorphsToGeografts(bpy.types.Operator):
     """ transfer morphs to geografts """
@@ -5071,6 +5201,7 @@ operators = [
     (SaveMorphs, "Generate fav morphs"),
     (SaveMorphsWithFACS, "Generate fav morphs (with FACS)"),
     (LoadMorphs, "Load fav morphs"),
+    (RebindFavMorphs, "Rebind fav morphs"),
     (TransferMorphsToGeografts, "Transfer morphs to geografts"),
     (DazAddBreastBones_operator, "Subdivide breast bones"),
     (DazAddGluteBones_operator, "Add glute bones"),
