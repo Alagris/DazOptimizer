@@ -2662,15 +2662,15 @@ class DazOptimizer:
             json.dump(fav_morphs, f, indent=2)
 
     def load_fav_morphs(self):
-        body = self.get_body_mesh()
-        select_object(body)
-        bpy.ops.daz.load_favo_morphs(filepath=self.get_fav_morphs_path())
+        for obj in bpy.data.objects:
+            if isinstance(obj.data, bpy.types.Mesh) and hasattr(obj.data, 'daz_importer'):
+                select_object(obj)
+                bpy.ops.daz.load_favo_morphs(filepath=self.get_fav_morphs_path())
 
     def rebind_loaded_fav_morphs(self):
-        shape_keys, _ = self.collet_fav_shape_keys(CATS_FACS)
         body = self.get_body_mesh()
         rig = self.get_body_rig()
-        facs_regex = re.compile('.*_((facs|head|body)_c?bs_.+)')
+        facs_regex = re.compile('.*_((facs|head|body)_(c?bs)_.+)')
         ugly_hex_regex = re.compile('(.*)-0x[a-f0-9]+')
         data_path_regex = re.compile('key_blocks\["(.*)"\].value')
         body_drivers = {}
@@ -2700,28 +2700,25 @@ class DazOptimizer:
                 for nice_name, ugly_name in to_replace.items():
                     ugly_sk = mesh.shape_keys.key_blocks[ugly_name]
                     nice_sk = mesh.shape_keys.key_blocks.get(nice_name)
-                    if nice_sk is None:
-                        ugly_sk.name = nice_name
-                        print('    ',ugly_name, "#>", nice_name)
-                    else:
+                    if nice_sk is not None:
                         obj.shape_key_remove(nice_sk)
-                        # mesh.shape_keys.key_blocks.remove(nice_sk)
-                        ugly_sk.name = nice_name
-                        driver_path = body_drivers.get(nice_name)
-                        if driver_path is not None:
-                            ugly_sk.driver_remove('value')
-                            driver = ugly_sk.driver_add('value').driver
-                            driver.type = "SCRIPTED"
-                            driver.expression = "x"
-                            driver_var = driver.variables.new()
-                            driver_var.name = "x"
-                            driver_target = driver_var.targets[0]
-                            driver_target.id_type = 'ARMATURE'
-                            driver_target.id = rig.data
-                            driver_target.data_path = driver_path
-                            print('    ',ugly_name, "->", nice_name, ',', driver_path)
-                        else:
-                            print('    ',ugly_name, "->", nice_name)
+                    ugly_sk.name = nice_name
+                    driver_name = nice_name.replace('_cbs_', '_bs_') if '_cbs_' in nice_name else nice_name
+                    driver_path = body_drivers.get(driver_name)
+                    if driver_path is not None:
+                        ugly_sk.driver_remove('value')
+                        driver = ugly_sk.driver_add('value').driver
+                        driver.type = "SCRIPTED"
+                        driver.expression = "x"
+                        driver_var = driver.variables.new()
+                        driver_var.name = "x"
+                        driver_target = driver_var.targets[0]
+                        driver_target.id_type = 'ARMATURE'
+                        driver_target.id = rig.data
+                        driver_target.data_path = driver_path
+                        print('    ',ugly_name, "->", nice_name, ',', driver_path)
+                    else:
+                        print('    ',ugly_name, "->", nice_name)
 
 
         # for facs in rig.daz_importer.DazFacs:
