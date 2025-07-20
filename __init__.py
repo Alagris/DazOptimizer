@@ -445,22 +445,22 @@ MORPHS = {
                 "body_bs_NipplesDepthFeminine_HD3":MorphMeta(CAT_BREAST,"Nipples Depth Feminine", FIGURE_ANY),
                 "body_bs_NipplesDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Diameter Feminine", FIGURE_ANY),
                 "body_bs_Pregnant":MorphMeta(CAT_SPECIAL, "Pregnant", FIGURE_ANY),
-                "Hip_Back_Dimples": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Breast_Size_Reduction": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Hip_Back_Dimples": MorphMeta(CAT_BODY, "", FIGURE_TOON),
+                "Breast_Size_Reduction": MorphMeta(CAT_BREAST, "", FIGURE_TOON),
                 "Eye_Style_01": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Heart_Pupil": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Iris_Smoothing": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Left_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Navel_Sag_HD": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "O_Shaped_Cat_Mouth": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Oblique_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Oblique_Eyebrow": MorphMeta(CAT_FACS, "", FIGURE_TOON),
                 "Pseudo_Anime_Canine_Teeth_Left": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Pseudo_Anime_Canine_Teeth_Right": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Pupi_Constricting_Left": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Pupi_Constrictingl_Right": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Pupils_Shrink_and_Dilate": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
                 "Right_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Slanted_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Slanted_Eyebrow": MorphMeta(CAT_FACS, "", FIGURE_TOON),
             },
             "male": {
                 "body_bs_AnimeBodyHeavyMasculine":MorphMeta(CAT_BODY, "Heavy", FIGURE_TOON),
@@ -1935,7 +1935,7 @@ class DazOptimizer:
                 iris_bone.constraints["Limit Rotation"].use_limit_y = False
                 eye_bone = rig.pose.bones[eye_bone_name]
                 rotation_mode = eye_bone.rotation_mode
-                for i, axis in enumerate(['X', 'Y', 'Z']):
+                for i, axis in enumerate(['XYZ']):
                     iris_bone.driver_remove('rotation_euler', i)
                     driver = iris_bone.driver_add('rotation_euler', i).driver
                     driver.type = "SCRIPTED"
@@ -1954,7 +1954,7 @@ class DazOptimizer:
             fix_iris('Left Iris', 'l_eye')
             fix_iris('Right Iris', 'r_eye')
 
-    def optimize_eyes(self):
+    def optimize_eyes(self, optimize_for_toon=False, hard_toon_edges=False):
 
         EYES_M = self.get_eyes_mesh()
         select_object(EYES_M)
@@ -1973,8 +1973,8 @@ class DazOptimizer:
 
         for v in bm.verts:
             v.select = False
-        is_toon = bpy.context.scene.get('daz_optim_toon')
-        max_dist = 0.116 if is_toon else 0.24
+        is_toon = optimize_for_toon and bpy.context.scene.get('daz_optim_toon')
+        max_dist = (0.116 if hard_toon_edges else 0.128) if is_toon else 0.24
         min_dist = 0 if is_toon else 0.038
         for face in bm.faces:
             for loop in face.loops:
@@ -1990,21 +1990,21 @@ class DazOptimizer:
 
         if is_toon:
             bpy.ops.object.mode_set(mode='OBJECT')
-            bpy.ops.uv.select_linked_pick(location=(0.739347, 0.926649))
-            body = self.get_body_mesh()
-            select_object(body)
-
-            # uv_layer = EYES_M.data.uv_layers.active
-            # uvs = np.array([v.uv for v in uv_layer.data], dtype=bool)
-            # uvs[:, y] < 0.5
-            bpy.ops.object.mode_set(mode='EDIT')
-            bpy.context.scene.tool_settings.use_uv_select_sync = False
-            bpy.ops.uv.select_all(action='DESELECT')
-            bpy.ops.mesh.select_all(action='DESELECT')
-
-            me = bpy.context.object.data
-            bm = bmesh.from_edit_mesh(me)
-            uv_layer = bm.loops.layers.uv.verify()
+            # bpy.ops.uv.select_linked_pick(location=(0.739347, 0.926649))
+            # body = self.get_body_mesh()
+            # select_object(body)
+            #
+            # # uv_layer = EYES_M.data.uv_layers.active
+            # # uvs = np.array([v.uv for v in uv_layer.data], dtype=bool)
+            # # uvs[:, y] < 0.5
+            # bpy.ops.object.mode_set(mode='EDIT')
+            # bpy.context.scene.tool_settings.use_uv_select_sync = False
+            # bpy.ops.uv.select_all(action='DESELECT')
+            # bpy.ops.mesh.select_all(action='DESELECT')
+            #
+            # me = bpy.context.object.data
+            # bm = bmesh.from_edit_mesh(me)
+            # uv_layer = bm.loops.layers.uv.verify()
 
         else:
             def select_loop(center):
@@ -2014,8 +2014,6 @@ class DazOptimizer:
                         uv = np.array(loop_uv.uv)
                         dist = np.linalg.norm(uv - center)
                         loop.vert.select_set(dist < 0.044)
-
-
 
             select_loop([0.25, 0.75])
             bpy.ops.mesh.edge_face_add()
@@ -2577,7 +2575,7 @@ class DazOptimizer:
 
     def transfer_morphs_to_geografts(self):
         BODY_M = self.get_body_mesh()
-        BODY_RIG = self.get_body_rig()
+        # BODY_RIG = self.get_body_rig()
         select_object(BODY_M)
         # merge meshes
         #selection = [shape for shapes in MORPHS['__base__']['shapes'].values() for shape in shapes]
@@ -2586,16 +2584,16 @@ class DazOptimizer:
             if g + ' Mesh' in bpy.data.objects:
                 g_m = bpy.data.objects[g + ' Mesh']
                 g_m.select_set(True)
-        bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='NoFace') #, selection=selection)
+        bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='NoFace', useOverwrite=False) #, selection=selection)
 
 
     def transfer_morphs_to_eyebrows(self):
-        if 'Eyebrows Mesh' in bpy.data.objects:
+        eyebrows = self.get_eyebrows()
+        if eyebrows is not None:
             BODY_M = self.get_body_mesh()
             select_object(BODY_M)
-            g_m = bpy.data.objects['Eyebrows Mesh']
-            g_m.select_set(True)
-            bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='Face')
+            eyebrows.select_set(True)
+            bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='Face', useOverwrite=False)
 
     def merge_two_rigs(self, original, addon):
         select_object(original)
@@ -4357,7 +4355,21 @@ class DazSimplifyMaterials_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class DazOptimizeEyesForToon_operator(bpy.types.Operator):
+    """ Optimize eyes for toon """
+    bl_idname = "dazoptim.optim_eyes_for_toon"
+    bl_label = "Optimize eyes"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = 'n'
 
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazOptimizeEyes_operator]) and bpy.context.scene.get('daz_optim_toon')
+
+    def execute(self, context):
+        DazOptimizer().optimize_eyes(True)
+        pass_stage(self)
+        return {'FINISHED'}
 
 class DazOptimizeEyes_operator(bpy.types.Operator):
     """ Optimize eyes """
@@ -4371,9 +4383,10 @@ class DazOptimizeEyes_operator(bpy.types.Operator):
         return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazOptimizeEyes_operator])
 
     def execute(self, context):
-        DazOptimizer().optimize_eyes()
+        DazOptimizer().optimize_eyes(False)
         pass_stage(self)
         return {'FINISHED'}
+
 
 class DazOptimizeEyelashes_operator(bpy.types.Operator):
     """ Optimize eyes """
@@ -4450,7 +4463,7 @@ class DazTransferFACSToEyebrow_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazApplyEyebrows_operator], [DazTransferFACSToEyebrow_operator])
+        return UNLOCK or check_stage(context, [DazMaleLoad_operator], [DazTransferFACSToEyebrow_operator])
 
     def execute(self, context):
         DazOptimizer().transfer_morphs_to_eyebrows()
@@ -5198,6 +5211,22 @@ class SaveMorphsOnlyGenitals(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class SaveMorphsOnlySpecial(bpy.types.Operator):
+    """ Generates favourite morphs """
+    bl_idname = "dazoptim.save_fav_morphs_only_special"
+    bl_label = "Save favourite morphs with special"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = 'Q'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().make_fav_morphs_list({CAT_SPECIAL})
+        pass_stage(self)
+        return {'FINISHED'}
+
 class LoadMorphs(bpy.types.Operator):
     """ load morphs """
     bl_idname = "dazoptim.load_morphs"
@@ -5434,6 +5463,7 @@ operators = [
     (SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
     (SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
     (SaveMorphsOnlyGenitals, "Generate fav morphs (only genitals)"),
+    (SaveMorphsOnlySpecial, "Generate fav morphs (only special)"),
     (LoadMorphs, "Load fav morphs"),
     (RebindFavMorphs, "Rebind fav morphs"),
     (TransferMorphsToGeografts, "Transfer morphs to geografts"),
@@ -5442,6 +5472,7 @@ operators = [
     (DazAddThighBones_operator, "Add thigh bones"),
     (DazSimplifyMaterials_operator, "Simplify materials"),
     (DazOptimizeEyes_operator, "Optimize eyes mesh"),
+    (DazOptimizeEyesForToon_operator, "Optimize eyes for toon"),
     (DazOptimizeEyelashes_operator, "Optimize eyelashes"),
     (DazOptimizeEyebrows_operator, "Optimize eyebrows"),
     (DazRemoveOldEyebrows_operator,"Remove old eyebrows"),
