@@ -306,7 +306,7 @@ CAT_FACSDET = "Facsdetails"
 CAT_JCM = "JCM"
 CATS_BODY = {CAT_BREAST,CAT_HEAD,CAT_ARMS,CAT_LEGS,CAT_BODY,CAT_ASS,CAT_GENITALS,CAT_SPECIAL}
 CATS_FACS = {CAT_FACS, CAT_FACSDET, CAT_FACSEXPR}
-
+NIRV_ZERO_EYES_DAZ_DIR = "/data/nirvana/nirv zero/nirv zero eyes"
 MORPHS = {
     "/data/rudy studio/wtkt toon/wtkt toon":{
         "shapes": { "female":{
@@ -1189,13 +1189,18 @@ DAZ_G9_TO_UE5_BONES = {
     'r_pinkymetacarpal': 'pinky_metacarpal_r',
 }
 
+def is_clothes(obj)->ClothesMeta:
+    name = obj.name
+    if name.endswith(" Mesh"):
+        name = name[:-len(" Mesh")]
+    return CLOTHES.get(name)
+
 
 def find_all_clothes(predicate=None):
     clothes = []
     for obj in bpy.data.objects:
-        if obj.name.endswith(" Mesh"):
-            name = obj.name[:-len(" Mesh")]
-            meta: ClothesMeta = CLOTHES.get(name)
+        if isinstance(obj.data, bpy.types.Mesh):
+            meta = is_clothes(obj)
             if meta is not None and (predicate is None or predicate(meta)):
                 meta.obj = obj
                 clothes.append(meta)
@@ -1219,10 +1224,13 @@ def find_all_skin_tight_clothes():
 def find_all_non_skin_tight_clothes():
     return find_all_clothes(is_not_skin_tight)
 
+def is_hair(obj):
+    return 'hair' in obj.name.lower() and obj.name.endswith(" Mesh")
+
 def find_all_hair():
     hair = []
     for obj in bpy.data.objects:
-        if 'hair' in obj.name.lower() and obj.name.endswith(" Mesh"):
+        if is_hair(obj):
             hair.append(obj)
     return hair
 
@@ -1914,11 +1922,37 @@ class DazOptimizer:
                 v.uv = new_uv
             body.data.uv_layers.remove(eyelashes_uvs)
 
+    def fix_toon_eyes(self):
+        eyes = self.get_eyes_mesh()
+        rig = self.get_body_rig()
+        daz_dir = obj_daz_dir(eyes).lower()
+        if daz_dir == NIRV_ZERO_EYES_DAZ_DIR:
+            select_object(rig)
+            bpy.ops.object.mode_set(mode='POSE')
 
-        # for mat in eyelashes_mats:
-        #     mat = eyelashes.material_slots[mat]
-        #     eyelashes.active_material_index = mat.slot_index
-        #     bpy.ops.object.material_slot_remove()
+            def fix_iris(iris_bone_name, eye_bone_name):
+                iris_bone = rig.pose.bones[iris_bone_name]
+                iris_bone.constraints["Limit Rotation"].use_limit_y = False
+                eye_bone = rig.pose.bones[eye_bone_name]
+                rotation_mode = eye_bone.rotation_mode
+                for i, axis in enumerate(['X', 'Y', 'Z']):
+                    iris_bone.driver_remove('rotation_euler', i)
+                    driver = iris_bone.driver_add('rotation_euler', i).driver
+                    driver.type = "SCRIPTED"
+                    driver.expression = '-0.267 * A'
+                    driver_var = driver.variables.new()
+                    driver_var.type = 'TRANSFORMS'
+                    driver_var.name = "A"
+
+                    driver_target = driver_var.targets[0]
+                    driver_target.id = rig
+                    driver_target.bone_target = eye_bone_name
+                    driver_target.transform_type = 'ROT_'+axis
+                    driver_target.rotation_mode = rotation_mode
+                    driver_target.transform_space = 'LOCAL_SPACE'
+
+            fix_iris('Left Iris', 'l_eye')
+            fix_iris('Right Iris', 'r_eye')
 
     def optimize_eyes(self):
 
@@ -1939,36 +1973,57 @@ class DazOptimizer:
 
         for v in bm.verts:
             v.select = False
-
+        is_toon = bpy.context.scene.get('daz_optim_toon')
+        max_dist = 0.116 if is_toon else 0.24
+        min_dist = 0 if is_toon else 0.038
         for face in bm.faces:
             for loop in face.loops:
                 loop_uv = loop[uv_layer]
                 uv = np.array(loop_uv.uv)
                 dist = np.linalg.norm(uv % 0.5 - 0.25)
-                if uv[1] < 0.5 or dist > 0.24 or dist < 0.038:
+                if uv[1] < 0.5 or dist > max_dist or dist < min_dist:
                     loop.vert.select = True
         for v in bm.verts:
             if v.select:
                 bm.verts.remove(v)
-
-        def select_loop(center):
-            for face in bm.faces:
-                for loop in face.loops:
-                    loop_uv = loop[uv_layer]
-                    uv = np.array(loop_uv.uv)
-                    dist = np.linalg.norm(uv - center)
-                    loop.vert.select_set(dist < 0.044)
-
         bmesh.update_edit_mesh(me)
 
-        select_loop([0.25, 0.75])
-        bpy.ops.mesh.edge_face_add()
-        select_loop([0.75, 0.75])
-        bpy.ops.mesh.edge_face_add()
+        if is_toon:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.uv.select_linked_pick(location=(0.739347, 0.926649))
+            body = self.get_body_mesh()
+            select_object(body)
 
-        bmesh.update_edit_mesh(me)
+            # uv_layer = EYES_M.data.uv_layers.active
+            # uvs = np.array([v.uv for v in uv_layer.data], dtype=bool)
+            # uvs[:, y] < 0.5
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.context.scene.tool_settings.use_uv_select_sync = False
+            bpy.ops.uv.select_all(action='DESELECT')
+            bpy.ops.mesh.select_all(action='DESELECT')
 
-        bpy.ops.object.mode_set(mode='OBJECT')
+            me = bpy.context.object.data
+            bm = bmesh.from_edit_mesh(me)
+            uv_layer = bm.loops.layers.uv.verify()
+
+        else:
+            def select_loop(center):
+                for face in bm.faces:
+                    for loop in face.loops:
+                        loop_uv = loop[uv_layer]
+                        uv = np.array(loop_uv.uv)
+                        dist = np.linalg.norm(uv - center)
+                        loop.vert.select_set(dist < 0.044)
+
+
+
+            select_loop([0.25, 0.75])
+            bpy.ops.mesh.edge_face_add()
+            select_loop([0.75, 0.75])
+            bpy.ops.mesh.edge_face_add()
+            bmesh.update_edit_mesh(me)
+
+            bpy.ops.object.mode_set(mode='OBJECT')
         #
 
     def merge_all_rigs(self):
@@ -2663,7 +2718,10 @@ class DazOptimizer:
 
     def load_fav_morphs(self):
         for obj in bpy.data.objects:
-            if isinstance(obj.data, bpy.types.Mesh) and hasattr(obj.data, 'daz_importer'):
+            if (isinstance(obj.data, bpy.types.Mesh)
+                    and hasattr(obj.data, 'daz_importer')
+                    and is_clothes(obj) is None
+                    and not is_hair(obj)):
                 select_object(obj)
                 bpy.ops.daz.load_favo_morphs(filepath=self.get_fav_morphs_path())
 
@@ -3976,9 +4034,9 @@ def load_daz(context, is_female):
                                 useExpressions=False,
                                 useVisemes=False,
                                 useHead=False,
-                                useFacs=True,
-                                useFacsdetails=True,
-                                useFacsexpr=True,
+                                useFacs=False,
+                                useFacsdetails=False,
+                                useFacsexpr=False,
                                 useAnime=False,
                                 usePowerpose=False,
                                 useBody=False,
@@ -4122,6 +4180,20 @@ class DazSaveBlend_operator(bpy.types.Operator):
             pass_stage(DazSaveTextures_operator)
         return {'FINISHED'}
 
+class FixToonEyes(bpy.types.Operator):
+    bl_idname = "dazoptim.fix_toon_eyes"
+    bl_label = "Fix toon eyes"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '?'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [FixToonEyes]) and bpy.context.scene.get('daz_optim_toon')
+
+    def execute(self, context):
+        DazOptimizer().fix_toon_eyes()
+        pass_stage(self)
+        return {'FINISHED'}
 
 class DazSaveTextures_operator(bpy.types.Operator):
     bl_idname = "dazoptim.save_textures"
@@ -5357,6 +5429,7 @@ operators = [
     (DazSaveBlend_operator, "Save blend file"),
     (DazSaveTextures_operator, "Save textures"),
     (DazMergeAllRigs_operator, "Merge all rigs"),
+    (FixToonEyes, "Fix toon eyes"),
     (SaveMorphs, "Generate fav morphs (all)"),
     (SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
     (SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
