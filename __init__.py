@@ -306,9 +306,9 @@ CAT_FACSDET = "Facsdetails"
 CAT_JCM = "JCM"
 CATS_BODY = {CAT_BREAST,CAT_HEAD,CAT_ARMS,CAT_LEGS,CAT_BODY,CAT_ASS,CAT_GENITALS,CAT_SPECIAL}
 CATS_FACS = {CAT_FACS, CAT_FACSDET, CAT_FACSEXPR}
+
 MORPHS = {
-    "Wet Kitty TOON":{
-        "path": "data\RuDy Studio\WTKT TOON\WTKT TOON\Morphs\RuDy Studio\Base",
+    "/data/rudy studio/wtkt toon/wtkt toon":{
         "shapes": { "female":{
             'OPEN 02': MorphMeta(CAT_SPECIAL,"open 02",FIGURE_TOON),
             'OPEN 03': MorphMeta(CAT_SPECIAL,"open 03",FIGURE_TOON),
@@ -399,8 +399,7 @@ MORPHS = {
 
         }}
     },
-    "Body Geo":{
-        "path": "data/Vyusur/Body Geo/Body Geo/Morphs/",
+    "/data/vyusur/body geo/body geo":{
         "shapes": { "female": {
             "Navel":MorphMeta(CAT_BREAST,"Navel", FIGURE_G9),
             "Nipples":MorphMeta(CAT_BREAST,"Nipples", FIGURE_G9),
@@ -408,220 +407,7 @@ MORPHS = {
             "Nipples3":MorphMeta(CAT_BREAST,"Nipples 3", FIGURE_G9),
         }},
     },
-    "Nirv Zero Eyelashes":{
-        "path": "data/Nirvana/Nirv Zero/Nirv Zero Eyelashes/Morphs/",
-        "shapes": { "female": {
-            "BaseAnime_head_bs_Head":MorphMeta(CAT_HEAD,"",FIGURE_TOON),
-            "G9_Eyelashes_Hidden_Fix":MorphMeta(CAT_SPECIAL,"",FIGURE_TOON),
-            "BaseAnime_facs_cbs_EyeBlinkCrescentLeftFix":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "BaseAnime_facs_cbs_EyeBlinkCrescentRightFix":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "BaseAnime_facs_cbs_EyeBlinkLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "BaseAnime_facs_cbs_EyeBlinkRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeBlinkLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeBlinkRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeLidCloseUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeLidCloseUpperRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeLookDownLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeLookDownRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeSquintLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyeSquintRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyelidCloseLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyelidCloseLowerRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyelidOpenLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyelidOpenLowerRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyelidOpenUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_bs_EyelidOpenUpperRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_ctrl_EyeBlinkCrescentLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_facs_ctrl_EyeBlinkCrescentRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "Nirv_Zero_head_bs_Head":MorphMeta(CAT_HEAD,"",FIGURE_TOON),
-            "facs_bs_EyeLookOutLeft":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-            "facs_bs_EyeLookOutRight":MorphMeta(CAT_FACS,"",FIGURE_TOON),
-        }}
-    },
-    "Nirv Zero": {
-        "path": "data/DAZ 3D/Genesis 9/Base/Morphs/",
-        "shapes": {"female": {
-                "Nirv_Hip_Back_Dimples": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_BaseAnime_facs_cbs_JawOpen": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_BaseAnime_facs_cbs_JawOpenWide": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Breast_Size_Reduction": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Eye_Style_01": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Heart_Pupil": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Iris_Smoothing": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Left_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Navel_Sag_HD": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_O_Shaped_Cat_Mouth": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Oblique_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Pseudo_Anime_Canine_Teeth_Left": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Pseudo_Anime_Canine_Teeth_Right": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Pupi_Constricting_Left": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Pupi_Constrictingl_Right": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Pupils_Shrink_and_Dilate": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Right_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_Slanted_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_body_bs_Body": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nire_zero_body_cbs_pinky1_z95n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_Thumb_z45p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_Thumb_z45p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_foot_x45n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_foot_x45n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_foot_x65p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_foot_x65p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_forearm_y135n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_forearm_y135p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_forearm_y75n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_forearm_y75p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_hand_z70n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_hand_z70p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_head_x25p": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_neck1_x40p": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_neck1_z40p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_shin_x155p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_shin_x155p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_shin_x90p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_shin_x90p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_shoulder_z55n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_shoulder_z55p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thigh_x115n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thigh_x115n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thigh_x90n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thigh_x90n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thigh_z90n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thigh_z90n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thumb1_y40n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thumb1_y40p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thumb1_z20n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_thumb1_z20p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_toes_x60n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_upperarm_y110n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_body_cbs_upperarm_y110p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_BrowDownLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_BrowDownRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_BrowOuterUpLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_BrowOuterUpRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_BrowSqueezeLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_BrowSqueezeRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_CheekHollowLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_CheekHollowRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_CheekSquintLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_CheekSquintRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeBlinkLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeBlinkRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLidCloseUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLidCloseUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookDownLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookDownRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookInLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookInRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookOutLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookOutRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookUpLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeLookUpRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeSquintLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyeSquintRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyelidCloseLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyelidCloseLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyelidOpenLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyelidOpenLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyelidOpenUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_EyelidOpenUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_JawForward": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_JawRecess": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthBackUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthBackUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCloseLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCloseLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCloseUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCloseUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCompressLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCompressLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCompressUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCompressUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCornerMoveBackLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCornerMoveBackRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCornerMoveSide_SideLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthCornerMoveSide_SideRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthDimpleLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthDimpleRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthForwardUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthForwardUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthFrownLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthFrownRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthFunnelLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthFunnelLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthFunnelUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthFunnelUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthLipsCat": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthLipsSide-SideLower": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthLowerDownLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthLowerDownRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPressLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPressLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPressUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPressUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPurseLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPurseLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPurseUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthPurseUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthRollLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthRollLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthRollUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthRollUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthShrugLowerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthShrugLowerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthSmileLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthSmileRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthSmileWidenLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthSmileWidenRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthStretchLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthStretchRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_MouthUp-Down": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NasalCreaseFlexLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NasalCreaseFlexRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NasalFlareLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NasalFlareRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NasalStretchLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NasalStretchRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NoseSneerLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NoseSneerRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NoseSneerUpperLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_bs_NoseSneerUpperRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_ctrl_EyeBlinkCrescentLeft": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_facs_ctrl_EyeBlinkCrescentRight": MorphMeta(CAT_FACS, "", FIGURE_TOON),
-                "Nirv_Zero_figure_ctrl_Character": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_figure_ctrl_Proportions": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
-                "Nirv_Zero_head_bs_Head": MorphMeta(CAT_SPECIAL, "Nirv Head", FIGURE_TOON),
-                "Nirv_Zero_pupils_Dilate_Left": MorphMeta(CAT_HEAD, "Dilate Left Pupil", FIGURE_TOON),
-                "Nirv_Zero_pupils_Dilate_Right": MorphMeta(CAT_HEAD, "Dilate Right Pupil", FIGURE_TOON),
-                "Nirv_zero_Spine1_Bend_n20": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_Spine2_Bend_n25": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_Big_Toe_1_x65n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_Big_Toe_1_x65n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_Index_Toe_1_x45p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_Index_Toe_1_x45p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_index1_z90n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_index1_z90p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_mid1_z95n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_mid1_z95p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_pelvis_x25n": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_pinky1_z95p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_ring1_z95n_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_ring1_z95p_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_spine1_x35p": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_spine2_x40p": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_thumb2_y65n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_thumb2_y65p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_toes_x60n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_upperarm_z90n_r": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "Nirv_zero_body_cbs_upperarm_z90p_l": MorphMeta(CAT_JCM, "", FIGURE_TOON),
-                "alias_head_Nirv_Zero_Pseudo_Anime_Canine_Teeth_Left": MorphMeta(CAT_HEAD, "", FIGURE_TOON),
-                "alias_head_Nirv_Zero_Pseudo_Anime_Canine_Teeth_Right": MorphMeta(CAT_HEAD, "", FIGURE_TOON),
-        }}
-    },
-    "__base__": {
-        "path": "data/DAZ 3D/Genesis 9/Base/Morphs/",
+    "/data/daz 3d/genesis 9/base": {
         "shapes": {
             "female": {
                 "body_bs_AnimeBodyHeavyFeminine":MorphMeta(CAT_BODY, "Heavy", FIGURE_TOON),
@@ -658,8 +444,23 @@ MORPHS = {
                 "body_bs_NipplesAreolaeDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Areolae Diameter Feminine", FIGURE_ANY),
                 "body_bs_NipplesDepthFeminine_HD3":MorphMeta(CAT_BREAST,"Nipples Depth Feminine", FIGURE_ANY),
                 "body_bs_NipplesDiameterFeminine":MorphMeta(CAT_BREAST,"Nipples Diameter Feminine", FIGURE_ANY),
-                "body_bs_Pregnant":MorphMeta(CAT_SPECIAL,"Pregnant", FIGURE_ANY),
-
+                "body_bs_Pregnant":MorphMeta(CAT_SPECIAL, "Pregnant", FIGURE_ANY),
+                "Hip_Back_Dimples": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Breast_Size_Reduction": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Eye_Style_01": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Heart_Pupil": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Iris_Smoothing": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Left_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Navel_Sag_HD": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "O_Shaped_Cat_Mouth": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Oblique_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Pseudo_Anime_Canine_Teeth_Left": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Pseudo_Anime_Canine_Teeth_Right": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Pupi_Constricting_Left": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Pupi_Constrictingl_Right": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Pupils_Shrink_and_Dilate": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Right_Eye_Effect_Zoom_and_Out": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "Slanted_Eyebrow": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
             },
             "male": {
                 "body_bs_AnimeBodyHeavyMasculine":MorphMeta(CAT_BODY, "Heavy", FIGURE_TOON),
@@ -680,6 +481,309 @@ MORPHS = {
                 "body_bs_PectoralsWidth":MorphMeta(CAT_BODY,"Pectorals Width", FIGURE_ANY),
             },
             "unisex": {
+                "facs_cbs_JawOpen": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "facs_cbs_JawOpenWide": MorphMeta(CAT_SPECIAL, "", FIGURE_TOON),
+                "facs_cbs_EyeBlinkCrescentLeftFix":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EyeBlinkCrescentRightFix":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EyeBlinkLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EyeBlinkRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthUp":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_EyeLidCloseUpperRight":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_MouthCornerMoveSide_SideRight":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_MouthLipsCat":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_MouthCornerMoveSide_SideLeft":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_MouthCornerMoveBackLeft":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_MouthCornerMoveBackRight":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_ctrl_EyeBlinkCrescentRight":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_ctrl_EyeBlinkCrescentLeft":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "facs_bs_MouthLipsSide":MorphMeta(CAT_FACS, "", FIGURE_ANY),
+                "pupils_Dilate_Right":MorphMeta(CAT_HEAD, "Pupils dilate right", FIGURE_ANY),
+                "pupils_Dilate_Left":MorphMeta(CAT_HEAD, "Pupils dilate left", FIGURE_ANY),
+                "facs_bs_BrowDownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowDownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowInnerUpLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowInnerUpRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowOuterUpLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowOuterUpRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowSqueezeLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_BrowSqueezeRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekHollowLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekHollowRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekInflateCounterLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekInflateCounterRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekInflateLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekInflateRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekPuffLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekPuffRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekSquintLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_CheekSquintRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EarPullBackLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EarPullBackRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeBlinkLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeBlinkRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeCornerTightnessInnerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeCornerTightnessInnerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeCornerTightnessOuterLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeCornerTightnessOuterRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLidCloseUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookDownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookDownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookInLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookInRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookOutLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookOutRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookUpLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeLookUpRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyePupilsDilate":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeSquintLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyeSquintRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidCloseLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidCloseLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidCloseUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidOpenLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidOpenLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidOpenUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_EyelidOpenUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawChinCompression":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawClenchLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawClenchRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawForward":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawOpen":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawOpenWide":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawRecess":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_JawRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthBackLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthBackLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthBackUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthBackUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCloseLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCloseLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCloseUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCloseUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCompressLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCompressLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCompressUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCompressUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerMoveFwd-BackLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerMoveFwd-BackRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerMoveSide-SideLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerMoveSide-SideRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerMoveUp-DownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerMoveUp-DownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerTightnessLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerTightnessLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerTightnessUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthCornerTightnessUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthDimpleLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthDimpleRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthForward-BackMiddleLower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthForward-BackMiddleUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthForwardLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthForwardLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthForwardUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthForwardUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthFrownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthFrownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthFunnelLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthFunnelLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthFunnelUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthFunnelUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLipsSide-SideLower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLipsSide-SideUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLipsVolumeLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLipsVolumeLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLipsVolumeUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLipsVolumeUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLowerDownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthLowerDownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPressLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPressLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPressUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPressUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPurseLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPurseLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPurseUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthPurseUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthRollLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthRollLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthRollUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthRollUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthShrugLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthShrugLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthShrugUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthShrugUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthSmileLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthSmileRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthSmileWidenLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthSmileWidenRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyLowerCenter":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyLowerInnerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyLowerInnerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyLowerOuterLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyLowerOuterRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyUpperCenter":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyUpperInnerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyUpperInnerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyUpperOuterLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStickyUpperOuterRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStretchLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthStretchRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthUp-Down":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthUp-DownMiddleLower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthUp-DownMiddleUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthUpperUpLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_MouthUpperUpRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalCompressLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalCompressRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalCreaseFlexLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalCreaseFlexRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalFlareLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalFlareRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalStretchLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NasalStretchRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NeckFlexLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NeckFlexRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NeckLarynxUp":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NeckMastoidFlexLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NeckMastoidFlexRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NeckUnderChinFlex":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NoseSneerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NoseSneerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NoseSneerUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_NoseSneerUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_TongueIn":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_TongueNarrow":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_TongueOut":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_TongueRoll":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_TongueTipNarrow":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_bs_TongueTipWide":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_BIUL_BDL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_BIUR_BDR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_BIUL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_BOUL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_CSL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_ELIL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_ELOL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_ESL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBL_NSL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_BIUR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_BOUR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_CSR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_ELIR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_ELOR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_ESR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EBR_NSR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EyeFullCompressionLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_EyeFullCompressionRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_JO_MF":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_JO_ML":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_JO_MR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_MP_CPL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_MP_CPR":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_MP_MC":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_cbs_MP_MF":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_BrowDown":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_BrowInnerUp":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_BrowSqueeze":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_BrowUp":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_CheekHollow":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_CheekPuff":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_CheekSquint":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EarPullBack":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeBlink":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeCrossed":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeFullCompressionLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeFullCompressionRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookAuto":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookDownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookDownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookInLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookInRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookOutLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookOutRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookSide-Side":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookSide-SideLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookSide-SideRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookUp-Down":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookUp-DownLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookUp-DownRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookUpLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeLookUpRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeRestingFocalPoint":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeSquint":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeWide":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeWideLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyeWideRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyelidOpen-CloseLower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyelidOpen-CloseLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyelidOpen-CloseUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyelidOpen-CloseUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyelidOpen-CloseUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_EyelidOpenCloseLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_JawClench":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_JawForward-Recess":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_JawLeft-Right":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthClose":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthCompress":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthDimple":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthForward-Back":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthForward-BackLowerLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthForward-BackLowerRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthForward-BackUpperLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthForward-BackUpperRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthFrown":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthFunnel":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthLeft-Right":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthLowerDown":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthPress":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthPressLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthPressRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthPucker":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthPurse":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthRollLower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthRollUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthShrugLower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthShrugUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthSmile":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthSmileWiden":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthStickyControlLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthStickyControlRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthStickyPower":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthStretch":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_MouthUpperUp":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NasalCompress":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NasalCreaseFlex":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NasalFlare":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NasalStretch":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NeckFlex":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NeckSwallow":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NoseSneer":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_NoseSneerUpper":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_TongueLeft":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_TongueRight":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_TongueTipBend":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_TongueTwist":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_TongueUp":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vAA":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vEE":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vEH":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vER":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vF":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vIH":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vIY":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vK":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vL":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vM":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vOW":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vS":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vSH":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vT":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vTH":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vUW":MorphMeta(CAT_FACS,"",FIGURE_ANY),
+                "facs_ctrl_vW":MorphMeta(CAT_FACS,"",FIGURE_ANY),
                 "head_ctrl_ToonIrisOval":MorphMeta(CAT_HEAD, "Iris Oval", FIGURE_TOON),
                 "body_bs_FingersTaper":MorphMeta(CAT_ARMS, "Fingers Taper", FIGURE_TOON),
                 "head_bs_EarElfLongOutward":MorphMeta(CAT_HEAD, "Ear Elf Long Outward", FIGURE_TOON),
@@ -777,8 +881,7 @@ MORPHS = {
             }
         }
     },
-    "Genesis 9 Anatomical Elements Male": {
-        "path": "data/DAZ 3D/Genesis 9/Anatomical Elements Male/Morphs/",
+    "/data/daz 3d/genesis 9/anatomical elements male": {
         "shapes": {
             "male": {
                 "body_ctrl_PenileLength":MorphMeta(CAT_GENITALS,"Penile Length", FIGURE_G9),
@@ -786,8 +889,7 @@ MORPHS = {
             }
         }
     },
-    "GoldenPalace_G9": {
-        "path": "data/meipex/GoldenPalace_Genitalia_G9/G9GoldenPalace_Graft/Morphs/",
+    "/data/meipex/goldenpalace_genitalia_g9/g9goldenpalace_graft": {
         "shapes": {
             "female": {
                 "GP_MonsVeneris_Front-Back1":MorphMeta(CAT_GENITALS,"Mons Veneris Front-Back 1", FIGURE_G9),
@@ -853,6 +955,8 @@ MORPHS = {
         }
     }
 }
+
+
 # euelr rotation order 'YZX'
 DAZ_TO_UE5_POSE_ROTATIONS = {
     'upperarm_l': [0.03490658849477768, -0.0, -0.10471975803375244],
@@ -1421,6 +1525,22 @@ def bind_surf_deform(body_obj, clothes_obj, name=None):
     with bpy.context.temp_override(object=clothes_obj):
         bpy.ops.object.surfacedeform_bind(modifier=m.name)
     return m
+
+
+def get_daz_content_dirs():
+    settingsDir = bpy.context.preferences.addons['bl_ext.user_default.import_daz'].preferences.settingsDir
+    settings = os.path.join(settingsDir, 'import_daz_settings.json')
+    settings = io.open(settings, 'r', encoding='utf-8-sig')
+    settings = json.load(settings)
+    settings = settings['daz-settings']
+    content_dirs = settings["contentDirs"]
+    return content_dirs
+
+def obj_daz_dir(obj):
+    daz_url: str = obj.daz_importer.DazUrl
+    daz_path = daz_url.rsplit('#', maxsplit=1)[0]
+    daz_dir = os.path.dirname(daz_path)
+    return daz_dir
 
 def bind_to_objects(body_obj, clothes_objs=None, name=None):
     return [(bind_surf_deform(body_obj, o, name=name), o) for o in clothes_objs]
@@ -2450,86 +2570,93 @@ class DazOptimizer:
                 bone.parent = original.data.edit_bones[parent]
         bpy.ops.object.mode_set(mode='OBJECT')
 
-    def collet_fav_shape_keys(self, categories_to_include=None)->({str:MorphMeta},{str:{}}):
-        is_female = self.is_female()
-        morphs_and_objects = {}
+    def get_allowed_morph_prefixes(self):
+        rig = self.get_body_rig()
+        if rig.name == 'Nirv Zero':
+            return ["BaseAnime_", "Nirv_Zero_BaseAnim_", "Nirv_zero_", "Nirv_Zero_", "Nirv_"]
+        elif bpy.context.scene.get('daz_optim_toon'):
+            return ["BaseAnime_"]
+        return []
+
+    def collect_fav_shape_keys(self, categories_to_include=None)->({str:MorphMeta},{str:{}}):
+        is_fem = self.is_female()
         shape_keys = {}
         figure = FIGURE_TOON if bpy.context.scene.get('daz_optim_toon') else FIGURE_G9
-        for mesh_name, morphs in MORPHS.items():
-            mesh = None
-            if mesh_name == "__base__":
-                mesh = self.get_body_mesh()
-                mesh_name = mesh.name
-            else:
-                mesh_name = mesh_name + " Mesh"
-                if mesh_name in bpy.data.objects:
-                    mesh = bpy.data.objects[mesh_name]
-            if mesh is not None:
-                morphs['mesh'] = mesh
-                if mesh_name in morphs_and_objects:
-                    assert morphs_and_objects[mesh_name]['path'] == morphs['path']
-                else:
-                    morphs_and_objects[mesh_name] = morphs
-                shapes = morphs['shapes']
-                for key in ['unisex', 'female' if is_female else 'male']:
+        for obj in bpy.data.objects:
+            daz_dir = obj_daz_dir(obj).lower()
+            morphs_for_daz_obj = MORPHS.get(daz_dir)
+            if morphs_for_daz_obj is not None:
+                shapes = morphs_for_daz_obj['shapes']
+                for key in ['unisex', 'female' if is_fem else 'male']:
                     if key in shapes:
-                        for shake_key, meta in shapes[key].items():
+                        for shape_key, meta in shapes[key].items():
                             if figure in meta.figure and (
                                     categories_to_include is None or meta.category in categories_to_include):
-                                shape_keys[shake_key] = meta
-        return shape_keys, morphs_and_objects
+                                shape_keys[shape_key] = meta
+        return shape_keys
 
-
-    def make_fav_morphs_list(self, categories_to_include=None):
-        settingsDir = bpy.context.preferences.addons['bl_ext.user_default.import_daz'].preferences.settingsDir
-        settings = os.path.join(settingsDir, 'import_daz_settings.json')
-        settings = io.open(settings, 'r', encoding='utf-8-sig')
-        settings = json.load(settings)
-        settings = settings['daz-settings']
-        content_dirs = settings["contentDirs"]
-        shape_keys, morphs_and_objects = self.collet_fav_shape_keys(categories_to_include)
-        ext = '.dsf'
+    def make_fav_morphs_list(self, categories_to_include=None, load_all_conflicting_morphs=True):
+        content_dirs = get_daz_content_dirs()
+        content_dirs = [d[:-1] if d.endswith("/") or d.endswith("\\") else d for d in content_dirs]
+        morph_prefixes = self.get_allowed_morph_prefixes()
+        morph_prefixes_regex = re.compile(r"("+"|".join(morph_prefixes)+")?(.+)\.dsf")
+        shape_keys = self.collect_fav_shape_keys(categories_to_include)
         fav_morphs = {
             "filetype": "favo_morphs",
             "root_paths": content_dirs,
-
         }
-        facs_regex = re.compile('.*_(facs_c?bs_.+)')
-        for morphs in morphs_and_objects.values():
-            morphs_path = morphs['path']
-            mesh = morphs['mesh']
-            mesh_url = urllib.parse.quote(mesh.daz_importer.DazUrl)
-            morphs_dict = {}
-            fav_morphs[mesh_url] = {
-                "finger_print": mesh.data.daz_importer.DazFingerPrint,
-                "morphs": morphs_dict
-            }
-
+        for obj in bpy.data.objects:
+            if not isinstance(obj.data, bpy.types.Mesh):
+                continue
+            daz_dir = obj_daz_dir(obj)
+            collected_shape_keys = {}
             for contentDir in content_dirs:
-                morphs_dir_path = os.path.join(contentDir, morphs_path)
+                morphs_dir_path = contentDir+daz_dir+"/Morphs"
                 if os.path.isdir(morphs_dir_path):
                     for root, dirs, files in os.walk(morphs_dir_path):
                         for file in files:
-                            if file.endswith(ext):
-                                file_no_ext = file[:-len(ext)]
-                                meta: MorphMeta = shape_keys.get(file_no_ext)
+                            m = morph_prefixes_regex.match(file)
+                            if m:
+                                prefix = m.group(1)
+                                shape_key_name = m.group(2)
+                                meta: MorphMeta = shape_keys.get(shape_key_name)
                                 if meta is not None:
-                                    shape_key = file_no_ext
+                                    if load_all_conflicting_morphs and prefix is not None:
+                                        shape_key_name = prefix+shape_key_name
+                                    collected_shape_key = collected_shape_keys.get(shape_key_name)
+                                    try:
+                                        priority = morph_prefixes.index(prefix)
+                                    except ValueError:
+                                        priority = -1
+                                    if collected_shape_key is None:
+                                        collected_shape_key = collected_shape_keys[shape_key_name] = {}
+                                    elif priority > collected_shape_key['priority']:
+                                        pass
+                                    else:
+                                        continue
                                     filepath = os.path.join(root, file)
                                     filepath = os.path.relpath(filepath, contentDir)
                                     filepath = filepath.replace("\\", "/")
-                                    category = "Custom"
-                                    if meta.category.startswith("Facs"):
-                                        m = facs_regex.fullmatch(shape_key)
-                                        if m:
-                                            shape_key = m.group(1)
-                                        category = "Face"
-
-                                    if meta.category not in morphs_dict:
-                                        shapes_list = morphs_dict[meta.category] = []
-                                    else:
-                                        shapes_list = morphs_dict[meta.category]
-                                    shapes_list.append([filepath, shape_key, category])
+                                    collected_shape_key['priority'] = priority
+                                    collected_shape_key['filepath'] = filepath
+                                    collected_shape_key['meta'] = meta
+            if len(collected_shape_keys)>0:
+                morphs_dict = {}
+                mesh = obj.data
+                mesh_url = urllib.parse.quote(obj.daz_importer.DazUrl)
+                fav_morphs[mesh_url] = {
+                    "finger_print": mesh.daz_importer.DazFingerPrint,
+                    "morphs": morphs_dict
+                }
+                for shape_key_name, collected_shape_key in collected_shape_keys.items():
+                    filepath = collected_shape_key['filepath']
+                    meta = collected_shape_key['meta']
+                    category = "Face" if meta.category.startswith("Facs") else "Custom"
+                    if meta.category not in morphs_dict:
+                        shapes_list = morphs_dict[meta.category] = []
+                    else:
+                        shapes_list = morphs_dict[meta.category]
+                    shapes_list.append([filepath, shape_key_name, category])
         fav_morphs_path = self.get_fav_morphs_path()
         with open(fav_morphs_path, 'w+') as f:
             json.dump(fav_morphs, f, indent=2)
@@ -4919,6 +5046,7 @@ class DazApplyPose(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+
 class DazScaleToUnreal(bpy.types.Operator):
     """ Scale to unreal """
     bl_idname = "dazoptim.scale_to_ue5"
@@ -4935,6 +5063,7 @@ class DazScaleToUnreal(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+
 class SaveMorphs(bpy.types.Operator):
     """ Generates favourite morphs """
     bl_idname = "dazoptim.save_fav_morphs"
@@ -4947,13 +5076,14 @@ class SaveMorphs(bpy.types.Operator):
         return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
 
     def execute(self, context):
-        DazOptimizer().make_fav_morphs_list(CATS_BODY)
+        DazOptimizer().make_fav_morphs_list()
         pass_stage(self)
         return {'FINISHED'}
 
-class SaveMorphsWithFACS(bpy.types.Operator):
+
+class SaveMorphsOnlyFACS(bpy.types.Operator):
     """ Generates favourite morphs """
-    bl_idname = "dazoptim.save_fav_morphs_with_facs"
+    bl_idname = "dazoptim.save_fav_morphs_only_facs"
     bl_label = "Save favourite morphs with facs"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = 'Q'
@@ -4963,7 +5093,39 @@ class SaveMorphsWithFACS(bpy.types.Operator):
         return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
 
     def execute(self, context):
-        DazOptimizer().make_fav_morphs_list(CATS_BODY.union(CATS_FACS))
+        DazOptimizer().make_fav_morphs_list(CATS_FACS)
+        pass_stage(self)
+        return {'FINISHED'}
+
+class SaveMorphsOnlyBody(bpy.types.Operator):
+    """ Generates favourite morphs """
+    bl_idname = "dazoptim.save_fav_morphs_only_body"
+    bl_label = "Save favourite morphs with facs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = 'Q'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().make_fav_morphs_list(CATS_BODY)
+        pass_stage(self)
+        return {'FINISHED'}
+
+class SaveMorphsOnlyGenitals(bpy.types.Operator):
+    """ Generates favourite morphs """
+    bl_idname = "dazoptim.save_fav_morphs_only_genitals"
+    bl_label = "Save favourite morphs with facs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = 'Q'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().make_fav_morphs_list({CAT_GENITALS})
         pass_stage(self)
         return {'FINISHED'}
 
@@ -5198,8 +5360,10 @@ operators = [
     (DazSaveBlend_operator, "Save blend file"),
     (DazSaveTextures_operator, "Save textures"),
     (DazMergeAllRigs_operator, "Merge all rigs"),
-    (SaveMorphs, "Generate fav morphs"),
-    (SaveMorphsWithFACS, "Generate fav morphs (with FACS)"),
+    (SaveMorphs, "Generate fav morphs (all)"),
+    (SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
+    (SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
+    (SaveMorphsOnlyGenitals, "Generate fav morphs (only genitals)"),
     (LoadMorphs, "Load fav morphs"),
     (RebindFavMorphs, "Rebind fav morphs"),
     (TransferMorphsToGeografts, "Transfer morphs to geografts"),
