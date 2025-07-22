@@ -225,21 +225,22 @@ class NodesUtils:
 
 def install_libraries():
     pil_missing = False
-    opencv_missing = False
+
     try:
         import PIL
     except ModuleNotFoundError:
         pil_missing = True
-    try:
-        import cv2
-    except ModuleNotFoundError:
-        opencv_missing = True
-    if pil_missing or opencv_missing:
+
+    if pil_missing:
         py_exe = sys.executable
         res_path = os.path.realpath(os.path.join(py_exe, "../../lib/site-packages"))
         target = '"--target='+res_path+'"'
+        print("=========================================================")
+        print("=========================================================")
         print("Run the following command as an admin: ")
-        print('&"' + py_exe + '" -m pip install Pillow opencv-python')
+        print('&"' + py_exe + '" -m pip install Pillow')
+        print("=========================================================")
+        print("=========================================================")
 
 
 install_libraries()
@@ -1366,6 +1367,9 @@ def select_bone(bone):
 
 
 def find_body_rig():
+    root = bpy.data.objects.get('root')
+    if root is not None:
+        return root
     for o in bpy.data.objects:
         if o.parent is None and isinstance(o.data, bpy.types.Armature):
             if o.daz_importer.DazRig == 'genesis9':
@@ -1935,7 +1939,7 @@ class DazOptimizer:
                 iris_bone.constraints["Limit Rotation"].use_limit_y = False
                 eye_bone = rig.pose.bones[eye_bone_name]
                 rotation_mode = eye_bone.rotation_mode
-                for i, axis in enumerate(['XYZ']):
+                for i, axis in enumerate('XYZ'):
                     iris_bone.driver_remove('rotation_euler', i)
                     driver = iris_bone.driver_add('rotation_euler', i).driver
                     driver.type = "SCRIPTED"
@@ -2354,7 +2358,6 @@ class DazOptimizer:
     def concat_textures(self):
         from PIL import Image
         import re
-        import cv2
 
         all_filepaths = self.find_body_parts_textures()
 
@@ -2406,15 +2409,16 @@ class DazOptimizer:
                 raise Exception(str(fp)+" is not string")
             print("Reading ", fp, end='', flush=True)
             tile = Image.open(fp)
+            print(" of size ", tile.size," and type ", tile.format)
+            if resize is not None:
+                tile = tile.resize((s4, s4))
+                print("Resized to ", tile.size, " ", tile.format)
             tile = np.array(tile)
-            print(" of size ", tile.shape," and type ", tile.dtype)
             if map_type == "Roughness" and tile.ndim>2 and tile.shape[2]>1:
                 tile = np.average(tile, axis=2)
                 tile = tile.astype(np.uint8)
                 print("Converted to greyscale ", tile.shape, " ",tile.dtype)
-            if resize is not None:
-                tile = cv2.resize(tile, [s4, s4])
-                print("Resized to ", tile.shape, " ", tile.dtype)
+
             return tile
 
         # from matplotlib import pyplot as plt
@@ -3565,14 +3569,6 @@ class DazOptimizer:
             bpy.ops.object.mode_set(mode='POSE')
             for bone in rig.data.bones:
                 bone.inherit_scale = 'FULL'
-            for bone in rig.pose.bones:
-                bone.lock_rotation = (False, False, False)
-                bone.lock_location = (False, False, False)
-                if not bone.name.endswith("(drv)"):
-                    bone.rotation_mode = 'QUATERNION'
-                for c in list(bone.constraints):
-                    if isinstance(c, bpy.types.LimitRotationConstraint):
-                        bone.constraints.remove(c)
 
             # r_thigh = rig.data.edit_bones.get('thigh_r')
             # spine_01 = rig.data.edit_bones.get('spine_01')
@@ -3588,14 +3584,27 @@ class DazOptimizer:
             #     spine_01.tail.z += (new_z-old_z)
 
         convert_rig(body_rig)
-        body_rig.name = 'root'
-        body_mesh.name = 'root Mesh'
+        # body_rig.name = 'root'
+        # body_mesh.name = 'root Mesh'
         children = list(body_rig.children)
         while len(children)>0:
             o = children.pop()
             if isinstance(o.data, bpy.types.Armature):
                 convert_rig(o)
             children.extend(o.children)
+
+    @staticmethod
+    def remove_daz_bone_constraints(self):
+        for rig in bpy.data.objects:
+            if isinstance(rig.data, bpy.types.Armature):
+                for bone in rig.pose.bones:
+                    bone.lock_rotation = (False, False, False)
+                    bone.lock_location = (False, False, False)
+                    if not bone.name.endswith("(drv)"):
+                        bone.rotation_mode = 'QUATERNION'
+                    for c in list(bone.constraints):
+                        if isinstance(c, bpy.types.LimitRotationConstraint):
+                            bone.constraints.remove(c)
 
     def align_pose_to_ue5(self):
         import mathutils
@@ -3693,6 +3702,105 @@ class DazOptimizer:
     #
     #     recursion(body_rig.data.edit_bones['pelvis'], mathutils.Quaternion())
     #     bpy.ops.object.mode_set(mode='OBJECT')
+
+    def duplicate_skeleton(self):
+        body_rig = self.get_body_rig()
+        body_mesh = self.get_body_mesh()
+
+        def dup(rig_obj, new_name, parent):
+            rig = rig_obj.data
+            select_object(rig_obj)
+            bpy.ops.object.mode_set(mode='EDIT')
+            class B:
+                def __init__(self, b):
+                    self.head = tuple(b.head)
+                    self.roll = b.roll
+                    self.tail = tuple(b.tail)
+                    self.parent = None if b.parent is None else b.parent.name
+                    self.rotation_mode = None
+                    self.use_deform = b.use_deform
+
+            bones_to_copy = {b.name: B(b) for b in rig.edit_bones if '(' not in b.name}
+            bpy.ops.object.mode_set(mode='POSE')
+            for bone in rig_obj.pose.bones:
+                b = bones_to_copy.get(bone.name)
+                if b is not None:
+                    b.rotation_mode = bone.rotation_mode
+            bpy.ops.object.mode_set(mode='OBJECT')
+            new_rig_obj = rig_obj.copy()
+            new_rig_obj.name = new_name
+            rig_obj.users_collection[0].objects.link(new_rig_obj)
+            if parent is not None:
+                new_rig_obj.parent = parent
+            new_rig_obj.data = bpy.data.armatures.new(new_name)
+
+            new_rig = new_rig_obj.data
+            new_rig.display_type = 'STICK'
+            select_object(new_rig_obj)
+            bpy.ops.object.mode_set(mode='EDIT')
+
+            for bone_name, bone in bones_to_copy.items():
+                new_bone = new_rig.edit_bones.new(bone_name)
+                new_bone.head = bone.head
+                new_bone.tail = bone.tail
+                new_bone.roll = bone.roll
+                new_bone.use_deform = bone.use_deform
+            for new_bone in new_rig.edit_bones:
+                bone = bones_to_copy[new_bone.name]
+                if bone.parent is not None:
+                    new_parent = new_rig.edit_bones[bone.parent]
+                    new_bone.parent = new_parent
+            bpy.ops.object.mode_set(mode='POSE')
+            for new_bone in new_rig_obj.pose.bones:
+                bone = bones_to_copy[new_bone.name]
+                new_bone.rotation_mode = bone.rotation_mode
+
+                c = new_bone.constraints.new('TRANSFORM')
+                c.name = 'Transformation'
+                c.target = rig_obj
+                c.subtarget = new_bone.name
+                c.map_from = 'ROTATION'
+                c.map_to = 'ROTATION'
+                if bone.rotation_mode != 'QUATERNION':
+                    c.to_euler_order = bone.rotation_mode
+                a = 3.14159
+                c.to_max_x_rot = a
+                c.to_max_y_rot = a
+                c.to_max_z_rot = a
+                c.to_min_x_rot = -a
+                c.to_min_y_rot = -a
+                c.to_min_z_rot = -a
+                c.from_max_x_rot = a
+                c.from_max_y_rot = a
+                c.from_max_z_rot = a
+                c.from_min_x_rot = -a
+                c.from_min_y_rot = -a
+                c.from_min_z_rot = -a
+                c.map_to_x_from = 'X'
+                c.map_to_y_from = 'Y'
+                c.map_to_z_from = 'Z'
+                c.target_space = 'LOCAL' # 'POSE'
+                c.owner_space = 'LOCAL' # 'POSE'
+
+            return new_rig_obj
+
+        new_body_rig = dup(body_rig, 'root', None)
+        body_mesh.name = 'root Mesh'
+        old_to_new_rig = {body_rig: new_body_rig}
+        for o in body_rig.children:
+            if isinstance(o.data, bpy.types.Armature):
+                new_o = dup(o, 'ue5_'+o.name, new_body_rig)
+                old_to_new_rig[o] = new_o
+        for o in bpy.data.objects:
+            if isinstance(o, bpy.types.Mesh):
+                new_o = old_to_new_rig.get(o.parent)
+                if new_o is not None:
+                    o.parent = new_o
+            for m in o.modifiers:
+                if isinstance(m, bpy.types.ArmatureModifier):
+                    new_o = old_to_new_rig.get(m.object)
+                    if new_o is not None:
+                        m.object = new_o
 
     def reorient_bones(self):
         import mathutils
@@ -4947,6 +5055,22 @@ class DazCompareToUe5Skeleton_operator(bpy.types.Operator):
         DazOptimizer().compare_daz_to_ue5_skeleton()
         return {'FINISHED'}
 
+class DuplicateSkeleton(bpy.types.Operator):
+    """ Duplicate skeleton """
+    bl_idname = "dazoptim.duplicate_skeleton"
+    bl_label = "Duplicate skeleton"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '&'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DuplicateSkeleton])
+
+    def execute(self, context):
+        DazOptimizer().duplicate_skeleton()
+        pass_stage(self)
+        return {'FINISHED'}
+
 class DazConvertToUe5Skeleton_operator(bpy.types.Operator):
     """ Convert rig to UE5-compatible skeleton """
     bl_idname = "dazoptim.convert_ue5"
@@ -4956,12 +5080,13 @@ class DazConvertToUe5Skeleton_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazConvertToUe5Skeleton_operator, DazDetachHairFromSkeleton_operator])
+        return UNLOCK or check_stage(context, [DuplicateSkeleton], [DazConvertToUe5Skeleton_operator, DazDetachHairFromSkeleton_operator])
 
     def execute(self, context):
         DazOptimizer().convert_daz_to_ue5_skeleton()
         pass_stage(self)
         return {'FINISHED'}
+
 
 
 class DazReorientBones_operator(bpy.types.Operator):
@@ -5404,6 +5529,21 @@ class HideAllClothes(bpy.types.Operator):
             c.obj.hide_set(True)
         return {'FINISHED'}
 
+class RemoveDazBoneConstraints(bpy.types.Operator):
+    """ remove daz bone constraints """
+    bl_idname = "dazoptim.remove_daz_bone_constraints"
+    bl_label = "remove daz bone constraints"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        DazOptimizer.remove_daz_bone_constraints()
+        return {'FINISHED'}
+
 
 class ShowAllClothes(bpy.types.Operator):
     """ show all clothes """
@@ -5515,6 +5655,7 @@ operators = [
     (DazTransferMissingBonesToClothes_operator, "Transfer new bones to clothes"),
     (TransferMorphsToClothes, "Transfer morphs to clothes"),
     (DazScaleToQuinn, "Scale to Manny height"),
+    (DuplicateSkeleton, "Duplicate skeleton"),
     (DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
     (DazReorientBones_operator, "Reorient bones"),
     (DazOptimizeHair_operator, "Optimize hair"),
@@ -5533,6 +5674,7 @@ util_operators = [
     (ShowAllClothes, "Show all clothes"),
     (UnlockEverything, "Unlock everything"),
     (DazAlignPoseQuinn, "Align pose to ue5"),
+    (RemoveDazBoneConstraints, "Remove daz bone constraints"),
     (DazApplyPose, "Apply pose"),
 
 ]
