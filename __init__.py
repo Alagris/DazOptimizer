@@ -3802,34 +3802,44 @@ class DazOptimizer:
                     if new_o is not None:
                         m.object = new_o
 
-    def reorient_bones(self):
+    def compute_ue5_bone_oerientation(self):
         import mathutils
         body_rig = self.get_body_rig()
         select_object(body_rig)
         bpy.ops.object.mode_set(mode='EDIT')
-        new_y_axis_per_bone = {}
-        new_z_axis_per_bone = {}
-        lengths = {}
+
+        class B:
+            def __init__(self, bone):
+                self.new_y_axis = bone.z_axis.copy()
+                self.new_z_axis = bone.x_axis.copy()
+                self.length = 0
+                self.axes =  ['X', 'Y', 'Z']
+                self.directions = [1,1,1]
+
+        bones: {str: B} = {}
         hierarchy = self.get_hierarchy()
         for bone in body_rig.data.edit_bones:
             bone_name = bone.name
-            new_y_axis_per_bone[bone_name] = bone.z_axis.copy()
-            new_z_axis_per_bone[bone_name] = bone.x_axis.copy()
+            bones[bone_name] = B(bone)
         for side in ['l', 'r']:
             for bone_name in ['hand_', 'clavicle_']:
                 bone_name = bone_name+side
-                new_y_axis_per_bone[bone_name] = body_rig.data.edit_bones[bone_name].x_axis.copy()
-                new_z_axis_per_bone[bone_name] = body_rig.data.edit_bones[bone_name].z_axis.copy()
-            new_y_axis_per_bone['foot_'+side] = new_y_axis_per_bone['calf_'+side]
+                b = bones[bone_name]
+                bone = body_rig.data.edit_bones[bone_name]
+                b.new_y_axis = bone.x_axis.copy()
+                b.new_z_axis = bone.z_axis.copy()
+            bones['foot_'+side].new_y_axis = bones['calf_'+side].new_y_axis
         for spine_bone in ['pelvis', 'spine_01', 'spine_02', 'spine_03', 'spine_04', 'spine_05', 'neck_01', 'neck_02']:
             _, _, x_axis, y_axis, z_axis, _, _ = hierarchy[spine_bone]
-            new_y_axis_per_bone[spine_bone] = mathutils.Vector(y_axis)
-            new_z_axis_per_bone[spine_bone] = mathutils.Vector(z_axis)
+            b = bones[spine_bone]
+            b.new_y_axis = mathutils.Vector(y_axis)
+            b.new_z_axis = mathutils.Vector(z_axis)
         for bone in body_rig.data.edit_bones:
             bone_name = bone.name
             if bone_name in hierarchy:
-                new_z_axis = new_z_axis_per_bone[bone_name]
-                new_y_axis = new_y_axis_per_bone[bone_name]
+                b = bones[bone_name]
+                new_z_axis = b.new_z_axis
+                new_y_axis = b.new_y_axis
                 ue5_start, ue5_tail, x_axis, y_axis, z_axis, roll, parent_name = hierarchy[bone_name]
                 z_axis = mathutils.Vector(z_axis)
                 y_axis = mathutils.Vector(y_axis)
@@ -3841,9 +3851,15 @@ class DazOptimizer:
                     new_y_axis = -new_y_axis
                 if z_axis.dot(new_z_axis) < 0:
                     new_z_axis = -new_z_axis
-                new_z_axis_per_bone[bone_name] = new_z_axis
-                new_y_axis_per_bone[bone_name] = new_y_axis
-                lengths[bone_name] = length
+                b.new_z_axis = new_z_axis
+                b.new_y_axis = new_y_axis
+                b.length = length
+
+        return hierarchy, bones
+
+    def reorient_bones(self):
+        import mathutils
+        hierarchy, bones = self.compute_ue5_bone_oerientation()
 
         def reorient(rig):
             select_object(rig)
@@ -3851,15 +3867,63 @@ class DazOptimizer:
             for bone in rig.data.edit_bones:
                 bone_name = bone.name
                 if bone_name in hierarchy:
-                    new_z_axis = new_z_axis_per_bone[bone_name]
-                    new_y_axis = new_y_axis_per_bone[bone_name]
-                    length = lengths[bone_name]
-                    bone.tail = bone.head + new_y_axis * length
-                    bone.align_roll(new_z_axis)
+                    b = bones[bone_name]
+                    old_x = bone.x_axis.copy()
+                    old_y = bone.y_axis.copy()
+                    old_z = bone.z_axis.copy()
+                    bone.tail = bone.head + b.new_y_axis * b.length
+                    bone.align_roll(b.new_z_axis)
+                    new_x = bone.x_axis.copy()
+                    new_y = bone.y_axis.copy()
+                    new_z = bone.z_axis.copy()
+                    old = mathutils.Matrix((old_x, old_y, old_z))
+                    new = mathutils.Matrix((new_x, new_y, new_z))
+                    print("bone_name=", bone_name)
+                    print("old=", old)
+                    print("new=", new)
+                    dot_products = old @ new.transposed()
+                    print("dots=", dot_products)
+                    old_axes = "XYZ"
+                    used_axes = ""
+                    for old_i in range(3):
+                        most_similar_new_d = 0
+                        most_similar_new_i = -1
+                        for new_i in range(3):
+                            if old_axes[new_i] not in used_axes:
+                                d = dot_products[old_i][new_i]
+                                if abs(d) > abs(most_similar_new_d):
+                                    most_similar_new_d = d
+                                    most_similar_new_i = new_i
+                        used_axes += old_axes[most_similar_new_i]
+                        print("b.axes[",most_similar_new_i,"]=",b.axes[most_similar_new_i]," := old_axes[",old_i,"]=",old_axes[old_i])
+                        b.axes[most_similar_new_i] = old_axes[old_i]
+                        b.directions[most_similar_new_i] = 1 if most_similar_new_d >= 0 else -1
+                    print("new_axes=", b.axes)
+
+            bpy.ops.object.mode_set(mode='POSE')
+            for bone in rig.pose.bones:
+                bone_name = bone.name
+                if bone_name in hierarchy:
+                    t = bone.constraints.get("Transformation")
+                    if t is not None:
+                        b = bones[bone_name]
+                        t.map_to_x_from = b.axes[0]
+                        t.map_to_y_from = b.axes[1]
+                        t.map_to_z_from = b.axes[2]
+                        if b.directions[0] == -1:
+                            t.to_min_x_rot = -t.to_min_x_rot
+                            t.to_max_x_rot = -t.to_max_x_rot
+                        if b.directions[1] == -1:
+                            t.to_min_y_rot = -t.to_min_y_rot
+                            t.to_max_y_rot = -t.to_max_y_rot
+                        if b.directions[2] == -1:
+                            t.to_min_z_rot = -t.to_min_z_rot
+                            t.to_max_z_rot = -t.to_max_z_rot
                 # else:
                 #     bone.tail = bone.head + ue5_orientation
             bpy.ops.object.mode_set(mode='OBJECT')
 
+        body_rig = self.get_body_rig()
         reorient(body_rig)
         children = list(body_rig.children)
         while len(children) > 0:
