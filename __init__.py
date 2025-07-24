@@ -3792,7 +3792,7 @@ class DazOptimizer:
                 new_o = dup(o, 'ue5_'+o.name, new_body_rig)
                 old_to_new_rig[o] = new_o
         for o in bpy.data.objects:
-            if isinstance(o, bpy.types.Mesh):
+            if isinstance(o.data, bpy.types.Mesh):
                 new_o = old_to_new_rig.get(o.parent)
                 if new_o is not None:
                     o.parent = new_o
