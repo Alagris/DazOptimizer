@@ -1366,6 +1366,13 @@ def select_bone(bone):
     bone.select_tail = True
 
 
+def find_original_body_rig():
+    for o in bpy.data.objects:
+        if o.name != 'root' and o.parent is None and isinstance(o.data, bpy.types.Armature):
+            if o.daz_importer.DazRig == 'genesis9':
+                return o
+
+
 def find_body_rig():
     root = bpy.data.objects.get('root')
     if root is not None:
@@ -1376,9 +1383,11 @@ def find_body_rig():
                 return o
     return None
 
+
 def find_body_mesh():
     body_rig = find_body_rig()
     return bpy.data.objects[body_rig.name + ' Mesh']
+
 
 def is_toon(body_mesh):
     for mat in body_mesh.data.materials:
@@ -3703,6 +3712,29 @@ class DazOptimizer:
     #     recursion(body_rig.data.edit_bones['pelvis'], mathutils.Quaternion())
     #     bpy.ops.object.mode_set(mode='OBJECT')
 
+    @staticmethod
+    def attach_duplicate_skeleton(attach):
+        root = bpy.data.objects.get('root')
+        if root is not None:
+            for bone in root.pose.bones:
+                t = bone.constraints.get("Transformation")
+                if t is not None:
+                    t.enabled = attach
+
+    @staticmethod
+    def has_duplicate_skeleton():
+        return 'root' in bpy.data.objects
+
+    @staticmethod
+    def is_duplicate_skeleton_attached():
+        root = bpy.data.objects.get('root')
+        if root is not None:
+            for bone in root.pose.bones:
+                t = bone.constraints.get("Transformation")
+                if t is not None:
+                    return t.enabled
+        return None
+
     def duplicate_skeleton(self):
         body_rig = self.get_body_rig()
         body_mesh = self.get_body_mesh()
@@ -3813,7 +3845,7 @@ class DazOptimizer:
                 self.new_y_axis = bone.z_axis.copy()
                 self.new_z_axis = bone.x_axis.copy()
                 self.length = 0
-                self.axes =  ['X', 'Y', 'Z']
+                self.axes = ['X', 'Y', 'Z']
                 self.directions = [1,1,1]
 
         bones: {str: B} = {}
@@ -3989,11 +4021,17 @@ class DazOptimizer:
 
     def scale(self, z):
         rig = self.get_body_rig()
-        scale(rig, (z,z,z))
+        scale(rig, (z, z, z))
+        original_rig = find_original_body_rig()
+        if original_rig is not None:
+            scale(original_rig, (z, z, z))
 
     def translate(self, t):
         rig = self.get_body_rig()
         translate(rig, t)
+        original_rig = find_original_body_rig()
+        if original_rig is not None:
+            translate(original_rig, t)
 
     def detach_hair_from_skeleton(self):
         for hair in find_all_hair():
@@ -4011,6 +4049,11 @@ class DazOptimizer:
                 translate(rig, -head_pos)
 
     def export_body_to_fbx(self):
+        body = self.get_body_mesh()
+        rig = self.get_body_rig()
+        self.export_to_fbx(rig, body, os.path.join(self.workdir, self.name + '.fbx'))
+
+    def export_animation_to_fbx(self):
         body = self.get_body_mesh()
         rig = self.get_body_rig()
         self.export_to_fbx(rig, body, os.path.join(self.workdir, self.name + '.fbx'))
@@ -5135,6 +5178,37 @@ class DuplicateSkeleton(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+
+class AttachDuplicateSkeleton(bpy.types.Operator):
+    """ Attach Duplicate skeleton """
+    bl_idname = "dazoptim.attach_duplicate_skeleton"
+    bl_label = "Attach duplicate skeleton"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DuplicateSkeleton], []) and DazOptimizer.is_duplicate_skeleton_attached()==False
+
+    def execute(self, context):
+        DazOptimizer.attach_duplicate_skeleton(True)
+        return {'FINISHED'}
+
+
+class DetachDuplicateSkeleton(bpy.types.Operator):
+    """ Detach Duplicate skeleton """
+    bl_idname = "dazoptim.detach_duplicate_skeleton"
+    bl_label = "Detach duplicate skeleton"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DuplicateSkeleton], []) and DazOptimizer.is_duplicate_skeleton_attached()==True
+
+    def execute(self, context):
+        DazOptimizer.attach_duplicate_skeleton(False)
+        return {'FINISHED'}
+
+
 class DazConvertToUe5Skeleton_operator(bpy.types.Operator):
     """ Convert rig to UE5-compatible skeleton """
     bl_idname = "dazoptim.convert_ue5"
@@ -5637,115 +5711,144 @@ class DazOptimize_sidebar(bpy.types.Panel):
         self.props = {}
 
     def draw(self, context):
-        col = self.layout.column(align=True)
-        i = 0
+        col = None
+        idx = -1
         for op in operators:
-            op_class, op_text = op[:2]
-            if issubclass(op_class, bpy.types.Operator):
-                prop = col.operator(op_class.bl_idname, text=str(i) + ". " + op_text)
-                op_class.idx = i
-                i += 1
-            elif op_class == float:
-                self.props[op_text] = col.prop(context.scene, op_text)
+           idx, col = op.draw(self,col,context, idx)
 
-        self.layout.label(text="Utilities")
-        col = self.layout.column(align=True)
+class EntryLabel:
+    def __init__(self, s: str, idx: int):
+        self.s = s
+        self.idx = idx
 
-        for op_class, op_text in util_operators:
-            prop = col.operator(op_class.bl_idname, text=op_text)
+    def draw(self, p: DazOptimize_sidebar, col, context, idx: int):
+        p.layout.label(text=self.s)
+        col = p.layout.column(align=True)
+        return self.idx, col
+
+
+class EntryOp:
+    def __init__(self, op_class: type, op_text: str):
+        self.op_text = op_text
+        self.op_class = op_class
+
+    def draw(self, p: DazOptimize_sidebar, col, context, idx: int):
+        if idx >= 0:
+            text = str(idx) + ". " + self.op_text
+        else:
+            text = self.op_text
+        prop = col.operator(self.op_class.bl_idname, text=text)
+        if idx >= 0:
+            self.op_class.idx = idx
+            return idx+1, col
+        else:
+            return idx, col
+
+
+class EntryProp:
+    def __init__(self, name: str):
+        self.name = name
+
+    def draw(self, p: DazOptimize_sidebar, col, context, idx: int):
+        p.props[self.name] = col.prop(context.scene, self.name)
+        return idx, col
 
 
 operators = [
-    (DazDelCube_operator, "Delete default cube"),
-    (DazMaleLoad_operator, "Load Daz (male)"),
-    (DazFemaleLoad_operator, "Load Daz (female)"),
-    (DazSaveBlend_operator, "Save blend file"),
-    (DazSaveTextures_operator, "Save textures"),
-    (DazMergeAllRigs_operator, "Merge all rigs"),
-    (FixToonEyes, "Fix toon eyes"),
-    (SaveMorphs, "Generate fav morphs (all)"),
-    (SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
-    (SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
-    (SaveMorphsOnlyGenitals, "Generate fav morphs (only genitals)"),
-    (SaveMorphsOnlySpecial, "Generate fav morphs (only special)"),
-    (LoadMorphs, "Load fav morphs"),
-    (RebindFavMorphs, "Rebind fav morphs"),
-    (TransferMorphsToGeografts, "Transfer morphs to geografts"),
-    (DazAddBreastBones_operator, "Subdivide breast bones"),
-    (DazAddGluteBones_operator, "Add glute bones"),
-    (DazAddThighBones_operator, "Add thigh bones"),
-    (DazSimplifyMaterials_operator, "Simplify materials"),
-    (DazOptimizeEyes_operator, "Optimize eyes mesh"),
-    (DazOptimizeEyesForToon_operator, "Optimize eyes for toon"),
-    (DazOptimizeEyelashes_operator, "Optimize eyelashes"),
-    (DazOptimizeEyebrows_operator, "Optimize eyebrows"),
-    (DazRemoveOldEyebrows_operator,"Remove old eyebrows"),
-    (DazApplyEyebrows_operator, "Apply eyebrows"),
-    (DazTransferFACSToEyebrow_operator, "Transfer FACS to Eyebrows"),
-    (DazSimplifyEyesMaterial_operator, "Simplify eyes material"),
-    (DazSeparateIrisUVs_operator, "Separate iris UVs"),
-    (DazOptimizeGoldenPalaceUVs, "Optimize golden palace UVs"),
-    (DazSetupGoldenPalaceForBaking, "golden palace prepare baking"),
-    (DazSelectGoldenPalaceColor_operator, "select golden palace color for baking"),
-    (DazBakeGoldenPalaceDiffuse, 'Bake'),
-    (DazSelectGoldenPalaceNormals_operator, "select golden palace normals for baking"),
-    (DazBakeGoldenPalaceNormal, 'Bake'),
-    (DazSelectGoldenPalaceRoughness_operator, "select golden palace roughness for baking"),
-    (DazBakeGoldenPalaceRoughness, 'Bake'),
-    (DazGoldenPalaceBsdf_operator, "use principled bsdf"),
-    (DazGoldenPalaceDiffuse_operator, "use diffuse bsdf"),
-    (DazSaveGoldenPalaceBaked_operator, "Save baked golden palace textures"),
-    (DazMergeGrografts_operator, "Merge Geografts"),
-    (DazSimplifyGoldenPalaceMaterials_operator, "Simplify golden palace materials"),
-    (DazMergeEyes_operator, "Merge eyes"),
-    (DazMergeMouth_operator, "Merge mouth"),
-    (DazRemoveTear_operator, "Remove tear"),
-    (DazMergeEyebrowsAndEyelashes_operator, "Merge eyebrows+eyelashes"),
-    (DazMergeToonEyelashesAndBody_operator, "Merge toon eyelashes+body"),
-    (DazConcatTextures_operator, "Merge textures"),
-    (DazOptimizeUVs_operator, "Optimize UVs"),
-    (DazOptimizeUVsHalfGP_operator, "Optimize UVs (half GP)"),
-    (DazSeparateLipUVs_operator, "Separate Lip UVs"),
-    (DazMakeSingleMaterial_operator, "Unify skin materials into one"),
-    (DazMergeEyelashesAndBody_operator, "Merge eyelashes+body"),
-    (DazFitClothes_operator, "Fit clothes"),
-    (DazBindFitClothes_operator, "Bind clothes displacement"),
-    (float, "clothes_displacement"),
-    (DazApplyFitClothes_operator, "Apply displacement"),
-    (DazFitPanties_operator, "Fit panties"),
-    (DazFitSkinTightClothes_operator, "Fit skin-tight clothes"),
-    (float, "skin_tight_displacement"),
-    (DazApplyFitSkinTightClothes_operator, "Apply skin-tight clothes"),
-    (DazTransferMissingBonesToClothes_operator, "Transfer new bones to clothes"),
-    (TransferMorphsToClothes, "Transfer morphs to clothes"),
-    (DazScaleToQuinn, "Scale to Manny height"),
-    (DuplicateSkeleton, "Duplicate skeleton"),
-    (DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
-    (DazReorientBones_operator, "Reorient bones"),
-    (DazOptimizeHair_operator, "Optimize hair"),
-    (DazDetachHairFromSkeleton_operator, "Detach hair from skeleton"),
-    (AddUe5IkBones, "Add UE5 IK bones"),
-    (DazScaleToUnreal, "Scale to ue5 units"),
-    (DazExportBodyFbx, "Export body to fbx"),
-    (DazExportClothesFbx, "Export clothes to fbx"),
-    (DazExportHairFbx, "Export hair to fbx"),
+    EntryLabel("Character pipeline", 0),
+    EntryOp(DazDelCube_operator, "Delete default cube"),
+    EntryOp(DazMaleLoad_operator, "Load Daz (male)"),
+    EntryOp(DazFemaleLoad_operator, "Load Daz (female)"),
+    EntryOp(DazSaveBlend_operator, "Save blend file"),
+    EntryOp(DazSaveTextures_operator, "Save textures"),
+    EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
+    EntryOp(FixToonEyes, "Fix toon eyes"),
+    EntryOp(SaveMorphs, "Generate fav morphs (all)"),
+    EntryOp(SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
+    EntryOp(SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
+    EntryOp(SaveMorphsOnlyGenitals, "Generate fav morphs (only genitals)"),
+    EntryOp(SaveMorphsOnlySpecial, "Generate fav morphs (only special)"),
+    EntryOp(LoadMorphs, "Load fav morphs"),
+    EntryOp(RebindFavMorphs, "Rebind fav morphs"),
+    EntryOp(TransferMorphsToGeografts, "Transfer morphs to geografts"),
+    EntryOp(DazAddBreastBones_operator, "Subdivide breast bones"),
+    EntryOp(DazAddGluteBones_operator, "Add glute bones"),
+    EntryOp(DazAddThighBones_operator, "Add thigh bones"),
+    EntryOp(DazSimplifyMaterials_operator, "Simplify materials"),
+    EntryOp(DazOptimizeEyes_operator, "Optimize eyes mesh"),
+    EntryOp(DazOptimizeEyesForToon_operator, "Optimize eyes for toon"),
+    EntryOp(DazOptimizeEyelashes_operator, "Optimize eyelashes"),
+    EntryOp(DazOptimizeEyebrows_operator, "Optimize eyebrows"),
+    EntryOp(DazRemoveOldEyebrows_operator,"Remove old eyebrows"),
+    EntryOp(DazApplyEyebrows_operator, "Apply eyebrows"),
+    EntryOp(DazTransferFACSToEyebrow_operator, "Transfer FACS to Eyebrows"),
+    EntryOp(DazSimplifyEyesMaterial_operator, "Simplify eyes material"),
+    EntryOp(DazSeparateIrisUVs_operator, "Separate iris UVs"),
+    EntryOp(DazOptimizeGoldenPalaceUVs, "Optimize golden palace UVs"),
+    EntryOp(DazSetupGoldenPalaceForBaking, "golden palace prepare baking"),
+    EntryOp(DazSelectGoldenPalaceColor_operator, "select golden palace color for baking"),
+    EntryOp(DazBakeGoldenPalaceDiffuse, 'Bake'),
+    EntryOp(DazSelectGoldenPalaceNormals_operator, "select golden palace normals for baking"),
+    EntryOp(DazBakeGoldenPalaceNormal, 'Bake'),
+    EntryOp(DazSelectGoldenPalaceRoughness_operator, "select golden palace roughness for baking"),
+    EntryOp(DazBakeGoldenPalaceRoughness, 'Bake'),
+    EntryOp(DazGoldenPalaceBsdf_operator, "use principled bsdf"),
+    EntryOp(DazGoldenPalaceDiffuse_operator, "use diffuse bsdf"),
+    EntryOp(DazSaveGoldenPalaceBaked_operator, "Save baked golden palace textures"),
+    EntryOp(DazMergeGrografts_operator, "Merge Geografts"),
+    EntryOp(DazSimplifyGoldenPalaceMaterials_operator, "Simplify golden palace materials"),
+    EntryOp(DazMergeEyes_operator, "Merge eyes"),
+    EntryOp(DazMergeMouth_operator, "Merge mouth"),
+    EntryOp(DazRemoveTear_operator, "Remove tear"),
+    EntryOp(DazMergeEyebrowsAndEyelashes_operator, "Merge eyebrows+eyelashes"),
+    EntryOp(DazMergeToonEyelashesAndBody_operator, "Merge toon eyelashes+body"),
+    EntryOp(DazConcatTextures_operator, "Merge textures"),
+    EntryOp(DazOptimizeUVs_operator, "Optimize UVs"),
+    EntryOp(DazOptimizeUVsHalfGP_operator, "Optimize UVs (half GP)"),
+    EntryOp(DazSeparateLipUVs_operator, "Separate Lip UVs"),
+    EntryOp(DazMakeSingleMaterial_operator, "Unify skin materials into one"),
+    EntryOp(DazMergeEyelashesAndBody_operator, "Merge eyelashes+body"),
+    EntryOp(DazFitClothes_operator, "Fit clothes"),
+    EntryOp(DazBindFitClothes_operator, "Bind clothes displacement"),
+    EntryProp("clothes_displacement"),
+    EntryOp(DazApplyFitClothes_operator, "Apply displacement"),
+    EntryOp(DazFitPanties_operator, "Fit panties"),
+    EntryOp(DazFitSkinTightClothes_operator, "Fit skin-tight clothes"),
+    EntryProp("skin_tight_displacement"),
+    EntryOp(DazApplyFitSkinTightClothes_operator, "Apply skin-tight clothes"),
+    EntryOp(DazTransferMissingBonesToClothes_operator, "Transfer new bones to clothes"),
+    EntryOp(TransferMorphsToClothes, "Transfer morphs to clothes"),
+    EntryOp(DazScaleToQuinn, "Scale to Manny height"),
+    EntryOp(DuplicateSkeleton, "Duplicate skeleton"),
+    EntryOp(DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
+    EntryOp(DazReorientBones_operator, "Reorient bones"),
+    EntryOp(DazOptimizeHair_operator, "Optimize hair"),
+    EntryOp(DazDetachHairFromSkeleton_operator, "Detach hair from skeleton"),
+    EntryOp(AddUe5IkBones, "Add UE5 IK bones"),
+    EntryOp(DazScaleToUnreal, "Scale to ue5 units"),
+    EntryOp(DazExportBodyFbx, "Export body to fbx"),
+    EntryOp(DazExportClothesFbx, "Export clothes to fbx"),
+    EntryOp(DazExportHairFbx, "Export hair to fbx"),
+    EntryLabel("Animation tools", -1),
+    EntryOp(AttachDuplicateSkeleton, "Attach ue5 skeleton"),
+    EntryOp(DetachDuplicateSkeleton, "Detach ue5 skeleton"),
+    EntryLabel("Utilities", -1),
+    EntryOp(DazCompareToUe5Skeleton_operator, "Compare to UE5 Skeleton"),
+    EntryOp(PrintMorphCsv, "Print Morphs CSV"),
+    EntryOp(HideAllClothes, "Hide all clothes"),
+    EntryOp(ShowAllClothes, "Show all clothes"),
+    EntryOp(UnlockEverything, "Unlock everything"),
+    EntryOp(DazAlignPoseQuinn, "Align pose to ue5"),
+    EntryOp(RemoveDazBoneConstraints, "Remove daz bone constraints"),
+    EntryOp(DazApplyPose, "Apply pose"),
+
 ]
 
-util_operators = [
-    (DazCompareToUe5Skeleton_operator, "Compare to UE5 Skeleton"),
-    (PrintMorphCsv, "Print Morphs CSV"),
-    (HideAllClothes, "Hide all clothes"),
-    (ShowAllClothes, "Show all clothes"),
-    (UnlockEverything, "Unlock everything"),
-    (DazAlignPoseQuinn, "Align pose to ue5"),
-    (RemoveDazBoneConstraints, "Remove daz bone constraints"),
-    (DazApplyPose, "Apply pose"),
 
-]
-classes = [
+classes = ([
               DazOptimize_sidebar,
               EasyImportPanel,
-          ] + [op[0] for op in operators if issubclass(op[0], bpy.types.Operator)] + [op[0] for op in util_operators]
+          ] + [op.op_class for op in operators if isinstance(op, EntryOp)])
 
 
 def register():
