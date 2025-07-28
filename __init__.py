@@ -3713,6 +3713,30 @@ class DazOptimizer:
     #     bpy.ops.object.mode_set(mode='OBJECT')
 
     @staticmethod
+    def bake_animation_to_root():
+        original_rig = find_original_body_rig()
+        original_action = original_rig.animation_data.action
+        root = bpy.data.objects.get('root')
+        start_frame, end_frame = original_action.curve_frame_range
+        select_object(root)
+        new_action = bpy.data.actions.new(original_action.name+' ue5')
+        root.animation_data.action = new_action
+        bpy.ops.nla.bake(
+            frame_start=int(start_frame),
+            frame_end=int(end_frame),
+            step=1,
+            only_selected=False,
+            visual_keying=True,
+            clear_constraints=False,
+            clear_parents=False,
+            use_current_action=True,
+            clean_curves=False,
+            bake_types={'POSE'},
+            channel_types={'LOCATION', 'ROTATION'}
+        )
+
+
+    @staticmethod
     def attach_duplicate_skeleton(attach):
         root = bpy.data.objects.get('root')
         if root is not None:
@@ -4056,7 +4080,58 @@ class DazOptimizer:
     def export_animation_to_fbx(self):
         body = self.get_body_mesh()
         rig = self.get_body_rig()
-        self.export_to_fbx(rig, body, os.path.join(self.workdir, self.name + '.fbx'))
+        if "Subsurf" in body.modifiers:
+            body.modifiers.remove(body.modifiers["Subsurf"])
+        select_object(rig)
+        body.select_set(True)
+        p = os.path.join(self.workdir, self.name + "_anims")
+        if not os.path.exists(p):
+            os.mkdir(p)
+        action = rig.animation_data.action
+        start_frame, end_frame = action.curve_frame_range
+        path = os.path.join(p, action.name + '.fbx')
+        bpy.ops.export_scene.fbx(filepath=path,
+                                 check_existing=False,
+                                 filter_glob='*.fbx',
+                                 use_selection=True,
+                                 use_visible=False,
+                                 use_active_collection=False,
+                                 collection='',
+                                 global_scale=1.0,
+                                 apply_unit_scale=True,
+                                 apply_scale_options='FBX_SCALE_NONE',
+                                 use_space_transform=True,
+                                 bake_space_transform=False,
+                                 object_types={'ARMATURE', 'CAMERA', 'EMPTY', 'LIGHT', 'MESH', 'OTHER'},
+                                 use_mesh_modifiers=True,
+                                 use_mesh_modifiers_render=True,
+                                 mesh_smooth_type='FACE',
+                                 colors_type='SRGB',
+                                 prioritize_active_color=False,
+                                 use_subsurf=False,
+                                 use_mesh_edges=False,
+                                 use_tspace=False,
+                                 use_triangles=False,
+                                 use_custom_props=False,
+                                 add_leaf_bones=False,
+                                 primary_bone_axis='Y',
+                                 secondary_bone_axis='X',
+                                 use_armature_deform_only=False,
+                                 armature_nodetype='NULL',
+                                 bake_anim=True,
+                                 bake_anim_use_all_bones=True,
+                                 bake_anim_use_nla_strips=False,
+                                 bake_anim_use_all_actions=False,
+                                 bake_anim_force_startend_keying=True,
+                                 bake_anim_step=1.0,
+                                 bake_anim_simplify_factor=1.0,
+                                 path_mode='AUTO',
+                                 embed_textures=False,
+                                 batch_mode='OFF',
+                                 use_batch_own_dir=True,
+                                 use_metadata=True,
+                                 axis_forward='-Z',
+                                 axis_up='Y')
 
     def export_hair_to_fbx(self):
         rig = self.get_body_rig()
@@ -5209,6 +5284,36 @@ class DetachDuplicateSkeleton(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BakeAction(bpy.types.Operator):
+    """ Bake action """
+    bl_idname = "dazoptim.bake_action"
+    bl_label = "Bake action"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DuplicateSkeleton], []) and DazOptimizer.is_duplicate_skeleton_attached()==True
+
+    def execute(self, context):
+        DazOptimizer.bake_animation_to_root()
+        return {'FINISHED'}
+
+
+class ExportAction(bpy.types.Operator):
+    """ export action """
+    bl_idname = "dazoptim.export_action"
+    bl_label = "Export action"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DuplicateSkeleton], [])
+
+    def execute(self, context):
+        DazOptimizer().export_animation_to_fbx()
+        return {'FINISHED'}
+
+
 class DazConvertToUe5Skeleton_operator(bpy.types.Operator):
     """ Convert rig to UE5-compatible skeleton """
     bl_idname = "dazoptim.convert_ue5"
@@ -5832,6 +5937,8 @@ operators = [
     EntryLabel("Animation tools", -1),
     EntryOp(AttachDuplicateSkeleton, "Attach ue5 skeleton"),
     EntryOp(DetachDuplicateSkeleton, "Detach ue5 skeleton"),
+    EntryOp(BakeAction, "Bake current daz action to ue5"),
+    EntryOp(ExportAction, "Export action to fbx"),
     EntryLabel("Utilities", -1),
     EntryOp(DazCompareToUe5Skeleton_operator, "Compare to UE5 Skeleton"),
     EntryOp(PrintMorphCsv, "Print Morphs CSV"),
