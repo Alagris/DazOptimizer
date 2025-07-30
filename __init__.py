@@ -3735,7 +3735,6 @@ class DazOptimizer:
             channel_types={'LOCATION', 'ROTATION'}
         )
 
-
     @staticmethod
     def attach_duplicate_skeleton(attach):
         root = bpy.data.objects.get('root')
@@ -4412,7 +4411,7 @@ def check_stage_any(context, required_any_of_stage_ids, forbidden_stage_ids):
 
 class DazFemaleLoad_operator(bpy.types.Operator):
     """ Load female daz character """
-    bl_idname = "dazoptim.load"
+    bl_idname = "dazoptim.load_female"
     bl_label = "Load female Daz character"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = 'a'
@@ -4429,7 +4428,7 @@ class DazFemaleLoad_operator(bpy.types.Operator):
 
 class DazMaleLoad_operator(bpy.types.Operator):
     """ Load male daz character """
-    bl_idname = "dazoptim.load"
+    bl_idname = "dazoptim.load_male"
     bl_label = "Load male Daz character"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = 'a'
