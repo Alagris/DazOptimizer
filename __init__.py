@@ -62,9 +62,138 @@ def serialize_object(obj, vertices=False, vertex_normals=False, loops=False, pol
             print("uvs=", [[tuple(bm_loop[uv_layer].uv) for bm_loop in bm_face.loops] for bm_face in bm.faces])
 
 
+class BakedImg:
+    def __init__(self, i: bpy.types.Image, p: bool=False):
+        self.np = None
+        self.image = None
+        self.path = None
+        if isinstance(i, np.ndarray):
+            self.np = i
+            self.path = p
+        else:
+            self.image = i
+            self.is_alpha = p
+            self.path = os.path.basename(i.filepath)
+
+    def to_numpy(self):
+        if self.np is None:
+            from PIL import Image
+            path = bpy.path.abspath(self.image.filepath)
+            i = np.array(Image.open(path)) / np.float32(255)
+            self.np = i[:, :, -1] if self.is_alpha else i[:, :, :3]
+        return self.np
+
+    def to_image(self, suffix):
+        from PIL import Image
+        path = self.path.rsplit('.', maxsplit=1)[0]
+        path = bpy.path.abspath('//' + path) + suffix + '.png'
+
+        self.np *= 255
+        img = Image.fromarray(self.np.astype(np.uint8))
+        img.save(path)
+        return bpy.data.images.load(path)
 
 
 class NodesUtils:
+
+    @staticmethod
+    def bake_textures(input_socket):
+
+        def tonp(x):
+            return x if isinstance(x, np.ndarray) else x.to_numpy()
+
+        def topa(x):
+            return [x.path] if isinstance(x, BakedImg) else []
+
+        def channels(x):
+            if x.ndim == 0:
+                return 1
+            elif x.ndim == 1:
+                if len(x)==4 and x[3]==1:
+                    return 3
+                return len(x)
+            elif x.ndim < 3:
+                return 1
+            else:
+                return x.shape[2]
+
+        def to_channels(x, c):
+            if x.ndim == 0:
+                return x.repeat(c)
+            elif x.ndim == 1:
+                if c == 1:
+                    return np.mean(x)
+                c2 = len(x)
+                if c2 >= c:
+                    if c == 1:
+                        return np.mean(x)
+                    return x[:c]
+                o = np.zeros(c)
+                if c == 4:
+                    o[3] = 1
+                o[:c2] = x
+                return o
+            elif x.ndim < 3:
+                return x[:, :, None].repeat(c, axis=2)
+            else:
+                c2 = x.shape[2]
+                if c2 >= c:
+                    if c == 1:
+                        return np.expand_dims(np.mean(x, axis=2), axis=2)
+                    return x[:, :, :c]
+                new_shape = list(x.shape)
+                new_shape[2] = c
+                o = np.zeros(new_shape)
+                if c == 4:
+                    o[:, :, 3] = 1
+                o[:, :, :c2] = x
+                return o
+
+        def linearrgb_to_srgb(c):
+            if c < 0:
+                return 0
+            elif c < 0.0031308:
+                return 12.92 * c
+            else:
+                return 1.055 * (c ** (1 / 2.4)) - 0.055
+
+        if len(input_socket.links) == 0:
+            return np.array(input_socket.default_value)
+        elif len(input_socket.links) == 1:
+            link = input_socket.links[0]
+            node = link.from_node
+            src_socket = link.from_socket
+            if isinstance(node, bpy.types.ShaderNodeRGB):
+                r, g, b, a = src_socket.default_value
+                r = linearrgb_to_srgb(r)
+                g = linearrgb_to_srgb(g)
+                b = linearrgb_to_srgb(b)
+                return np.array((r, g, b, a))
+            elif isinstance(node, bpy.types.ShaderNodeTexImage):
+                return BakedImg(node.image, src_socket.name == "Alpha")
+            elif isinstance(node, bpy.types.ShaderNodeMix):
+                a_i = NodesUtils.bake_textures(node.inputs['A'])
+                b_i = NodesUtils.bake_textures(node.inputs['B'])
+                alpha_i = NodesUtils.bake_textures(node.inputs['Factor'])
+                p = os.path.commonprefix(topa(a_i) + topa(b_i) + topa(alpha_i))
+                a = tonp(a_i)
+                b = tonp(b_i)
+                alpha = tonp(alpha_i)
+                max_channels = max(channels(a), channels(b), channels(alpha))
+                print("alpha=", alpha.shape, ", a=", a.shape, ", b=", b, "node=", node)
+                a = to_channels(a, max_channels)
+                b = to_channels(b, max_channels)
+                alpha = to_channels(alpha, max_channels)
+                print("alpha=", alpha.shape, ", a=", a.shape, ", b=", b, "[adjusted]")
+
+                if node.blend_type == 'MIX':
+                    img_c = a * (1 - alpha) + b * alpha
+                    print("at 2492, 1312: c=", img_c[1312, 2492], "a=", a[1312, 2492] if a.ndim>1 else a, "b=", b[1312, 2492] if b.ndim>1 else b, "alpha=", alpha[1312, 2492] if alpha.ndim>1 else alpha)
+                    return BakedImg(img_c, p)
+                elif node.blend_type == 'MULTIPLY':
+                    img_c = a * (b * alpha + 1 - alpha)
+                    return BakedImg(img_c, p)
+        return None
 
     @staticmethod
     def add_explicit_uvs(mat, uv_layer):
@@ -2219,59 +2348,13 @@ class DazOptimizer:
                         nt = node.node_tree
                         fs = link.from_socket
                         for group_output in NodesUtils.find_all_by_type(nt, bpy.types.NodeGroupOutput):
-                            find_textures(group_output.inputs[fs.name], outputs)
-                    elif isinstance(node, bpy.types.ShaderNodeMix):
-                        l_a = node.inputs['A'].links
-                        l_b = node.inputs['B'].links
-                        l_f = node.inputs['Factor'].links
-                        if len(l_a)==1 and len(l_b)==1 and len(l_f)==1 \
-                            and isinstance(l_a[0].from_node, bpy.types.ShaderNodeTexImage) \
-                            and isinstance(l_b[0].from_node, bpy.types.ShaderNodeTexImage)\
-                            and isinstance(l_f[0].from_node, bpy.types.ShaderNodeTexImage)\
-                            and l_f[0].from_socket.name == 'Alpha':
-                            i_a = l_a[0].from_node.image
-                            i_b = l_b[0].from_node.image
-                            i_f = l_f[0].from_node.image
-
-                            from PIL import Image
-                            pa: str = bpy.path.abspath(i_a.filepath)
-                            pb: str = bpy.path.abspath(i_b.filepath)
-                            img_a: np.ndarray = np.array(Image.open(pa))/np.float32(255)
-                            img_b: np.ndarray = np.array(Image.open(pb))/np.float32(255)
-                            if i_f == i_a:
-                                img_f = img_a
-                                primary_path = pa
-                                secondary_path = pb
-                            elif i_f == i_b:
-                                img_f = img_b
-                                primary_path = pb
-                                secondary_path = pa
-                            else:
-                                img_f = np.array(Image.open(i_f.filepath))/np.float32(255)
-                                primary_path = pa
-                                secondary_path = pb
-                            alpha = img_f[:, :, -1]
-                            a = img_a[:, :, :3]
-                            b = img_b[:, :, :3]
-                            if node.blend_type == 'MIX':
-                                img_c = a.T * (1-alpha.T) + b * alpha.T
-                                img_c = img_c.T
-                            elif node.blend_type == 'MULTIPLY':
-                                img_c = a.T * (b.T * alpha.T+1-alpha.T)
-                                img_c = img_c.T
-                            else:
-                                img_c = None
-                            if img_c is not None:
-                                suffix = os.path.basename(secondary_path)
-                                suffix = suffix.rsplit('.', maxsplit=1)[0]
-                                prefix, extension = primary_path.rsplit('.', maxsplit=1)
-                                pc = prefix + suffix + node.blend_type + '.' + extension
-                                img_c *= 255
-                                img_c = Image.fromarray(img_c.astype(np.uint8))
-                                img_c.save(pc)
-                                i_c = bpy.data.images.load(pc)
-                                outputs.add(i_c)
+                            inp_soc = group_output.inputs[fs.name]
+                            baked_img = NodesUtils.bake_textures(inp_soc)
+                            if isinstance(baked_img, BakedImg):
+                                outputs.add(baked_img.to_image(nt.name))
                                 continue
+                            else:
+                                find_textures(inp_soc, outputs)
 
                     for in_soc in node.inputs:
                         find_textures(in_soc, outputs)
