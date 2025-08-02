@@ -84,12 +84,47 @@ class BakedImg:
         return self.np
 
     def to_image(self, path):
-        from PIL import Image
-
-        self.np *= 255
-        img = Image.fromarray(self.np.astype(np.uint8))
+        img = np_to_pil(self.np)
         img.save(path)
         return bpy.data.images.load(path)
+
+
+def np_to_pil(x: np.ndarray):
+    from PIL import Image
+    if x.dtype.kind == 'f':
+        x = (x * 255).astype(np.uint8)
+    return Image.fromarray(x)
+
+def open_img_to_np(filepath):
+    from PIL import Image
+    img_path = bpy.path.abspath(filepath)
+    img_np = Image.open(img_path)
+    img_np = np.array(img_np) / np.float32(255)
+    return img_np
+
+def linearrgb_to_srgb_channel(c):
+    if c < 0:
+        return 0
+    elif c < 0.0031308:
+        return 12.92 * c
+    else:
+        return 1.055 * (c ** (1 / 2.4)) - 0.055
+
+def linearrgb_to_srgb(c):
+    r, g, b = c[:3]
+    r = linearrgb_to_srgb_channel(r)
+    g = linearrgb_to_srgb_channel(g)
+    b = linearrgb_to_srgb_channel(b)
+    if len(c)==3:
+        return np.array((r, g, b))
+    else:
+        return np.array((r, g, b, c[-1]))
+
+def srgb_to_linearrgb(c):
+    mask = c >= 0.04045
+    c[mask] = ((c[mask] + 0.055) / 1.055) ** 2.4
+    c[~mask] = c[~mask] / 12.92
+    return c
 
 
 class NodesUtils:
@@ -163,19 +198,6 @@ class NodesUtils:
                 o[:, :, :c2] = x
                 return o
 
-        def linearrgb_to_srgb(c):
-            if c < 0:
-                return 0
-            elif c < 0.0031308:
-                return 12.92 * c
-            else:
-                return 1.055 * (c ** (1 / 2.4)) - 0.055
-
-        def srgb_to_linearrgb(c):
-            mask = c >= 0.04045
-            c[mask] = ((c[mask] + 0.055) / 1.055) ** 2.4
-            c[~mask] = c[~mask] / 12.92
-            return c
 
         if len(input_socket.links) == 0:
             return np.array(input_socket.default_value)
@@ -184,11 +206,8 @@ class NodesUtils:
             node = link.from_node
             src_socket = link.from_socket
             if isinstance(node, bpy.types.ShaderNodeRGB):
-                r, g, b, a = src_socket.default_value
-                r = linearrgb_to_srgb(r)
-                g = linearrgb_to_srgb(g)
-                b = linearrgb_to_srgb(b)
-                return np.array((r, g, b, a))
+                rgb = linearrgb_to_srgb(src_socket.default_value)
+                return rgb
             elif isinstance(node, bpy.types.ShaderNodeTexImage):
                 return BakedImg(node.image, src_socket.name == "Alpha")
             elif isinstance(node, bpy.types.ShaderNodeMix):
@@ -362,9 +381,6 @@ class NodesUtils:
         for idx, channel in enumerate(channels):
             filepath_channel = 'Base Color' if channel == "Color" else channel
             if filepath_channel in filepaths:
-                tex_node = ns.new('ShaderNodeTexImage')
-                tex_node.name = 'simple_material_'+channel
-                tex_node.location = (-600 + shift_x, -(idx - 1) * 300)
                 filepath = filepaths[filepath_channel]
                 if isinstance(filepath, list):
                     if len(filepath) > 0:
@@ -374,6 +390,11 @@ class NodesUtils:
                 if isinstance(filepath, str):
                     filepath = bpy.data.images.load(filepath)
                     filepath.colorspace_settings.name = 'sRGB' if channel == 'Base Color' else 'Non-Color'
+                elif isinstance(filepath, np.ndarray):
+                    continue
+                tex_node = ns.new('ShaderNodeTexImage')
+                tex_node.name = 'simple_material_' + channel
+                tex_node.location = (-600 + shift_x, -(idx - 1) * 300)
                 tex_node.image = filepath
                 if uvs is not None:
                     ls.new(tex_node.inputs['Vector'], uvs)
@@ -2395,10 +2416,12 @@ class DazOptimizer:
             return outputs
 
         all_filepaths: {str: {str: [bpy.types.Image]}} = {}
+        const_color_values = {}
         for mat in mats:
             output_node = NodesUtils.find_by_type(mat.node_tree, bpy.types.ShaderNodeOutputMaterial)
             body_part = mat.name.rstrip('0123456789-_.')
             body_part_filepaths = all_filepaths[body_part] = {'Base Color': set(), 'Roughness': set(), 'Normal': set()}
+            const_color_value = None
             if output_node is not None:
                 for bsdf in NodesUtils.from_socket_backwards_search_for(output_node.inputs['Surface'], (bpy.types.ShaderNodeBsdfPrincipled, bpy.types.ShaderNodeGroup), set()):
                     if isinstance(bsdf, bpy.types.ShaderNodeBsdfPrincipled):
@@ -2417,12 +2440,19 @@ class DazOptimizer:
                             body_part_filepaths['Normal'].add(image)
                             print(body_part, "Normal", image)
                     elif bsdf.node_tree.name == 'DAZ Toon Diffuse':
-                        for image in find_textures(bsdf.inputs['Color'], set()):
-                            body_part_filepaths['Base Color'].add(image)
-                            print(body_part,"Base Color",image)
+                        clr_soc = bsdf.inputs['Color']
+                        if len(clr_soc.links) == 0:
+                            const_color_value = np.array(clr_soc.default_value)
+                        else:
+                            for image in find_textures(bsdf.inputs['Color'], set()):
+                                body_part_filepaths['Base Color'].add(image)
+                                print(body_part,"Base Color",image)
                         for image in find_textures(bsdf.inputs['Normal'], set()):
                             body_part_filepaths['Normal'].add(image)
                             print(body_part, "Normal", image)
+                if len(body_part_filepaths['Base Color']) == 0 and const_color_value is not None:
+                    const_color_values[body_part] = const_color_value
+                    print(body_part, "Base Color", const_color_value)
         for body_part_name, body_part_filepaths in all_filepaths.items():
             occurrences = {}
             filenames = []
@@ -2439,8 +2469,11 @@ class DazOptimizer:
                     occurrences[image] += 1 + len(os.path.commonprefix([image.filepath, lcp]))
 
             for channel in body_part_filepaths:
-                body_part_filepaths[channel] = list(sorted(body_part_filepaths[channel], key=lambda x: -occurrences[x]))
-        print(json.dumps({k: {k2: [v3.filepath for v3 in v2] for k2, v2 in v.items()} for k, v in all_filepaths.items()}, indent=2))
+                s = list(sorted(body_part_filepaths[channel], key=lambda x: -occurrences[x]))
+                if channel == "Base Color" and len(s)==0:
+                    s = const_color_values[body_part_name]
+                body_part_filepaths[channel] = s
+        print(json.dumps({k: {k2: v2.tolist() if isinstance(v2, np.ndarray) else [v3.filepath for v3 in v2] for k2, v2 in v.items()} for k, v in all_filepaths.items()}, indent=2))
         return all_filepaths
 
     @staticmethod
@@ -2454,8 +2487,101 @@ class DazOptimizer:
             NodesUtils.gen_simple_material(mat.node_tree, body_part_filepaths)
 
     def simplify_materials(self):
+
         BODY_M = self.get_body_mesh()
         all_filepaths = self.find_body_parts_textures()
+        nails_img = None
+        head_img = None
+        head_body_part = None
+        mouth_cavity_color = None
+        mouth_cavity_body_part = None
+        fingernails_color = None
+        fingernails_body_part = None
+        toenails_color = None
+        toenails_body_part = None
+        eye_socket_color = None
+        toon_eye_socket = DazOptimizer.get_toon_eye_socket_mesh()
+        if toon_eye_socket is not None:
+            eye_socket_color = np.array((1,1,1,1))
+            bpy.data.objects.remove(toon_eye_socket)
+
+        for body_part, channels in all_filepaths.items():
+            bc = channels['Base Color']
+            bp = body_part.lower()
+            if "nails" in bp:
+                if "finger" in bp:
+                    fingernails_body_part = body_part
+                    if isinstance(bc, np.ndarray):
+                        fingernails_color = linearrgb_to_srgb(bc)
+                    elif len(bc)>0:
+                        nails_img = bc[0]
+                elif "toe" in bp:
+                    toenails_body_part = body_part
+                    if isinstance(bc, np.ndarray):
+                        toenails_color = linearrgb_to_srgb(bc)
+                    elif len(bc) > 0:
+                        nails_img = bc[0]
+            elif "mouth" in bp and "cavity" in bp:
+                mouth_cavity_body_part = body_part
+                if isinstance(bc, np.ndarray):
+                    mouth_cavity_color = linearrgb_to_srgb(bc)
+            elif 'head' in bp:
+                head_body_part = body_part
+                if not isinstance(bc, np.ndarray) and len(bc)>0:
+                    head_img = bc[0]
+
+        def to_channels(x, c):
+            if len(x) < c:
+                return np.append(x, 1)
+            else:
+                return x[:c]
+
+        if head_img is not None and (mouth_cavity_color is not None or eye_socket_color is not None):
+            dst_head_img_path = bpy.path.abspath("//head.png")
+            if not os.path.exists(dst_head_img_path):
+                if head_img is None:
+                    head_img_np = np.zeros((4096, 4096, 4))
+                else:
+                    head_img_np = open_img_to_np(head_img.filepath)
+                h, w, c = head_img_np.shape
+                if mouth_cavity_color is not None:
+                    mouth_cavity_rle = rle_decode(MOUTH_CAVITY_RLE, MASK_SHAPE)
+                    mouth_cavity_color = to_channels(mouth_cavity_color, c)
+                    print("Baking mouth cavity color: ", mouth_cavity_color)
+                    head_img_np[mouth_cavity_rle] = mouth_cavity_color
+                if eye_socket_color is not None:
+                    eye_socket_rle = rle_decode(EYE_SOCKET_RLE, MASK_SHAPE)
+                    eye_socket_color = to_channels(eye_socket_color, c)
+                    print("Baking eye socket color: ", eye_socket_color)
+                    head_img_np[eye_socket_rle] = eye_socket_color
+                np_to_pil(head_img_np).save(dst_head_img_path)
+            head_img = bpy.data.images.load(dst_head_img_path)
+            if mouth_cavity_body_part is not None:
+                all_filepaths[mouth_cavity_body_part]['Base Color'] = [head_img]
+            if head_body_part is not None:
+                all_filepaths[head_body_part]['Base Color'] = [head_img]
+        if fingernails_color is not None or toenails_color is not None:
+            dst_nails_img_path = bpy.path.abspath("//nails.png")
+            if not os.path.exists(dst_nails_img_path):
+                if nails_img is None:
+                    nails_img_np = np.zeros((4096, 4096, 4))
+                else:
+                    nails_img_np = open_img_to_np(nails_img.filepath)
+                h, w, c = nails_img_np.shape
+                if fingernails_color is not None:
+                    fingernails_color = to_channels(fingernails_color, c)
+                    print("Baking finger nails color: ", fingernails_color)
+                    nails_img_np[:h//2] = fingernails_color
+                if toenails_color is not None:
+                    toenails_color = to_channels(toenails_color, c)
+                    print("Baking toe nails color: ", toenails_color)
+                    nails_img_np[h//2:] = toenails_color
+                np_to_pil(nails_img_np).save(dst_nails_img_path)
+            nails_img = bpy.data.images.load(dst_nails_img_path)
+            if fingernails_body_part is not None:
+                all_filepaths[fingernails_body_part]['Base Color'] = [nails_img]
+            if toenails_body_part is not None:
+                all_filepaths[toenails_body_part]['Base Color'] = [nails_img]
 
         mats = list(BODY_M.data.materials)
         for n in BREAST_GEOGRAFTS+MALE_ONLY_GEOGRAFTS:
