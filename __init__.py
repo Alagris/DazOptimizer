@@ -2247,7 +2247,6 @@ class DazOptimizer:
                 bmesh.update_edit_mesh(me)
                 bpy.ops.object.mode_set(mode='OBJECT')
 
-
         if is_floating_iris:
             body = self.get_body_mesh()
             select_object(body)
@@ -2318,7 +2317,31 @@ class DazOptimizer:
         is_toon = EYES_M is None
         if is_toon:
             EYES_M = DazOptimizer.get_toon_floating_iris_mesh()
-        all_filepaths = DazOptimizer.find_body_part_textures(EYES_M.data.materials)
+            all_filepaths = DazOptimizer.find_body_part_textures(EYES_M.data.materials)
+            highlight_color = None
+            highlight_body_part = None
+            for body_part, channels in all_filepaths.items():
+                bp = body_part.lower()
+                if 'highlight' in bp:
+                    highlight_color = channels['Base Color']
+                    highlight_body_part = body_part
+            if isinstance(highlight_color, np.ndarray):
+                select_object(EYES_M)
+                eyes_layer = EYES_M.data.uv_layers[0]
+                eyes_layer.name = NEW_EYES_UV_MAP
+                eyes_layer_np = np.array([v.uv for v in eyes_layer.data])
+                is_highlight = eyes_layer_np[:, 0] > 1
+                eyes_layer_np[is_highlight] = (eyes_layer_np[is_highlight] % 1) * 0.25 + (0.5-(1/8), 0.75)
+                for v, new_uv in zip(eyes_layer.data, eyes_layer_np):
+                    v.uv = new_uv
+                for slot in EYES_M.material_slots:
+                    mat = slot.material
+                    if mat.name.rstrip('0123456789-_.') == highlight_body_part:
+                        EYES_M.active_material_index = slot.slot_index
+                        bpy.ops.object.material_slot_remove()
+
+        else:
+            all_filepaths = DazOptimizer.find_body_part_textures(EYES_M.data.materials)
         DazOptimizer.gen_simple_materials(EYES_M.data.materials, all_filepaths)
 
 
@@ -3057,7 +3080,11 @@ class DazOptimizer:
 
     def merge_eyes(self):
         EYES_M = self.get_eyes_mesh()
+        if EYES_M is None:
+            EYES_M = DazOptimizer.get_toon_floating_iris_mesh()
         if EYES_M is not None:
+            eyes_layer_name = NEW_EYES_UV_MAP if NEW_EYES_UV_MAP in EYES_M.data.uv_layers else EYES_M.data.uv_layers[0].name
+
             rig_name = EYES_M.name[:-len(" Mesh")]
             BODY_M = self.get_body_mesh()
 
@@ -3069,7 +3096,7 @@ class DazOptimizer:
             bpy.ops.object.join()
 
             # merge UV maps
-            eyes_layer = BODY_M.data.uv_layers[NEW_EYES_UV_MAP]
+            eyes_layer = BODY_M.data.uv_layers[eyes_layer_name]
             eyes_layer_np = np.array([v.uv for v in eyes_layer.data])
             is_eye = np.all(eyes_layer_np > 0, axis=1)
             base_layer_np = self.get_base_uv_layer_np()
