@@ -1282,6 +1282,23 @@ CLOTHES = {
     'SXS25 PANTS TOON': ClothesMeta('1702-3278-1574', CLOTHES_MIN_DIST_TO_SKIN, True),
     'SXS25 TOP TOON': ClothesMeta('2639-5079-2436', CLOTHES_MIN_DIST_TO_SKIN, False),
     'SXS29G9TOON': ClothesMeta('7299-13864-6532', CLOTHES_MIN_DIST_TO_SKIN, False),
+    'the Demon Servant Crown': ClothesMeta('2894-5628-2754', -1, False),
+    'the Demon Servant Gauntlet': ClothesMeta('5112-9594-4498', -1, False),
+    'the Demon Servant Greaves': ClothesMeta('10436-20112-9702', -1, False),
+    'the Demon Servant Hands': ClothesMeta('4326-8256-3952', -1, False),
+    'the Demon Servant Pants': ClothesMeta('2516-4977-2460', -1, False),
+    'the Demon Servant Shawl': ClothesMeta('2688-5312-2624', -1, False),
+    'the Demon Servant Shirt': ClothesMeta('4912-9788-4876', -1, False),
+    'the Demon Servant Skirt': ClothesMeta('2106-4088-1984', -1, False),
+    'the Demon Servant Top Armor': ClothesMeta('3765-7357-3590', -1, False),
+    'the Demon Servant Waist Armors': ClothesMeta('1554-2914-1366', -1, False),
+    'Viking Warrior Pants': ClothesMeta('2687-5323-2635', -1, False),
+    'Viking Warrior Tunic': ClothesMeta('6975-13839-6856', -1, False),
+    'Warrior Gloves': ClothesMeta('3964-7828-3856', -1, False),
+    'Warrior Gloves Shield': ClothesMeta('2052-3768-1728', -1, False),
+    'Warrior Pants': ClothesMeta('2343-4640-2296', -1, False),
+    'Warrior Skirt': ClothesMeta('2216-4296-2080', -1, False),
+    'Warrior Tops': ClothesMeta('3913-7680-3766', -1, False),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -2381,6 +2398,8 @@ class DazOptimizer:
     def separate_iris_uvs(self):
         EYES_M = self.get_eyes_mesh()
         if EYES_M is None:
+            EYES_M = self.get_toon_floating_iris_mesh()
+        if EYES_M is None:
             return
         old_uv_layer = EYES_M.data.uv_layers.active
         new_uv_layer = EYES_M.data.uv_layers.new(name=NEW_EYES_UV_MAP)
@@ -2526,7 +2545,7 @@ class DazOptimizer:
 
             for channel in body_part_filepaths:
                 s = list(sorted(body_part_filepaths[channel], key=lambda x: -occurrences[x]))
-                if channel == "Base Color" and len(s)==0:
+                if channel == "Base Color" and len(s)==0 and body_part_name in const_color_values:
                     s = const_color_values[body_part_name]
                 body_part_filepaths[channel] = s
         print(json.dumps({k: {k2: v2.tolist() if isinstance(v2, np.ndarray) else [v3.filepath for v3 in v2] for k2, v2 in v.items()} for k, v in all_filepaths.items()}, indent=2))
