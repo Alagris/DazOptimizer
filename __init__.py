@@ -214,6 +214,21 @@ class NodesUtils:
             if isinstance(node, bpy.types.ShaderNodeRGB):
                 rgb = linearrgb_to_srgb(src_socket.default_value)
                 return rgb
+            elif isinstance(node, bpy.types.ShaderNodeMath):
+                a_i = NodesUtils.bake_textures(node.inputs['A'])
+                b_i = NodesUtils.bake_textures(node.inputs['B'])
+                p = os.path.commonprefix(topa(a_i) + topa(b_i))
+                a = tonp(a_i)
+                b = tonp(b_i)
+                if node.operation == "MULTIPLY":
+                    c = a * b
+                elif node.operation == "ADD":
+                    c = a + b
+                elif node.operation == "SUBTRACT":
+                    c = a - b
+                elif node.operation == "DIVIDE":
+                    c = a / b
+                return BakedImg(c, p)
             elif isinstance(node, bpy.types.ShaderNodeTexImage):
                 return BakedImg(node.image, src_socket.name == "Alpha")
             elif isinstance(node, bpy.types.ShaderNodeMix):
@@ -512,97 +527,100 @@ CATS_FACS = {CAT_FACS, CAT_FACSDET, CAT_FACSEXPR}
 NIRV_ZERO_EYES_DAZ_DIR = "/data/nirvana/nirv zero/nirv zero eyes"
 PROFILE_FULL = "F"
 PROFILE_MIN = "M"
-USED_PROFILES = PROFILE_MIN
+PROFILE_MID = "D"
+MATCH_PROFILE_MIN = PROFILE_MIN
+MATCH_PROFILE_MID = MATCH_PROFILE_MIN + PROFILE_MID
+MATCH_PROFILE_FULL = MATCH_PROFILE_MID + PROFILE_FULL
+USED_PROFILES = MATCH_PROFILE_MID
 MORPHS = {
     "/data/rudy studio/wtkt toon/wtkt toon":{
         "shapes": { "female":{
-            'OPEN 02': MorphMeta(CAT_SPECIAL,"open 02",FIGURE_TOON, PROFILE_FULL),
+                        'OPEN 02': MorphMeta(CAT_SPECIAL,"open 02",FIGURE_TOON, PROFILE_FULL),
             'OPEN 03': MorphMeta(CAT_SPECIAL,"open 03",FIGURE_TOON, PROFILE_FULL),
             'OPEN 04': MorphMeta(CAT_SPECIAL,"open 04",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA OPEN 01':MorphMeta(CAT_SPECIAL,"labia minora open 0",FIGURE_TOON, PROFILE_FULL),
             'OPEN EXTREME MORE': MorphMeta(CAT_SPECIAL,"open extreme more",FIGURE_TOON, PROFILE_FULL),
-            'ANUS OPEN MORE':MorphMeta(CAT_SPECIAL,"anus open mor",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA OPEN 02':MorphMeta(CAT_SPECIAL,"labia minora open 0",FIGURE_TOON, PROFILE_FULL),
             'OPEN EXTREME': MorphMeta(CAT_SPECIAL,"open extreme",FIGURE_TOON, PROFILE_FULL),
-            'ANUS OPEN verse 2':MorphMeta(CAT_SPECIAL,"anus open verse ",FIGURE_TOON, PROFILE_FULL),
             'FULL OPEN 01':MorphMeta(CAT_SPECIAL,"full open 01",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA OPEN LEFT 2':MorphMeta(CAT_SPECIAL,"labia minora open left ",FIGURE_TOON, PROFILE_FULL),
-            'ANUS OPEN verse':MorphMeta(CAT_SPECIAL,"anus open vers",FIGURE_TOON, PROFILE_FULL),
             'FULL OPEN 02':MorphMeta(CAT_SPECIAL,"full open 02",FIGURE_TOON, PROFILE_MIN),
-            'LABIA MINORA OPEN LEFT':MorphMeta(CAT_SPECIAL,"labia minora open lef",FIGURE_TOON, PROFILE_FULL),
-            'ANUS OPEN':MorphMeta(CAT_SPECIAL,"anus ope",FIGURE_TOON, PROFILE_FULL),
             'FULL OPEN 03':MorphMeta(CAT_SPECIAL,"full open 03",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA OPEN RIGHT 2':MorphMeta(CAT_SPECIAL,"labia minora open right ",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA OPEN RIGHT':MorphMeta(CAT_SPECIAL,"labia minora open righ",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA OPEN':MorphMeta(CAT_SPECIAL,"labia minora ope",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MAJORA OPEN BACK':MorphMeta(CAT_SPECIAL,"labia majora open bac",FIGURE_TOON, PROFILE_FULL),
             'URETHRA OPEN': MorphMeta(CAT_SPECIAL,"urethra open",FIGURE_TOON, PROFILE_FULL),
-            'VAGINA OPEN 01': MorphMeta(CAT_SPECIAL,"vagina open 01",FIGURE_TOON, PROFILE_FULL),
             'OPEN 01': MorphMeta(CAT_SPECIAL,"open 01",FIGURE_TOON, PROFILE_FULL),
-            'CLOSED 02':MorphMeta(CAT_SPECIAL,"closed 0",FIGURE_TOON, PROFILE_FULL),
-            'CLOSED 03':MorphMeta(CAT_SPECIAL,"closed 0",FIGURE_TOON, PROFILE_FULL),
-            'CLOSED 04':MorphMeta(CAT_SPECIAL,"closed 0",FIGURE_TOON, PROFILE_FULL),
-            'CLOSED 01':MorphMeta(CAT_SPECIAL,"closed 0",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA FRONT CLOSED':MorphMeta(CAT_SPECIAL,"labia minora front close",FIGURE_TOON, PROFILE_FULL),
-            'ANUS 01':MorphMeta(CAT_GENITALS,"anus 0",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA FRONT SMALL':MorphMeta(CAT_GENITALS,"labia minora front smal",FIGURE_TOON, PROFILE_FULL),
-            'ANUS IN OUT 2':MorphMeta(CAT_GENITALS,"anus in out ",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA IN OUT':MorphMeta(CAT_GENITALS,"labia minora in ou",FIGURE_TOON, PROFILE_FULL),
-            'ANUS IN OUT ROTATED':MorphMeta(CAT_GENITALS,"anus in out rotate",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA LEFT LONG':MorphMeta(CAT_GENITALS,"labia minora left lon",FIGURE_TOON, PROFILE_FULL),
-            'ANUS IN OUT':MorphMeta(CAT_GENITALS,"anus in ou",FIGURE_TOON, PROFILE_FULL),
-            'FBM CAMEL TOE':MorphMeta(CAT_GENITALS,"fbm camel to",FIGURE_TOON, PROFILE_MIN),
-            'FULL IN OUT':MorphMeta(CAT_GENITALS,"full in ou",FIGURE_TOON, PROFILE_MIN),
+            'CLOSED 02':MorphMeta(CAT_SPECIAL,"closed 02",FIGURE_TOON, PROFILE_FULL),
+            'CLOSED 03':MorphMeta(CAT_SPECIAL,"closed 03",FIGURE_TOON, PROFILE_FULL),
+            'CLOSED 04':MorphMeta(CAT_SPECIAL,"closed 04",FIGURE_TOON, PROFILE_FULL),
+            'CLOSED 01':MorphMeta(CAT_SPECIAL,"closed 01",FIGURE_TOON, PROFILE_FULL),
+            'FBM CAMEL TOE':MorphMeta(CAT_GENITALS,"fbm camel toe",FIGURE_TOON, PROFILE_MIN),
+            'FULL IN OUT':MorphMeta(CAT_GENITALS,"full in out",FIGURE_TOON, PROFILE_MIN),
             'PERINEUM': MorphMeta(CAT_GENITALS,"perineum",FIGURE_TOON, PROFILE_FULL),
-            'PERPUCE FRONT BACK': MorphMeta(CAT_GENITALS,"perpuce front back",FIGURE_TOON, PROFILE_FULL),
-            'PERPUCE MOVE 2': MorphMeta(CAT_GENITALS,"perpuce move 2",FIGURE_TOON, PROFILE_FULL),
-            'ANUS SHAPE':MorphMeta(CAT_GENITALS,"anus shap",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MAJORA BIG 02':MorphMeta(CAT_GENITALS,"labia majora big 0",FIGURE_TOON, PROFILE_FULL),
-            'PERPUCE MOVE': MorphMeta(CAT_GENITALS,"perpuce move",FIGURE_TOON, PROFILE_FULL),
-            'ANUS SIZE 2':MorphMeta(CAT_GENITALS,"anus size ",FIGURE_TOON, PROFILE_MIN),
-            'LABIA MAJORA BIG':MorphMeta(CAT_GENITALS,"labia majora bi",FIGURE_TOON, PROFILE_FULL),
-            'PERPUCE SHAPE': MorphMeta(CAT_GENITALS,"perpuce shape",FIGURE_TOON, PROFILE_FULL),
-            'ANUS SIZE':MorphMeta(CAT_GENITALS,"anus siz",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MAJORA DEPTH':MorphMeta(CAT_GENITALS,"labia majora dept",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA RIGHT LONG':MorphMeta(CAT_GENITALS,"labia minora right lon",FIGURE_TOON, PROFILE_FULL),
-            'PERPUCE SIZE': MorphMeta(CAT_GENITALS,"perpuce size",FIGURE_TOON, PROFILE_FULL),
-            'ANUS SIZE3':MorphMeta(CAT_GENITALS,"anus size",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SHAPE 01':MorphMeta(CAT_GENITALS,"labia minora shape 0",FIGURE_TOON, PROFILE_MIN),
-            'PERPUCE THICKNESS': MorphMeta(CAT_GENITALS,"perpuce thickness",FIGURE_TOON, PROFILE_FULL),
-            'ANUS STRETCH 2':MorphMeta(CAT_GENITALS,"anus stretch ",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MAJORA SHAPE 01':MorphMeta(CAT_GENITALS,"labia majora shape 0",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SHAPE 02':MorphMeta(CAT_GENITALS,"labia minora shape 0",FIGURE_TOON, PROFILE_MIN),
             'REN_02 corr': MorphMeta(CAT_GENITALS,"ren_02 corr",FIGURE_TOON, PROFILE_FULL),
-            'ANUS STRETCH':MorphMeta(CAT_GENITALS,"anus stretc",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MAJORA SHAPE 02':MorphMeta(CAT_GENITALS,"labia majora shape 0",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SHAPE 03':MorphMeta(CAT_GENITALS,"labia minora shape 0",FIGURE_TOON, PROFILE_MIN),
             'URETHRA IN OUT': MorphMeta(CAT_GENITALS,"urethra in out",FIGURE_TOON, PROFILE_FULL),
             'CAMEL TOE':MorphMeta(CAT_GENITALS,"camel to",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA BACK  L SMALL':MorphMeta(CAT_GENITALS,"labia minora back  l smal",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SHAPE 04':MorphMeta(CAT_GENITALS,"labia minora shape 0",FIGURE_TOON, PROFILE_MIN),
-            'CLITORIS FRONT BACK':MorphMeta(CAT_GENITALS,"clitoris front bac",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA BACK 01':MorphMeta(CAT_GENITALS,"labia minora back 0",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SHAPE 05':MorphMeta(CAT_GENITALS,"labia minora shape 0",FIGURE_TOON, PROFILE_MIN),
+            'MONS PUBIS BIG':MorphMeta(CAT_GENITALS,"mons pubis big",FIGURE_TOON, PROFILE_MIN),
+            'PERPUCE FRONT BACK': MorphMeta(CAT_GENITALS,"perpuce front back",FIGURE_TOON, PROFILE_FULL),
+            'PERPUCE MOVE 2': MorphMeta(CAT_GENITALS,"perpuce move 2",FIGURE_TOON, PROFILE_FULL),
+            'PERPUCE MOVE': MorphMeta(CAT_GENITALS,"perpuce move",FIGURE_TOON, PROFILE_FULL),
+            'PERPUCE SHAPE': MorphMeta(CAT_GENITALS,"perpuce shape",FIGURE_TOON, PROFILE_FULL),
+            'PERPUCE SIZE': MorphMeta(CAT_GENITALS,"perpuce size",FIGURE_TOON, PROFILE_FULL),
+            'PERPUCE THICKNESS': MorphMeta(CAT_GENITALS,"perpuce thickness",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MAJORA OPEN BACK':MorphMeta(CAT_SPECIAL,"labia majora open back",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MAJORA BIG 02':MorphMeta(CAT_GENITALS,"labia majora big 02",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MAJORA BIG':MorphMeta(CAT_GENITALS,"labia majora big",FIGURE_TOON, PROFILE_MID),
+            'LABIA MAJORA DEPTH':MorphMeta(CAT_GENITALS,"labia majora depth",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MAJORA SHAPE 01':MorphMeta(CAT_GENITALS,"labia majora shape 01",FIGURE_TOON, PROFILE_MID),
+            'LABIA MAJORA SHAPE 02':MorphMeta(CAT_GENITALS,"labia majora shape 02",FIGURE_TOON, PROFILE_MID),
+            'VAGINA OPEN 01': MorphMeta(CAT_SPECIAL,"vagina open 01",FIGURE_TOON, PROFILE_FULL),
             'VAGINA DIAMETER': MorphMeta(CAT_GENITALS,"vagina diameter",FIGURE_TOON, PROFILE_FULL),
-            'CLITORIS IN OUT':MorphMeta(CAT_GENITALS,"clitoris in ou",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA BACK IN OUT':MorphMeta(CAT_GENITALS,"labia minora back in ou",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SHAPE 06':MorphMeta(CAT_GENITALS,"labia minora shape 0",FIGURE_TOON, PROFILE_MIN),
             'VAGINA IN OUT': MorphMeta(CAT_GENITALS,"vagina in out",FIGURE_TOON, PROFILE_FULL),
-            'CLITORIS MOVE':MorphMeta(CAT_GENITALS,"clitoris mov",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA BACK R SMALL':MorphMeta(CAT_GENITALS,"labia minora back r smal",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA SMALL':MorphMeta(CAT_GENITALS,"labia minora smal",FIGURE_TOON, PROFILE_FULL),
-            'CLITORIS SIZE - BACK':MorphMeta(CAT_GENITALS,"clitoris size - bac",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA FRONT  L BIG':MorphMeta(CAT_GENITALS,"labia minora front  l bi",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA THICKNES 01':MorphMeta(CAT_GENITALS,"labia minora thicknes 0",FIGURE_TOON, PROFILE_FULL),
             'VAGINA SHAPE 02': MorphMeta(CAT_GENITALS,"vagina shape 02",FIGURE_TOON, PROFILE_FULL),
-            'CLITORIS SIZE':MorphMeta(CAT_GENITALS,"clitoris siz",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA FRONT  R BIG':MorphMeta(CAT_GENITALS,"labia minora front  r bi",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA THIKNESS':MorphMeta(CAT_GENITALS,"labia minora thiknes",FIGURE_TOON, PROFILE_FULL),
             'VAGINA SHAPE': MorphMeta(CAT_GENITALS,"vagina shape",FIGURE_TOON, PROFILE_FULL),
+            'ANUS OPEN MORE':MorphMeta(CAT_SPECIAL,"anus open more",FIGURE_TOON, PROFILE_FULL),
+            'ANUS OPEN verse 2':MorphMeta(CAT_SPECIAL,"anus open verse 2",FIGURE_TOON, PROFILE_FULL),
+            'ANUS OPEN verse':MorphMeta(CAT_SPECIAL,"anus open verse",FIGURE_TOON, PROFILE_FULL),
+            'ANUS OPEN':MorphMeta(CAT_SPECIAL,"anus open",FIGURE_TOON, PROFILE_FULL),
+            'ANUS 01':MorphMeta(CAT_GENITALS,"anus 01",FIGURE_TOON, PROFILE_FULL),
+            'ANUS IN OUT 2':MorphMeta(CAT_GENITALS,"anus in out 2",FIGURE_TOON, PROFILE_FULL),
+            'ANUS IN OUT ROTATED':MorphMeta(CAT_GENITALS,"anus in out rotate",FIGURE_TOON, PROFILE_FULL),
+            'ANUS IN OUT':MorphMeta(CAT_GENITALS,"anus in out",FIGURE_TOON, PROFILE_FULL),
+            'ANUS SHAPE':MorphMeta(CAT_GENITALS,"anus shape",FIGURE_TOON, PROFILE_FULL),
+            'ANUS SIZE 2':MorphMeta(CAT_GENITALS,"anus size 2",FIGURE_TOON, PROFILE_MIN),
+            'ANUS SIZE':MorphMeta(CAT_GENITALS,"anus size",FIGURE_TOON, PROFILE_FULL),
+            'ANUS SIZE3':MorphMeta(CAT_GENITALS,"anus size",FIGURE_TOON, PROFILE_FULL),
+            'ANUS STRETCH 2':MorphMeta(CAT_GENITALS,"anus stretch 2",FIGURE_TOON, PROFILE_FULL),
+            'ANUS STRETCH':MorphMeta(CAT_GENITALS,"anus stretch",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN 01':MorphMeta(CAT_SPECIAL,"labia minora open 01",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN 02':MorphMeta(CAT_SPECIAL,"labia minora open 02",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN LEFT 2':MorphMeta(CAT_SPECIAL,"labia minora open left 2",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN LEFT':MorphMeta(CAT_SPECIAL,"labia minora open left",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN RIGHT 2':MorphMeta(CAT_SPECIAL,"labia minora open right 2",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN RIGHT':MorphMeta(CAT_SPECIAL,"labia minora open right",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA OPEN':MorphMeta(CAT_SPECIAL,"labia minora ope",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA FRONT CLOSED':MorphMeta(CAT_SPECIAL,"labia minora front close",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA FRONT SMALL':MorphMeta(CAT_GENITALS,"labia minora front small",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA IN OUT':MorphMeta(CAT_GENITALS,"labia minora in out",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA LEFT LONG':MorphMeta(CAT_GENITALS,"labia minora left long",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA RIGHT LONG':MorphMeta(CAT_GENITALS,"labia minora right long",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA SHAPE 01':MorphMeta(CAT_GENITALS,"labia minora shape 01",FIGURE_TOON, PROFILE_MIN),
+            'LABIA MINORA SHAPE 02':MorphMeta(CAT_GENITALS,"labia minora shape 02",FIGURE_TOON, PROFILE_MIN),
+            'LABIA MINORA SHAPE 03':MorphMeta(CAT_GENITALS,"labia minora shape 03",FIGURE_TOON, PROFILE_MIN),
+            'LABIA MINORA BACK  L SMALL':MorphMeta(CAT_GENITALS,"labia minora back l small",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA SHAPE 04':MorphMeta(CAT_GENITALS,"labia minora shape 04",FIGURE_TOON, PROFILE_MIN),
+            'LABIA MINORA BACK 01':MorphMeta(CAT_GENITALS,"labia minora back 01",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA SHAPE 05':MorphMeta(CAT_GENITALS,"labia minora shape 05",FIGURE_TOON, PROFILE_MIN),
+            'LABIA MINORA BACK IN OUT':MorphMeta(CAT_GENITALS,"labia minora back in out",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA SHAPE 06':MorphMeta(CAT_GENITALS,"labia minora shape 06",FIGURE_TOON, PROFILE_MIN),
+            'LABIA MINORA BACK R SMALL':MorphMeta(CAT_GENITALS,"labia minora back r small",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA SMALL':MorphMeta(CAT_GENITALS,"labia minora small",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA FRONT  L BIG':MorphMeta(CAT_GENITALS,"labia minora front l big",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA THICKNES 01':MorphMeta(CAT_GENITALS,"labia minora thicknes 01",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA FRONT  R BIG':MorphMeta(CAT_GENITALS,"labia minora front  r big",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA THIKNESS':MorphMeta(CAT_GENITALS,"labia minora thiknes",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA FRONT BIG':MorphMeta(CAT_GENITALS,"labia minora front big",FIGURE_TOON, PROFILE_FULL),
+            'CLITORIS FRONT BACK':MorphMeta(CAT_GENITALS,"clitoris front bac",FIGURE_TOON, PROFILE_MID),
+            'CLITORIS IN OUT':MorphMeta(CAT_GENITALS,"clitoris in out",FIGURE_TOON, PROFILE_MID),
+            'CLITORIS MOVE':MorphMeta(CAT_GENITALS,"clitoris move",FIGURE_TOON, PROFILE_MID),
+            'CLITORIS SIZE - BACK':MorphMeta(CAT_GENITALS,"clitoris size - back",FIGURE_TOON, PROFILE_FULL),
+            'CLITORIS SIZE':MorphMeta(CAT_GENITALS,"clitoris size",FIGURE_TOON, PROFILE_FULL),
             'CLITORIS SMALL':MorphMeta(CAT_GENITALS,"clitoris size",FIGURE_TOON, PROFILE_MIN),
-            'LABIA MINORA FRONT BIG':MorphMeta(CAT_GENITALS,"labia minora front bi",FIGURE_TOON, PROFILE_FULL),
-            'MONS PUBIS BIG':MorphMeta(CAT_GENITALS,"mons pubis bi",FIGURE_TOON, PROFILE_MIN),
-
         }}
     },
     "/data/vyusur/body geo/body geo":{
@@ -1031,23 +1049,23 @@ MORPHS = {
                 "body_bs_HipVDefine": MorphMeta(CAT_ASS, "Hip V Define", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_KneeBonesSize": MorphMeta(CAT_LEGS, "Knee Bones Size", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_LatsSize": MorphMeta(CAT_BODY, "Lats Size", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_LoveHandles": MorphMeta(CAT_BODY, "Love Handles", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassAnkles": MorphMeta(CAT_LEGS, "Mass Ankles", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassBody": MorphMeta(CAT_BODY, "Mass Body", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassFeet": MorphMeta(CAT_LEGS, "Mass Feet", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassForearms": MorphMeta(CAT_ARMS, "Mass Forearms", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassHands": MorphMeta(CAT_ARMS, "Mass Hands", FIGURE_ANY, PROFILE_FULL),
+                "body_bs_LoveHandles": MorphMeta(CAT_BODY, "Love Handles", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassAnkles": MorphMeta(CAT_LEGS, "Mass Ankles", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassBody": MorphMeta(CAT_BODY, "Mass Body", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassFeet": MorphMeta(CAT_LEGS, "Mass Feet", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassForearms": MorphMeta(CAT_ARMS, "Mass Forearms", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassHands": MorphMeta(CAT_ARMS, "Mass Hands", FIGURE_ANY, PROFILE_MID),
                 "body_bs_MassKnees": MorphMeta(CAT_LEGS, "Mass Knees", FIGURE_ANY, PROFILE_MIN),
-                "body_bs_MassLowerTorso": MorphMeta(CAT_BODY, "Mass Lower Torso", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassNeck": MorphMeta(CAT_HEAD, "Mass Neck", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassShins": MorphMeta(CAT_LEGS, "Mass Shins", FIGURE_ANY, PROFILE_MIN),
-                "body_bs_MassShoulders": MorphMeta(CAT_ARMS, "Mass Shoulders", FIGURE_ANY, PROFILE_FULL),
+                "body_bs_MassLowerTorso": MorphMeta(CAT_BODY, "Mass Lower Torso", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassNeck": MorphMeta(CAT_HEAD, "Mass Neck", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassShins": MorphMeta(CAT_LEGS, "Mass Shins", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassShoulders": MorphMeta(CAT_ARMS, "Mass Shoulders", FIGURE_ANY, PROFILE_MID),
                 "body_bs_MassThighs": MorphMeta(CAT_LEGS, "Mass Thighs", FIGURE_ANY, PROFILE_MIN),
-                "body_bs_MassUpperarms": MorphMeta(CAT_ARMS, "Mass Upperarms", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_MassUpperTorso": MorphMeta(CAT_BODY, "Mass Upper Torso", FIGURE_ANY, PROFILE_FULL),
+                "body_bs_MassUpperarms": MorphMeta(CAT_ARMS, "Mass Upperarms", FIGURE_ANY, PROFILE_MID),
+                "body_bs_MassUpperTorso": MorphMeta(CAT_BODY, "Mass Upper Torso", FIGURE_ANY, PROFILE_MID),
                 "body_bs_MassWrist": MorphMeta(CAT_ARMS, "Mass Wrist", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_NailsLengthRound": MorphMeta(CAT_ARMS, "Nails Length Round", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_NailsLengthSharp": MorphMeta(CAT_ARMS, "Nails Length Sharp", FIGURE_ANY, PROFILE_FULL),
+                "body_bs_NailsLengthRound": MorphMeta(CAT_ARMS, "Nails Length Round", FIGURE_ANY, PROFILE_MID),
+                "body_bs_NailsLengthSharp": MorphMeta(CAT_ARMS, "Nails Length Sharp", FIGURE_ANY, PROFILE_MID),
                 "body_bs_NailsLengthSquare": MorphMeta(CAT_ARMS, "Nails Length Square", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_NavelDepth_HD3": MorphMeta(CAT_BODY, "Navel Depth", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_NavelHollow_HD3": MorphMeta(CAT_BODY, "Navel Hollow", FIGURE_ANY, PROFILE_FULL),
@@ -1072,16 +1090,16 @@ MORPHS = {
                 "body_bs_TaperNeckB": MorphMeta(CAT_BODY, "Taper Neck B", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_TaperShinA": MorphMeta(CAT_LEGS, "Taper Shin A", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_TaperShinB": MorphMeta(CAT_LEGS, "Taper Shin B", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_TaperThighA": MorphMeta(CAT_LEGS, "Taper Thigh A", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_TaperThighB": MorphMeta(CAT_LEGS, "Taper Thigh B", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_TaperUpperArmA": MorphMeta(CAT_ARMS, "Taper Upper Arm A", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_TaperUpperArmB": MorphMeta(CAT_ARMS, "Taper Upper Arm B", FIGURE_ANY, PROFILE_FULL),
+                "body_bs_TaperThighA": MorphMeta(CAT_LEGS, "Taper Thigh A", FIGURE_ANY, PROFILE_MID),
+                "body_bs_TaperThighB": MorphMeta(CAT_LEGS, "Taper Thigh B", FIGURE_ANY, PROFILE_MID),
+                "body_bs_TaperUpperArmA": MorphMeta(CAT_ARMS, "Taper Upper Arm A", FIGURE_ANY, PROFILE_MID),
+                "body_bs_TaperUpperArmB": MorphMeta(CAT_ARMS, "Taper Upper Arm B", FIGURE_ANY, PROFILE_MID),
                 "body_bs_ThighDepth": MorphMeta(CAT_LEGS, "Thigh Depth", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_ThighTone": MorphMeta(CAT_LEGS, "Thigh Tone", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_TrapsSize": MorphMeta(CAT_BODY, "Traps Size", FIGURE_ANY, PROFILE_FULL),
                 "body_bs_UpperArmTaperWidth": MorphMeta(CAT_ARMS, "Upper Arm Taper Width", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_WaistDepth": MorphMeta(CAT_BODY, "Waist Depth", FIGURE_ANY, PROFILE_FULL),
-                "body_bs_WaistWidth": MorphMeta(CAT_BODY, "Waist Width", FIGURE_ANY, PROFILE_FULL),
+                "body_bs_WaistDepth": MorphMeta(CAT_BODY, "Waist Depth", FIGURE_ANY, PROFILE_MID),
+                "body_bs_WaistWidth": MorphMeta(CAT_BODY, "Waist Width", FIGURE_ANY, PROFILE_MID),
                 "body_bs_WaistWidthUpper": MorphMeta(CAT_BODY, "Waist Width Upper", FIGURE_ANY, PROFILE_FULL),
                 "body_ctrl_BodyFitness": MorphMeta(CAT_BODY, "Body Fitness", FIGURE_ANY, PROFILE_MIN),
                 "body_ctrl_BodyMuscular": MorphMeta(CAT_BODY, "Body Muscular", FIGURE_ANY, PROFILE_MIN),
@@ -1099,64 +1117,64 @@ MORPHS = {
     "/data/meipex/goldenpalace_genitalia_g9/g9goldenpalace_graft": {
         "shapes": {
             "female": {
-                "GP_MonsVeneris_Front-Back1":MorphMeta(CAT_GENITALS,"Mons Veneris Front-Back 1", FIGURE_G9, PROFILE_MIN),
-                "GP_MonsVeneris_Front-Back2":MorphMeta(CAT_GENITALS,"Mons Veneris Front-Back 2", FIGURE_G9, PROFILE_MIN),
-                "GP_MonsVeneris_Up-Down":MorphMeta(CAT_GENITALS,"Mons Veneris Up-Down", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Aicie":MorphMeta(CAT_GENITALS,"Aicie", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Angelica":MorphMeta(CAT_GENITALS,"Angelica", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Astra":MorphMeta(CAT_GENITALS,"Astra", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Augusta":MorphMeta(CAT_GENITALS,"Augusta", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Bammi":MorphMeta(CAT_GENITALS,"Bammi", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Carmen":MorphMeta(CAT_GENITALS,"Carmen", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Chiktad":MorphMeta(CAT_GENITALS,"Chiktad", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Crystal":MorphMeta(CAT_GENITALS,"Crystal", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Felicitas":MorphMeta(CAT_GENITALS,"Felicitas", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Gaia":MorphMeta(CAT_GENITALS,"Gaia", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Ilzolla":MorphMeta(CAT_GENITALS,"Ilzolla", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Krognea":MorphMeta(CAT_GENITALS,"Krognea", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Laetitia":MorphMeta(CAT_GENITALS,"Laetitia", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Livia":MorphMeta(CAT_GENITALS,"Livia", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Raad":MorphMeta(CAT_GENITALS,"Raad", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Remphea":MorphMeta(CAT_GENITALS,"Remphea", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Tophae":MorphMeta(CAT_GENITALS,"Tophae", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Valentina":MorphMeta(CAT_GENITALS,"Valentina", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Yelqi":MorphMeta(CAT_GENITALS,"Yelqi", FIGURE_G9, PROFILE_FULL),
-                "GP_PR-Zetill":MorphMeta(CAT_GENITALS,"Zetill", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Albina":MorphMeta(CAT_GENITALS,"Albina", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Amazon":MorphMeta(CAT_GENITALS,"Amazon", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Aurelia":MorphMeta(CAT_GENITALS,"Aurelia", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Majora01":MorphMeta(CAT_GENITALS,"Majora 01", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Majora02":MorphMeta(CAT_GENITALS,"Majora 02", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Majora03":MorphMeta(CAT_GENITALS,"Majora 03", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora01":MorphMeta(CAT_GENITALS,"Minora 01", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora02":MorphMeta(CAT_GENITALS,"Minora 02", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora03":MorphMeta(CAT_GENITALS,"Minora 03", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora04":MorphMeta(CAT_GENITALS,"Minora 04", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora05":MorphMeta(CAT_GENITALS,"Minora 05", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora06":MorphMeta(CAT_GENITALS,"Minora 06", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora07":MorphMeta(CAT_GENITALS,"Minora 07", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora08":MorphMeta(CAT_GENITALS,"Minora 08", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora09":MorphMeta(CAT_GENITALS,"Minora 09", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Minora10":MorphMeta(CAT_GENITALS,"Minora 10", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Bump1":MorphMeta(CAT_GENITALS,"Anus Bump 1", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Bump2":MorphMeta(CAT_GENITALS,"Anus Bump 2", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Bump3":MorphMeta(CAT_GENITALS,"Anus Bump 3", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Bump4":MorphMeta(CAT_GENITALS,"Anus Bump 4", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Bump5":MorphMeta(CAT_GENITALS,"Anus Bump 5", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Contraction":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_ContractionMore":MorphMeta(CAT_GENITALS,"Anus Contraction More", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Contraction_Shape1":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Contraction_Shape2":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Contraction_Wrinkles1":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Contraction_Wrinkles2":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Contraction_Wrinkles3":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Open1":MorphMeta(CAT_SPECIAL,"Anus Open 1", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Open2":MorphMeta(CAT_SPECIAL,"Anus Open 2", FIGURE_G9, PROFILE_FULL),
-                "GP_Anus_Open3":MorphMeta(CAT_SPECIAL,"Anus Open 3", FIGURE_G9, PROFILE_FULL),
-                "GP_PR_Vagina_Open":MorphMeta(CAT_SPECIAL,"Vagina Open", FIGURE_G9, PROFILE_FULL),
-                "GP_Vagina_Open1":MorphMeta(CAT_SPECIAL,"Vagina Open 1", FIGURE_G9, PROFILE_FULL),
-                "GP_Vagina_Open2":MorphMeta(CAT_SPECIAL,"Vagina Open 2", FIGURE_G9, PROFILE_FULL),
-                "GP_Vagina_Open3":MorphMeta(CAT_SPECIAL,"Vagina Open 3", FIGURE_G9, PROFILE_FULL),
+                "GP_MonsVeneris_Front-Back1":MorphMeta(CAT_GENITALS,"Mons Veneris Front-Back 1", FIGURE_ANY, PROFILE_MIN),
+                "GP_MonsVeneris_Front-Back2":MorphMeta(CAT_GENITALS,"Mons Veneris Front-Back 2", FIGURE_ANY, PROFILE_MIN),
+                "GP_MonsVeneris_Up-Down":MorphMeta(CAT_GENITALS,"Mons Veneris Up-Down", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Aicie":MorphMeta(CAT_GENITALS,"Aicie", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Angelica":MorphMeta(CAT_GENITALS,"Angelica", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Astra":MorphMeta(CAT_GENITALS,"Astra", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Augusta":MorphMeta(CAT_GENITALS,"Augusta", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Bammi":MorphMeta(CAT_GENITALS,"Bammi", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Carmen":MorphMeta(CAT_GENITALS,"Carmen", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Chiktad":MorphMeta(CAT_GENITALS,"Chiktad", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Crystal":MorphMeta(CAT_GENITALS,"Crystal", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Felicitas":MorphMeta(CAT_GENITALS,"Felicitas", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Gaia":MorphMeta(CAT_GENITALS,"Gaia", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Ilzolla":MorphMeta(CAT_GENITALS,"Ilzolla", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Krognea":MorphMeta(CAT_GENITALS,"Krognea", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Laetitia":MorphMeta(CAT_GENITALS,"Laetitia", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Livia":MorphMeta(CAT_GENITALS,"Livia", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Raad":MorphMeta(CAT_GENITALS,"Raad", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Remphea":MorphMeta(CAT_GENITALS,"Remphea", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Tophae":MorphMeta(CAT_GENITALS,"Tophae", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Valentina":MorphMeta(CAT_GENITALS,"Valentina", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR-Yelqi":MorphMeta(CAT_GENITALS,"Yelqi", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR-Zetill":MorphMeta(CAT_GENITALS,"Zetill", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Albina":MorphMeta(CAT_GENITALS,"Albina", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR_Amazon":MorphMeta(CAT_GENITALS,"Amazon", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Aurelia":MorphMeta(CAT_GENITALS,"Aurelia", FIGURE_ANY, PROFILE_MIN),
+                "GP_PR_Majora01":MorphMeta(CAT_GENITALS,"Majora 01", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Majora02":MorphMeta(CAT_GENITALS,"Majora 02", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Majora03":MorphMeta(CAT_GENITALS,"Majora 03", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora01":MorphMeta(CAT_GENITALS,"Minora 01", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora02":MorphMeta(CAT_GENITALS,"Minora 02", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora03":MorphMeta(CAT_GENITALS,"Minora 03", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora04":MorphMeta(CAT_GENITALS,"Minora 04", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora05":MorphMeta(CAT_GENITALS,"Minora 05", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora06":MorphMeta(CAT_GENITALS,"Minora 06", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora07":MorphMeta(CAT_GENITALS,"Minora 07", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora08":MorphMeta(CAT_GENITALS,"Minora 08", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora09":MorphMeta(CAT_GENITALS,"Minora 09", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Minora10":MorphMeta(CAT_GENITALS,"Minora 10", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Bump1":MorphMeta(CAT_GENITALS,"Anus Bump 1", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Bump2":MorphMeta(CAT_GENITALS,"Anus Bump 2", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Bump3":MorphMeta(CAT_GENITALS,"Anus Bump 3", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Bump4":MorphMeta(CAT_GENITALS,"Anus Bump 4", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Bump5":MorphMeta(CAT_GENITALS,"Anus Bump 5", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Contraction":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_ContractionMore":MorphMeta(CAT_GENITALS,"Anus Contraction More", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Contraction_Shape1":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Contraction_Shape2":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Contraction_Wrinkles1":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Contraction_Wrinkles2":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Contraction_Wrinkles3":MorphMeta(CAT_GENITALS,"Anus Contraction", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Open1":MorphMeta(CAT_SPECIAL,"Anus Open 1", FIGURE_ANY, PROFILE_FULL),
+                "GP_Anus_Open2":MorphMeta(CAT_SPECIAL,"Anus Open 2", FIGURE_ANY, PROFILE_MIN),
+                "GP_Anus_Open3":MorphMeta(CAT_SPECIAL,"Anus Open 3", FIGURE_ANY, PROFILE_FULL),
+                "GP_PR_Vagina_Open":MorphMeta(CAT_SPECIAL,"Vagina Open", FIGURE_ANY, PROFILE_FULL),
+                "GP_Vagina_Open1":MorphMeta(CAT_SPECIAL,"Vagina Open 1", FIGURE_ANY, PROFILE_FULL),
+                "GP_Vagina_Open2":MorphMeta(CAT_SPECIAL,"Vagina Open 2", FIGURE_ANY, PROFILE_MIN),
+                "GP_Vagina_Open3":MorphMeta(CAT_SPECIAL,"Vagina Open 3", FIGURE_ANY, PROFILE_FULL),
 
             }
         }
@@ -1215,7 +1233,7 @@ class ClothesMeta:
 
 PANTIE_SCALING = 0.02
 
-# [print("'"+o.name[:-len(" Mesh")]+"': ClothesMeta('"+o.data.daz_importer.DazFingerPrint+"', -1, "+str('panties' in o.name.lower())+"),") for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh) and o.name.endswith(" Mesh")];
+# [print("'"+o.name[:-len(" Mesh")]+"': ClothesMeta('"+o.data.daz_importer.DazFingerPrint+"', -1, "+str('panties' in o.name.lower())+"),") for o in bpy.data.objects if not o.hide_get() and isinstance(o.data, bpy.types.Mesh) and o.name.endswith(" Mesh")];
 
 CLOTHES = {
     "Romance Bra": ClothesMeta('13332-26195-12864', CLOTHES_MIN_DIST_TO_SKIN, False),
@@ -1303,6 +1321,19 @@ CLOTHES = {
     'Warrior Pants': ClothesMeta('2343-4640-2296', -1, False),
     'Warrior Skirt': ClothesMeta('2216-4296-2080', -1, False),
     'Warrior Tops': ClothesMeta('3913-7680-3766', -1, False),
+    'SAO Dress': ClothesMeta('37250-74468-37212', -1, False),
+    'SAO Gloves': ClothesMeta('11836-23030-11220', -1, False),
+    'SAO Shin Guard': ClothesMeta('7526-15022-7532', -1, False),
+    'SAO Shoes': ClothesMeta('6860-13628-6798', -1, False),
+    'SAO Socks': ClothesMeta('5168-10268-5100', CLOTHES_MIN_DIST_TO_SKIN, False),
+    'SAO Thigh Guard': ClothesMeta('1988-3968-1984', -1, False),
+    'SAO Arm Guard': ClothesMeta('7486-14958-7484', -1, False),
+    'SAO Belt': ClothesMeta('8172-16188-8104', -1, False),
+    'SAO Breast Guard': ClothesMeta('1242-2493-1253', -1, False),
+    'SAO Shoulder Guard': ClothesMeta('2737-5459-2734', -1, False),
+    'SAO Necklace': ClothesMeta('690-1380-690', -1, False),
+    'G9 Base Bra': ClothesMeta('9748-19504-9754', CLOTHES_MIN_DIST_TO_SKIN, False),
+    'G9 Base Panty': ClothesMeta('8624-17254-8630', -1, True),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -1458,6 +1489,15 @@ def find_all_hair():
             hair.append(obj)
     return hair
 
+def find_child_meshes(o):
+    out = []
+    def find_child_meshes_recursive(o):
+        for c in o.children:
+            if isinstance(c.data, bpy.types.Mesh):
+                out.append(c)
+            find_child_meshes_recursive(c)
+    find_child_meshes_recursive(o)
+    return out
 
 def remove_unnecessary_shape_keys(objs=None, tolerance=0.001):
     if objs is None:
@@ -1621,20 +1661,22 @@ def is_toon(body_mesh):
 
 
 def hide_object(obj, hide=False):
-    obj.hide_set(False)
-    obj.hide_viewport = False
-    obj.hide_render = False
+    obj.hide_set(hide)
+    obj.hide_viewport = hide
+    obj.hide_render = hide
+
 
 def select_object(obj):
     if bpy.context.view_layer.objects.active is not None:
         if bpy.context.object.mode != 'OBJECT':
             bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
-    hide_object(obj, False)
-    if bpy.context.object.mode != 'OBJECT':
-        bpy.ops.object.mode_set(mode='OBJECT')
+    if obj is not None:
+        hide_object(obj, False)
+        obj.select_set(True)
+        if bpy.context.object.mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
 
 
 def apply_vertex_group_weights(group:bpy.types.VertexGroup, weights:np.array, epsilon:float = 0.001, type='REPLACE'):
@@ -2332,6 +2374,24 @@ class DazOptimizer:
             bmesh.update_edit_mesh(me)
             bpy.ops.mesh.edge_face_add()
 
+    def merge_all_materials(self):
+        for o in bpy.data.objects:
+            if isinstance(o.data, bpy.types.Mesh):
+                select_object(o)
+                bpy.ops.daz.merge_materials()
+
+    def merge_multi_mesh_clothes(self):
+        for clothing_item in find_all_clothes():
+            sub_clothes = find_child_meshes(clothing_item.obj)
+            if len(sub_clothes)>0:
+                select_object(clothing_item.obj)
+                for sub in sub_clothes:
+                    sub.hide_viewport = False
+                    sub.hide_render = False
+                    sub.hide_set(False)
+                    sub.select_set(True)
+                bpy.ops.object.join()
+
     def merge_all_rigs(self):
         body_rig = self.get_body_rig()
         select_object(body_rig)
@@ -2552,7 +2612,7 @@ class DazOptimizer:
                 if channel == "Base Color" and len(s)==0 and body_part_name in const_color_values:
                     s = const_color_values[body_part_name]
                 body_part_filepaths[channel] = s
-        print(json.dumps({k: {k2: v2.tolist() if isinstance(v2, np.ndarray) else [v3.filepath for v3 in v2] for k2, v2 in v.items()} for k, v in all_filepaths.items()}, indent=2))
+        print(json.dumps({k: {k2: v2.tolist() if isinstance(v2, np.ndarray) else [v3.filepath+" "+str(tuple(v3.size)+(v3.channels,)) for v3 in v2] for k2, v2 in v.items()} for k, v in all_filepaths.items()}, indent=2))
         return all_filepaths
 
     @staticmethod
@@ -2566,7 +2626,7 @@ class DazOptimizer:
             NodesUtils.gen_simple_material(mat.node_tree, body_part_filepaths)
 
     def simplify_materials(self):
-
+        from PIL import Image
         BODY_M = self.get_body_mesh()
         MOUTH_M = self.get_mouth_mesh()
         mats = list(BODY_M.data.materials)
@@ -2659,7 +2719,10 @@ class DazOptimizer:
                         else:
                             mouth_img_np = open_img_to_np(mouth_img.filepath)
                     h, w, c = mouth_img_np.shape
-
+                    if [h,w] != TOON_MOUTH_MASK_SHAPE:
+                        mouth_mask = Image.fromarray(mouth_mask * np.uint8(255))
+                        mouth_mask = mouth_mask.resize((w,h))
+                        mouth_mask = np.array(mouth_mask)>0
                     if mouth_color is not None:
                         mouth_color = to_channels(mouth_color, c)
                         print("Baking mouth color: ", mouth_color)
@@ -2667,7 +2730,7 @@ class DazOptimizer:
                     if teeth_color is not None:
                         teeth_mask = np.logical_not(mouth_mask)
                         teeth_color = to_channels(teeth_color, c)
-                        print("Baking eye socket color: ", teeth_color)
+                        print("Baking teeth color: ", teeth_color)
                         mouth_img_np[teeth_mask] = teeth_color
                     np_to_pil(mouth_img_np).save(dst_mouth_img_path)
                 mouth_img = bpy.data.images.load(dst_mouth_img_path)
@@ -2841,9 +2904,31 @@ class DazOptimizer:
             legs_tile = open_img(legs_filepaths, map_type)
             if head_tile is None and body_tile is None and arms_tile is None and legs_tile is None:
                 continue
-            d = min(head_tile.ndim, body_tile.ndim, arms_tile.ndim, legs_tile.ndim)
-            c = 1 if d < 3 else min(head_tile.shape[-1], body_tile.shape[-1], arms_tile.shape[-1], legs_tile.shape[-1])
-            s = legs_tile.shape[0]
+            d = min(9 if head_tile is None else head_tile.ndim ,
+                    9 if body_tile is None else body_tile.ndim,
+                    9 if arms_tile is None else arms_tile.ndim,
+                    9 if legs_tile is None else legs_tile.ndim)
+            c = 1 if d < 3 else min(
+                9 if head_tile is None else head_tile.shape[-1],
+                9 if body_tile is None else body_tile.shape[-1],
+                9 if arms_tile is None else arms_tile.shape[-1],
+                9 if legs_tile is None else legs_tile.shape[-1]
+            )
+            s = max(
+                0 if head_tile is None else head_tile.shape[0],
+                0 if body_tile is None else body_tile.shape[0],
+                0 if arms_tile is None else arms_tile.shape[0],
+                0 if legs_tile is None else legs_tile.shape[0]
+            )
+            dtp = None
+            if head_tile is not None:
+                dtp = head_tile.dtype
+            elif body_tile is not None:
+                dtp = body_tile.dtype
+            elif arms_tile is not None:
+                dtp = arms_tile.dtype
+            elif legs_tile is not None:
+                dtp = legs_tile.dtype
             s2 = s * 2
             s4 = s // 4
             s8 = s // 8
@@ -2890,7 +2975,9 @@ class DazOptimizer:
                 return img
 
             def shift_img(img: np.ndarray, y0, y1, x0, x1, mask: np.ndarray, translation: [float, float], hflip=False, scale=1):
-                new_img = np.zeros(merged_shape, dtype=legs_tile.dtype)
+                new_img = np.zeros(merged_shape, dtype=dtp)
+                if img is None:
+                    return new_img
                 if hflip:
                     mask = np.flipud(mask)
                     img = np.flipud(img)
@@ -4578,13 +4665,21 @@ class DazOptimizer:
                                  axis_up='Y')
 
     def export_hair_to_fbx(self):
-        rig = self.get_body_rig()
+        root = bpy.data.objects.get('root')
+        if root is not None:
+            root.name = 'root_tmp'
         p = os.path.join(self.workdir, self.name + "_hair")
         if not os.path.exists(p):
             os.mkdir(p)
         for hair in find_all_hair():
+            hair_rig = get_rig_of(hair)
+            prev_name = hair_rig.name
+            hair_rig.name = 'root'
             name = hair.name[:-len(' Mesh')]
             self.export_to_fbx(None, hair, os.path.join(p, name + '.fbx'))
+            hair_rig.name = prev_name
+        if root is not None:
+            root.name = 'root'
 
     def export_clothes_to_fbx(self):
         rig = self.get_body_rig()
@@ -4680,8 +4775,10 @@ class DazOptimizer:
         for b in body.data.shape_keys.key_blocks:
             n = b.name
             if n in shape_key_categories:
+                assert isinstance(n, str)
                 is_female, is_male, meta = shape_key_categories[n]
                 if meta.category not in CATS_FACS:
+                    n = n.replace(' ', '_')
                     row = [n, meta.title, n, meta.category, is_female, is_male, b.slider_min, b.slider_max, b.value]
                     print(",".join(map(str,row)))
 
@@ -4962,6 +5059,22 @@ def has_gp():
     return 'GoldenPalace_G9 Mesh' in bpy.data.objects
 
 
+class DazMergeAllMaterials_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.merge_all_materials"
+    bl_label = "Merge all materials"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '('
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazMergeAllMaterials_operator])
+
+    def execute(self, context):
+        DazOptimizer().merge_all_materials()
+        pass_stage(self)
+        return {'FINISHED'}
+
+
 class DazMergeAllRigs_operator(bpy.types.Operator):
     bl_idname = "dazoptim.merge_all_rigs"
     bl_label = "Merge all rigs (except hair)"
@@ -4974,6 +5087,21 @@ class DazMergeAllRigs_operator(bpy.types.Operator):
 
     def execute(self, context):
         DazOptimizer().merge_all_rigs()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class DazMergeMultiMeshClothes_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.merge_multi_mesh_clothes"
+    bl_label = "Merge all clothes that are made up of senselessly separated tiny bits"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '{'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazMergeMultiMeshClothes_operator])
+
+    def execute(self, context):
+        DazOptimizer().merge_multi_mesh_clothes()
         pass_stage(self)
         return {'FINISHED'}
 
@@ -6231,6 +6359,44 @@ class HideAllClothes(bpy.types.Operator):
             c.obj.hide_set(True)
         return {'FINISHED'}
 
+class HideAllHair(bpy.types.Operator):
+    """ hide all hair """
+    bl_idname = "dazoptim.hide_all_hair"
+    bl_label = "hide all hair"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        for c in find_all_hair():
+            c.hide_set(True)
+            rig = get_rig_of(c)
+            if rig is not None:
+                rig.hide_set(True)
+        return {'FINISHED'}
+
+class ShowAllHair(bpy.types.Operator):
+    """ show all hair """
+    bl_idname = "dazoptim.show_all_hair"
+    bl_label = "show all hair"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        for c in find_all_hair():
+            c.hide_set(False)
+            rig = get_rig_of(c)
+            if rig is not None:
+                rig.hide_set(False)
+        return {'FINISHED'}
+
 class RemoveDazBoneConstraints(bpy.types.Operator):
     """ remove daz bone constraints """
     bl_idname = "dazoptim.remove_daz_bone_constraints"
@@ -6326,6 +6492,8 @@ operators = [
     EntryOp(DazSaveBlend_operator, "Save blend file"),
     EntryOp(DazSaveTextures_operator, "Save textures"),
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
+    EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
+    EntryOp(DazMergeMultiMeshClothes_operator, "Merge clothes sub-meshes"),
     EntryOp(FixToonEyes, "Fix toon eyes"),
     EntryOp(SaveMorphs, "Generate fav morphs (all)"),
     EntryOp(SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
@@ -6403,6 +6571,8 @@ operators = [
     EntryOp(PrintMorphCsv, "Print Morphs CSV"),
     EntryOp(HideAllClothes, "Hide all clothes"),
     EntryOp(ShowAllClothes, "Show all clothes"),
+    EntryOp(HideAllHair, "Hide all hair"),
+    EntryOp(ShowAllHair, "Show all hair"),
     EntryOp(UnlockEverything, "Unlock everything"),
     EntryOp(DazAlignPoseQuinn, "Align pose to ue5"),
     EntryOp(RemoveDazBoneConstraints, "Remove daz bone constraints"),
