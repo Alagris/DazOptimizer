@@ -67,13 +67,13 @@ class BakedImg:
         self.np = None
         self.image = None
         self.path = None
-        if isinstance(i, np.ndarray):
-            self.np = i
-            self.path = p
-        else:
+        if isinstance(i, bpy.types.Image):
             self.image = i
             self.is_alpha = p
             self.path = os.path.basename(i.filepath)
+        else:
+            self.np = i
+            self.path = p
 
     def to_numpy(self):
         if self.np is None:
@@ -139,7 +139,7 @@ class NodesUtils:
     def bake_textures(input_socket):
 
         def tonp(x):
-            return x if isinstance(x, np.ndarray) else x.to_numpy()
+            return x if isinstance(x, np.ndarray) or np.isscalar(x) else x.to_numpy()
 
         def topa(x):
             return [x.path] if isinstance(x, BakedImg) else []
@@ -215,8 +215,8 @@ class NodesUtils:
                 rgb = linearrgb_to_srgb(src_socket.default_value)
                 return rgb
             elif isinstance(node, bpy.types.ShaderNodeMath):
-                a_i = NodesUtils.bake_textures(node.inputs['A'])
-                b_i = NodesUtils.bake_textures(node.inputs['B'])
+                a_i = NodesUtils.bake_textures(node.inputs[0])
+                b_i = NodesUtils.bake_textures(node.inputs[1])
                 p = os.path.commonprefix(topa(a_i) + topa(b_i))
                 a = tonp(a_i)
                 b = tonp(b_i)
@@ -2184,15 +2184,18 @@ class DazOptimizer:
             select_object(eyelashes)
             eyebrows.select_set(True)
             bpy.ops.object.join()
-            if eyelashes_mat is not None:
-                if NodesUtils.contains_subgroup(eyelashes_mat, "DAZ Transparent"):
-                    eyelashes_mat.name = TRANSPARENT_TOON_EYELASHES_MAT_NAME
-            if eyebrow_mat is not None:
-                if NodesUtils.contains_subgroup(eyebrow_mat, "DAZ Transparent"):
-                    eyebrow_mat.name = TRANSPARENT_TOON_EYEBROWS_MAT_NAME
-                else:
-                    eyelashes.data.materials.clear()
-                    eyelashes.data.materials.append(eyebrow_mat)
+            if bpy.context.scene.get('is_nirv_zero'):
+                eyelashes.data.materials.clear()
+                eyelashes.data.materials.append(eyelashes_mat)
+            else:
+                if eyelashes_mat is not None:
+                    if NodesUtils.contains_subgroup(eyelashes_mat, "DAZ Transparent"):
+                        eyelashes_mat.name = TRANSPARENT_TOON_EYELASHES_MAT_NAME
+                if eyebrow_mat is not None:
+                    if NodesUtils.contains_subgroup(eyebrow_mat, "DAZ Transparent"):
+                        eyebrow_mat.name = TRANSPARENT_TOON_EYEBROWS_MAT_NAME
+
+
         else:
             eyelashes.data.uv_layers.active.name = 'Eyelashes UVs'
             eyebrows.data.uv_layers.active.name = 'Eyebrows UVs'
@@ -3044,7 +3047,7 @@ class DazOptimizer:
             # plt.imshow(packed)
             # plt.show()
 
-    def merge_geografts(self):
+    def simplify_wet_kitty(self):
         BODY_M = self.get_body_mesh()
         BODY_RIG = self.get_body_rig()
         select_object(BODY_M)
@@ -3055,12 +3058,16 @@ class DazOptimizer:
             rectum = wk.data.materials.get('Rectum')
             wk_body = None
             for m in wk.data.materials:
+                if m is not None:
+                    if 'body' in m.name.lower():
+                        wk_body = m
+                    else:
+                        all_filepaths = DazOptimizer.find_body_part_textures([m])
+                        NodesUtils.gen_simple_material(m.node_tree, all_filepaths)
+            mesh_body = None
+            for m in BODY_M.data.materials:
                 if 'body' in m.name.lower():
-                    wk_body = m
-                else:
-                    all_filepaths = DazOptimizer.find_body_part_textures([m])
-                    NodesUtils.gen_simple_material(m.node_tree, all_filepaths)
-            mesh_body = BODY_M.data.materials.get('Body')
+                    mesh_body = m
             wk.material_slots[wk_body.name].material = mesh_body
             # if mesh_body is not None:
             #     wk.data.materials.clear()
@@ -3074,6 +3081,12 @@ class DazOptimizer:
             vagina.name = 'WK Vagina'
             rectum.name = 'WK Rectum'
             labia_minora.name = 'WK Labia_Minora'
+
+    def merge_geografts(self):
+        BODY_M = self.get_body_mesh()
+        BODY_RIG = self.get_body_rig()
+        select_object(BODY_M)
+
         # merge meshes
         anything = False
         for g in GEOGRAFTS:
@@ -3138,8 +3151,7 @@ class DazOptimizer:
         bpy.ops.object.mode_set(mode='OBJECT')
 
     def get_allowed_morph_prefixes(self):
-        rig = self.get_body_rig()
-        if rig.name == 'Nirv Zero':
+        if bpy.context.scene.get('is_nirv_zero'):
             return ["BaseAnime_", "Nirv_Zero_BaseAnim_", "Nirv_zero_", "Nirv_Zero_", "Nirv_"]
         elif bpy.context.scene.get('daz_optim_toon'):
             return ["BaseAnime_"]
@@ -5018,7 +5030,10 @@ class DazSaveBlend_operator(bpy.types.Operator):
             bpy.context.scene['duf_filepath'] = bpy.types.dazoptim_easy_import_panel.filepath
         save_blend_file(bpy.context.scene['duf_filepath'])
         body_mesh = find_body_mesh()
-        bpy.context.scene['daz_optim_toon'] = is_toon(body_mesh)
+        is_t = bpy.context.scene['daz_optim_toon'] = is_toon(body_mesh)
+        if is_t:
+            is_t = bpy.context.scene['is_nirv_zero'] = 'nirv zero' in body_mesh.name.lower()
+
         pass_stage(self)
         if os.path.isdir(DazOptimizer().textures_dir()):
             pass_stage(DazSaveTextures_operator)
@@ -5026,13 +5041,13 @@ class DazSaveBlend_operator(bpy.types.Operator):
 
 class FixToonEyes(bpy.types.Operator):
     bl_idname = "dazoptim.fix_toon_eyes"
-    bl_label = "Fix toon eyes"
+    bl_label = "Fix Nirv Zero eyes"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = '?'
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [FixToonEyes]) and bpy.context.scene.get('daz_optim_toon')
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [FixToonEyes]) and bpy.context.scene.get('is_nirv_zero')
 
     def execute(self, context):
         DazOptimizer().fix_toon_eyes()
@@ -5193,6 +5208,23 @@ class DazSaveGoldenPalaceBaked_operator(bpy.types.Operator):
 
     def execute(self, context):
         DazOptimizer().save_gp_textures()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class DazSimplifyWetKittyMaterials_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.simplify_wk"
+    bl_label = "Simplify wet kitty materials"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '}'
+
+    @classmethod
+    def poll(cls, context):
+        if UNLOCK:
+            return True
+        return 'Wet Kitty TOON Mesh' in bpy.data.objects and check_stage(context, [DazSimplifyMaterials_operator], [DazSimplifyWetKittyMaterials_operator])
+
+    def execute(self, context):
+        DazOptimizer().simplify_wet_kitty()
         pass_stage(self)
         return {'FINISHED'}
 
@@ -6494,7 +6526,7 @@ operators = [
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
     EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
     EntryOp(DazMergeMultiMeshClothes_operator, "Merge clothes sub-meshes"),
-    EntryOp(FixToonEyes, "Fix toon eyes"),
+    EntryOp(FixToonEyes, "Fix Nirv Zero eyes"),
     EntryOp(SaveMorphs, "Generate fav morphs (all)"),
     EntryOp(SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
     EntryOp(SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
@@ -6516,6 +6548,7 @@ operators = [
     EntryOp(DazTransferFACSToEyebrow_operator, "Transfer FACS to Eyebrows"),
     EntryOp(DazSimplifyEyesMaterial_operator, "Simplify eyes material"),
     EntryOp(DazSeparateIrisUVs_operator, "Separate iris UVs"),
+    EntryOp(DazSimplifyWetKittyMaterials_operator, "Simplify Wet Kitty materials"),
     EntryOp(DazOptimizeGoldenPalaceUVs, "Optimize golden palace UVs"),
     EntryOp(DazSetupGoldenPalaceForBaking, "golden palace prepare baking"),
     EntryOp(DazSelectGoldenPalaceColor_operator, "select golden palace color for baking"),
