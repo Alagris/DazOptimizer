@@ -4361,7 +4361,7 @@ class DazOptimizer:
             if isinstance(obj.data, bpy.types.Mesh):
                 spine1 = obj.vertex_groups.get('spine_01')
                 if spine1 is not None:
-                    spine1.name = 'hip'
+                    spine1.name = 'pelvis'
 
     @staticmethod
     def remove_daz_bone_constraints(self):
