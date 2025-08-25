@@ -1489,6 +1489,9 @@ def find_all_hair():
             hair.append(obj)
     return hair
 
+def find_cum():
+    return [o for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh) and o.name.startswith("Love Loads")]
+
 def find_child_meshes(o):
     out = []
     def find_child_meshes_recursive(o):
@@ -1729,6 +1732,35 @@ def subdivide_bone(cuts, mesh, rig, bone_name):
     return vertex_groups
 
 
+def intersect_two_weght_groups(mesh, group1, group2, new_group):
+    select_object(mesh)
+    bpy.ops.object.mode_set(mode='EDIT')
+    g1 = mesh.vertex_groups[group1]
+    g2 = mesh.vertex_groups[group2]
+
+    def contains_group(vertex, group_index):
+        for g in vertex.groups:
+            if g.group == group_index:
+                return g.weight
+        return 0
+
+    i1 = g1.index
+    weights1 = np.array([contains_group(v, i1) for v in mesh.data.vertices])
+    i2 = g2.index
+    weights2 = np.array([contains_group(v, i2) for v in mesh.data.vertices])
+    bpy.ops.object.mode_set(mode='OBJECT')
+    intersection = np.minimum(weights1, weights2)
+    steps = len(vertex_groups) + 1
+    step = max_weight / steps
+    #pec_weights_normalised = pec_weights/max_weight
+    for i, subpec_group in enumerate(vertex_groups):
+        subpec_weights = old_weights - step * (i + 1)
+        # subpec_weights = subpec_weights.clip(0, step)
+        apply_vertex_group_weights(subpec_group, subpec_weights)
+    vertex_groups.append(old_group)
+    return vertex_groups
+
+
 def get_eyebrows_and_eyelashes_path():
     n = 'eyebrows_and_eyelashes.png'
     p = bpy.path.abspath('//'+n)
@@ -1856,6 +1888,53 @@ def transfer_shape_key(body_obj, sk, clothes_objs=None):
         bpy.ops.object.modifier_apply_as_shapekey(modifier=m.name)
         add_driver(body_obj, sk.name, o)
     sk.value = 0
+
+
+def serialize_nodes(ng):
+    if isinstance(ng, str):
+        ng = bpy.data.node_groups[ng]
+    nodes = ng.nodes
+    print()
+    print()
+    print("ng = bpy.data.node_groups.new('" + nodes.data.name + "', '" + nodes.data.__class__.__name__ + "')")
+
+    def escape(s: str) -> str:
+        return s.replace(".", "_").replace(" ", "_").lower()
+
+    for soc in ng.interface.items_tree:
+        print("ng.interface.new_socket(name='"+soc.name+"', in_out='"+soc.in_out+"', socket_type='"+soc.socket_type+"')")
+    for node in nodes:
+        nn = escape(node.name)
+        print(nn + " = ng.nodes.new('" + node.__class__.__name__ + "')")
+        print(nn + ".name = '" + node.name+ "'")
+        print(nn + ".location = "+str(tuple(node.location)))
+
+        for attr in ['data_type', 'operation', 'transform_space']:
+            if hasattr(node, attr):
+                print(escape(node.name) + "." + attr + " = " + repr(getattr(node, attr)))
+    def soc_id(soc):
+        if isinstance(soc.node, (bpy.types.NodeGroupOutput, bpy.types.NodeGroupInput)):
+            return soc.name
+        else:
+            return soc.identifier
+    for node in nodes:
+        for inp in node.inputs:
+            if not inp.is_unavailable:
+                dst = escape(node.name) + ".inputs['" + soc_id(inp) + "']"
+                if len(inp.links) > 0:
+                    for lnk in inp.links:
+                        src = escape(lnk.from_node.name) + ".outputs['" + soc_id(lnk.from_socket) + "']"
+                        print("ng.links.new(" + dst + ", " + src + ")")
+                elif hasattr(inp, 'default_value'):
+                    v = inp.default_value
+                    if isinstance(v, (int, float, bool, str)):
+                        val = str(v)
+                    else:
+                        try:
+                            val = str(tuple(v))
+                        except TypeError:
+                            val = repr(v)
+                    print(dst + ".default_value = " + val)
 
 
 def add_driver(body_obj, obj_sk, o):
@@ -2194,8 +2273,6 @@ class DazOptimizer:
                 if eyebrow_mat is not None:
                     if NodesUtils.contains_subgroup(eyebrow_mat, "DAZ Transparent"):
                         eyebrow_mat.name = TRANSPARENT_TOON_EYEBROWS_MAT_NAME
-
-
         else:
             eyelashes.data.uv_layers.active.name = 'Eyelashes UVs'
             eyebrows.data.uv_layers.active.name = 'Eyebrows UVs'
@@ -2380,8 +2457,87 @@ class DazOptimizer:
     def merge_all_materials(self):
         for o in bpy.data.objects:
             if isinstance(o.data, bpy.types.Mesh):
-                select_object(o)
-                bpy.ops.daz.merge_materials()
+                if not o.name.startswith("Love Loads"):
+                    select_object(o)
+                    bpy.ops.daz.merge_materials()
+
+    def merge_cum_materials(self):
+        cum_material = None
+        for o in find_cum():
+            if cum_material is None:
+                cum_material = o.material_slots[0].material
+            else:
+                o.material_slots[0].material = cum_material
+
+    def decimate_cum_meshes(self):
+        ng = bpy.data.node_groups.get('DecimateCum')
+        if ng is None:
+            body = self.get_body_mesh()
+
+            ng = bpy.data.node_groups.new('DecimateCum', 'GeometryNodeTree')
+            ng.interface.new_socket(name='Geometry', in_out='OUTPUT', socket_type='NodeSocketGeometry')
+            ng.interface.new_socket(name='Geometry', in_out='INPUT', socket_type='NodeSocketGeometry')
+            group_input = ng.nodes.new('NodeGroupInput')
+            group_input.name = 'Group Input'
+            group_input.location = (-340.0, 0.0)
+            group_output = ng.nodes.new('NodeGroupOutput')
+            group_output.name = 'Group Output'
+            group_output.location = (608.8350830078125, 127.03092193603516)
+            delete_geometry = ng.nodes.new('GeometryNodeDeleteGeometry')
+            delete_geometry.name = 'Delete Geometry'
+            delete_geometry.location = (383.6963195800781, 3.5750083923339844)
+            vector_math_001 = ng.nodes.new('ShaderNodeVectorMath')
+            vector_math_001.name = 'Vector Math.001'
+            vector_math_001.location = (-17.48244857788086, -212.68609619140625)
+            vector_math_001.operation = 'DOT_PRODUCT'
+            compare = ng.nodes.new('FunctionNodeCompare')
+            compare.name = 'Compare'
+            compare.location = (181.4677276611328, -146.98037719726562)
+            compare.data_type = 'FLOAT'
+            compare.operation = 'LESS_THAN'
+            sample_nearest_surface = ng.nodes.new('GeometryNodeSampleNearestSurface')
+            sample_nearest_surface.name = 'Sample Nearest Surface'
+            sample_nearest_surface.location = (-271.0045166015625, -196.76165771484375)
+            sample_nearest_surface.data_type = 'FLOAT_VECTOR'
+            object_info = ng.nodes.new('GeometryNodeObjectInfo')
+            object_info.name = 'Object Info'
+            object_info.location = (-512.5869750976562, -178.63140869140625)
+            object_info.transform_space = 'ORIGINAL'
+            normal_001 = ng.nodes.new('GeometryNodeInputNormal')
+            normal_001.name = 'Normal.001'
+            normal_001.location = (-538.8834228515625, -440.8331604003906)
+            ng.links.new(group_output.inputs['Geometry'], delete_geometry.outputs['Geometry'])
+            ng.links.new(delete_geometry.inputs['Geometry'], group_input.outputs['Geometry'])
+            ng.links.new(delete_geometry.inputs['Selection'], compare.outputs['Result'])
+            ng.links.new(vector_math_001.inputs['Vector'], sample_nearest_surface.outputs['Value'])
+            ng.links.new(vector_math_001.inputs['Vector_001'], normal_001.outputs['Normal'])
+            ng.links.new(compare.inputs['A'], vector_math_001.outputs['Value'])
+            compare.inputs['B'].default_value = 0.0
+            ng.links.new(sample_nearest_surface.inputs['Mesh'], object_info.outputs['Geometry'])
+            ng.links.new(sample_nearest_surface.inputs['Value'], normal_001.outputs['Normal'])
+            sample_nearest_surface.inputs['Group ID'].default_value = 0
+            sample_nearest_surface.inputs['Sample Position'].default_value = (0.0, 0.0, 0.0)
+            sample_nearest_surface.inputs['Sample Group ID'].default_value = 0
+            object_info.inputs['Object'].default_value = body
+            object_info.inputs['As Instance'].default_value = False
+
+        for o in find_cum():
+            gn_mod = o.modifiers.get("Geometry Nodes")
+            if gn_mod is not None:
+                o.modifiers.remove(gn_mod)
+            gn_mod = o.modifiers.new("Geometry Nodes", type='NODES')
+            gn_mod.node_group = ng
+            dec_mod = o.modifiers.get("Decimate")
+            if dec_mod is not None:
+                o.modifiers.remove(dec_mod)
+            dec_mod = o.modifiers.new("Decimate", type='DECIMATE')
+            dec_mod.decimate_type = 'UNSUBDIV'
+            dec_mod.iterations = 3
+
+    def apply_decimate_cum_meshes(self):
+        for o in find_cum():
+            bpy.ops.object.modifier_apply(modifier='Geometry Nodes')
+            bpy.ops.object.modifier_apply(modifier='Decimate')
 
     def merge_multi_mesh_clothes(self):
         for clothing_item in find_all_clothes():
@@ -3601,6 +3757,7 @@ class DazOptimizer:
         #
         # bind_to_objects(body, clothes, 'bind extruded')
         # sk.value = 1
+    
 
     def apply_fit_clothes(self):
         body = self.get_body_mesh()
@@ -4456,6 +4613,56 @@ class DazOptimizer:
 
         return hierarchy, bones
 
+    def reweight_pelvis(self):
+        body_mesh = self.get_body_mesh()
+        select_object(body_mesh)
+
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        bpy.context.scene.tool_settings.use_uv_select_sync = False
+        me = body_mesh.data
+        bm = bmesh.from_edit_mesh(me)
+        uv_layer = bm.loops.layers.uv.verify()
+        uv_mask = rle_decode(BUTT_RLE, MASK_SHAPE)
+        vertex_mask = np.zeros((len(me.vertices), 2), dtype=np.float32)
+        for face in bm.faces:
+            for loop in face.loops:
+                loop_uv = loop[uv_layer]
+                uv = np.array(loop_uv.uv)
+                if 1 < uv[0] < 2:
+                    uv[0] -= 1
+                    uv2 = np.array([uv[0], 1 - uv[1]])
+                    pixel_coord = (uv2 * MASK_SHAPE[0]).clip(0, MASK_SHAPE[0] - 1)
+                    pixel_coord = np.int32(pixel_coord)
+                    matched = uv_mask[pixel_coord[1], pixel_coord[0]]
+                    if matched:
+                        vertex_mask[loop.vert.index] = uv
+                    else:
+                        vertex_mask[loop.vert.index] = -uv
+        bpy.ops.object.mode_set(mode='OBJECT')
+        l_glute_group = body_mesh.vertex_groups.new(name="l_glute")
+        r_glute_group = body_mesh.vertex_groups.new(name="r_glute")
+
+        is_left = vertex_mask[:, 0] > 0.5
+        is_cheek = vertex_mask[:, 1] > 0
+        is_left_cheek = np.logical_and(is_left, is_cheek)
+        is_right_cheek = np.logical_and(np.logical_not(is_left), is_cheek)
+        r_cheek = vertex_mask[is_right_cheek]
+        l_cheek = vertex_mask[is_left_cheek]
+        r_center = (0.12788, 0.27)
+        l_center = (0.87212, 0.27)
+        r_cheek = np.linalg.norm(r_cheek - r_center, axis=1)
+        l_cheek = np.linalg.norm(l_cheek - l_center, axis=1)
+        max_radius = 0.13
+        r_cheek = 1 - r_cheek / max_radius
+        l_cheek = 1 - l_cheek / max_radius
+        l_cheek_indices, = np.where(is_left_cheek)
+        r_cheek_indices, = np.where(is_right_cheek)
+        for val, idx in zip(l_cheek.tolist(), l_cheek_indices.tolist()):
+            l_glute_group.add(index=(idx,), weight=val, type='REPLACE')
+        for val, idx in zip(r_cheek.tolist(), r_cheek_indices.tolist()):
+            r_glute_group.add(index=(idx,), weight=val, type='REPLACE')
+
     def reorient_bones(self):
         import mathutils
         hierarchy, bones = self.compute_ue5_bone_oerientation()
@@ -5073,6 +5280,52 @@ class DazSaveTextures_operator(bpy.types.Operator):
 def has_gp():
     return 'GoldenPalace_G9 Mesh' in bpy.data.objects
 
+
+class DazMergeCumMaterials_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.merge_cum_materials"
+    bl_label = "Merge cum materials"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '['
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazMergeCumMaterials_operator])
+
+    def execute(self, context):
+        DazOptimizer().merge_cum_materials()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class DazDecimateCumMeshes_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.decimate_cum_meshes"
+    bl_label = "Decimate cum meshes"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '-'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazDecimateCumMeshes_operator])
+
+    def execute(self, context):
+        DazOptimizer().decimate_cum_meshes()
+        pass_stage(self)
+        return {'FINISHED'}
+
+
+class DazApplyDecimateCumMeshes_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.apply_decimate_cum_meshes"
+    bl_label = "Apply decimate cum meshes"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '|'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazDecimateCumMeshes_operator], [DazApplyDecimateCumMeshes_operator])
+
+    def execute(self, context):
+        DazOptimizer().apply_decimate_cum_meshes()
+        pass_stage(self)
+        return {'FINISHED'}
 
 class DazMergeAllMaterials_operator(bpy.types.Operator):
     bl_idname = "dazoptim.merge_all_materials"
@@ -5967,6 +6220,22 @@ class DazReorientBones_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class DazReweightPelvis_operator(bpy.types.Operator):
+    """ Reweight pelvis """
+    bl_idname = "dazoptim.reweight pelvis"
+    bl_label = "Reweight pelvis"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = ']'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazConvertToUe5Skeleton_operator], [DazReweightPelvis_operator])
+
+    def execute(self, context):
+        DazOptimizer().reweight_pelvis()
+        pass_stage(self)
+        return {'FINISHED'}
+
 
 class DazOptimizeGoldenPalaceUVs(bpy.types.Operator):
     """ Optimize Golden Palace UVs """
@@ -6429,6 +6698,39 @@ class ShowAllHair(bpy.types.Operator):
                 rig.hide_set(False)
         return {'FINISHED'}
 
+
+class HideAllCum(bpy.types.Operator):
+    """ hide all cum """
+    bl_idname = "dazoptim.hide_all_cum"
+    bl_label = "hide all cum"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        for c in find_cum():
+            c.hide_set(True)
+        return {'FINISHED'}
+
+class ShowAllCum(bpy.types.Operator):
+    """ show all cum """
+    bl_idname = "dazoptim.show_all_cum"
+    bl_label = "show all cum"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        for c in find_cum():
+            c.hide_set(False)
+        return {'FINISHED'}
+
 class RemoveDazBoneConstraints(bpy.types.Operator):
     """ remove daz bone constraints """
     bl_idname = "dazoptim.remove_daz_bone_constraints"
@@ -6525,6 +6827,9 @@ operators = [
     EntryOp(DazSaveTextures_operator, "Save textures"),
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
     EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
+    EntryOp(DazMergeCumMaterials_operator, "Merge cum materials"),
+    EntryOp(DazDecimateCumMeshes_operator, "Decimate cum meshes"),
+    EntryOp(DazApplyDecimateCumMeshes_operator, "Apply decimate cum"),
     EntryOp(DazMergeMultiMeshClothes_operator, "Merge clothes sub-meshes"),
     EntryOp(FixToonEyes, "Fix Nirv Zero eyes"),
     EntryOp(SaveMorphs, "Generate fav morphs (all)"),
@@ -6606,6 +6911,8 @@ operators = [
     EntryOp(ShowAllClothes, "Show all clothes"),
     EntryOp(HideAllHair, "Hide all hair"),
     EntryOp(ShowAllHair, "Show all hair"),
+    EntryOp(HideAllCum, "Hide all cum"),
+    EntryOp(ShowAllCum, "Show all cum"),
     EntryOp(UnlockEverything, "Unlock everything"),
     EntryOp(DazAlignPoseQuinn, "Align pose to ue5"),
     EntryOp(RemoveDazBoneConstraints, "Remove daz bone constraints"),
