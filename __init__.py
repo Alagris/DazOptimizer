@@ -1682,12 +1682,16 @@ def select_object(obj):
             bpy.ops.object.mode_set(mode='OBJECT')
 
 
-def apply_vertex_group_weights(group:bpy.types.VertexGroup, weights:np.array, epsilon:float = 0.001, type='REPLACE'):
-    mask = weights>epsilon
-    values = weights[mask]
-    indices, = np.where(mask)
+def apply_vertex_group_weights(group:bpy.types.VertexGroup, weights:np.array, epsilon:float = 0.001, old_weights=None):
+    new_weights_present = weights>epsilon
+    if old_weights is not None:
+        #old_weights_vanished = np.logical_and(old_weights > 0, np.logical_not(new_weights_present))
+        new_weights_present = np.logical_or(new_weights_present, old_weights > 0)
+    values = weights[new_weights_present]
+    indices, = np.where(new_weights_present)
     for val, idx in zip(values.tolist(), indices.tolist()):
-        group.add(index=(idx,), weight=val, type=type)
+        group.add(index=(idx,), weight=val, type='REPLACE')
+
 
 def subdivide_bone(cuts, mesh, rig, bone_name):
     if cuts < 1:
@@ -1732,11 +1736,15 @@ def subdivide_bone(cuts, mesh, rig, bone_name):
     return vertex_groups
 
 
-def intersect_two_weght_groups(mesh, group1, group2, new_group):
+def intersect_two_weight_groups(mesh, group1, group2, new_group, method="L0"):
     select_object(mesh)
+    prev_mode = mesh.mode
     bpy.ops.object.mode_set(mode='EDIT')
     g1 = mesh.vertex_groups[group1]
     g2 = mesh.vertex_groups[group2]
+    gn = mesh.vertex_groups.get(new_group)
+    if gn is None:
+        gn = mesh.vertex_groups.new(name=new_group)
 
     def contains_group(vertex, group_index):
         for g in vertex.groups:
@@ -1749,16 +1757,51 @@ def intersect_two_weght_groups(mesh, group1, group2, new_group):
     i2 = g2.index
     weights2 = np.array([contains_group(v, i2) for v in mesh.data.vertices])
     bpy.ops.object.mode_set(mode='OBJECT')
-    intersection = np.minimum(weights1, weights2)
-    steps = len(vertex_groups) + 1
-    step = max_weight / steps
-    #pec_weights_normalised = pec_weights/max_weight
-    for i, subpec_group in enumerate(vertex_groups):
-        subpec_weights = old_weights - step * (i + 1)
-        # subpec_weights = subpec_weights.clip(0, step)
-        apply_vertex_group_weights(subpec_group, subpec_weights)
-    vertex_groups.append(old_group)
-    return vertex_groups
+    if method=="GEOM":
+        ##### Here is a method based on geometric mean
+        intersection = np.sqrt(weights1*weights2)
+        # from the AM-GM inequality (https://en.wikipedia.org/wiki/AM%E2%80%93GM_inequality) follows
+        # np.sqrt(weights1*weights2) <= (weights1+weights2)/2 <= weights1+weights2
+        # therefore
+        # 2*intersection <= (weights1 + weights2)
+        # 0 <= (weights1-intersection) + (weights2-intersection)
+        frac = intersection/(weights1+weights2)
+        new_weights1 = weights1-intersection
+        new_weights2 = weights2-intersection
+        intersection *= 2
+    elif method=="MIN":
+        ##### Here is a method based on lattice properties of min/max and intersection/union
+        intersection = np.minimum(weights1, weights2)
+        # min(weights1, weights2) <= weights1 and min(weights1, weights2) <= weights2
+        # therefore
+        # 2*min(weights1, weights2) <= weights1 + weights2
+        # 0 <= (weights1-intersection) + (weights2-intersection)
+        new_weights2 = weights2-intersection
+        new_weights1 = weights1-intersection
+        intersection *= 2
+        print("min1=", np.min(new_weights1))
+        print("min2=", np.min(new_weights2))
+    elif method == "L0":
+        ### This method is based on l0 norm
+        a = weights2 - weights1
+        # note that for all a the following two equations hold:
+        # max(a,0) - max(-a,0) == a
+        # max(a,0) + max(-a,0) == abs(a)
+        # therefore
+        # intersection == weights2+weights1 -  new_weights2 - new_weights1
+        # intersection == weights2+weights1 -  max(weights2-weights1,0) - max(weights1-weights2,0)
+        # intersection == weights2+weights1 - (max(weights2-weights1,0) + max(weights1-weights2,0))
+        # intersection == weights2+weights1 - abs(weights2-weights1)
+        intersection = weights2 + weights1 - np.absolute(a)
+        new_weights2 = np.maximum(a, 0)  # new_weights2 = max(weights2-weights1,0)
+        new_weights1 = np.maximum(-a, 0)  # new_weights1 = max(weights1-weights2,0)
+    else:
+        return
+    apply_vertex_group_weights(gn, intersection)
+    apply_vertex_group_weights(g1, new_weights1, old_weights=weights1)
+    apply_vertex_group_weights(g2, new_weights2, old_weights=weights2)
+    bpy.ops.object.mode_set(mode=prev_mode)
+    return g1, g2, gn
 
 
 def get_eyebrows_and_eyelashes_path():
@@ -3757,7 +3800,7 @@ class DazOptimizer:
         #
         # bind_to_objects(body, clothes, 'bind extruded')
         # sk.value = 1
-    
+
 
     def apply_fit_clothes(self):
         body = self.get_body_mesh()
@@ -4192,16 +4235,17 @@ class DazOptimizer:
             c.obj.select_set(True)
         bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='NoFace', useOverwrite=False)
 
-    def transfer_missing_bones_to_clothes(self):
+    def get_missing_bones(self):
         BODY_M = self.get_body_mesh()
         groups = []
+
         def add_subdivided(name):
             i = 1
             while True:
-                group = 'l_'+name + str(i)
+                group = 'l_' + name + str(i)
                 if group in BODY_M.vertex_groups:
                     groups.append(group)
-                    groups.append('r_'+name + str(i))
+                    groups.append('r_' + name + str(i))
                     i += 1
                 else:
                     break
@@ -4215,8 +4259,19 @@ class DazOptimizer:
             groups.append('r_thigh_jiggle')
             add_subdivided('thigh_jiggle')
         add_subdivided('pectoral')
+        return groups
+
+    def transfer_missing_bones_to_clothes(self):
+        BODY_M = self.get_body_mesh()
+        groups = self.get_missing_bones()
         clothes = [c.obj for c in find_all_clothes()]
         transfer_weights(BODY_M, clothes, groups)
+
+    def transfer_missing_bones_to_cum(self):
+        BODY_M = self.get_body_mesh()
+        groups = self.get_missing_bones()
+        cum = find_cum()
+        transfer_weights(BODY_M, cum, groups)
 
     def is_female(self):
         return bool(bpy.context.scene['daz_optim_female'])
@@ -4302,6 +4357,11 @@ class DazOptimizer:
             if isinstance(o.data, bpy.types.Armature):
                 convert_rig(o)
             children.extend(o.children)
+        for obj in bpy.data.objects:
+            if isinstance(obj.data, bpy.types.Mesh):
+                spine1 = obj.vertex_groups.get('spine_01')
+                if spine1 is not None:
+                    spine1.name = 'hip'
 
     @staticmethod
     def remove_daz_bone_constraints(self):
@@ -4615,53 +4675,10 @@ class DazOptimizer:
 
     def reweight_pelvis(self):
         body_mesh = self.get_body_mesh()
-        select_object(body_mesh)
-
-        bpy.ops.object.mode_set(mode='EDIT')
-
-        bpy.context.scene.tool_settings.use_uv_select_sync = False
-        me = body_mesh.data
-        bm = bmesh.from_edit_mesh(me)
-        uv_layer = bm.loops.layers.uv.verify()
-        uv_mask = rle_decode(BUTT_RLE, MASK_SHAPE)
-        vertex_mask = np.zeros((len(me.vertices), 2), dtype=np.float32)
-        for face in bm.faces:
-            for loop in face.loops:
-                loop_uv = loop[uv_layer]
-                uv = np.array(loop_uv.uv)
-                if 1 < uv[0] < 2:
-                    uv[0] -= 1
-                    uv2 = np.array([uv[0], 1 - uv[1]])
-                    pixel_coord = (uv2 * MASK_SHAPE[0]).clip(0, MASK_SHAPE[0] - 1)
-                    pixel_coord = np.int32(pixel_coord)
-                    matched = uv_mask[pixel_coord[1], pixel_coord[0]]
-                    if matched:
-                        vertex_mask[loop.vert.index] = uv
-                    else:
-                        vertex_mask[loop.vert.index] = -uv
-        bpy.ops.object.mode_set(mode='OBJECT')
-        l_glute_group = body_mesh.vertex_groups.new(name="l_glute")
-        r_glute_group = body_mesh.vertex_groups.new(name="r_glute")
-
-        is_left = vertex_mask[:, 0] > 0.5
-        is_cheek = vertex_mask[:, 1] > 0
-        is_left_cheek = np.logical_and(is_left, is_cheek)
-        is_right_cheek = np.logical_and(np.logical_not(is_left), is_cheek)
-        r_cheek = vertex_mask[is_right_cheek]
-        l_cheek = vertex_mask[is_left_cheek]
-        r_center = (0.12788, 0.27)
-        l_center = (0.87212, 0.27)
-        r_cheek = np.linalg.norm(r_cheek - r_center, axis=1)
-        l_cheek = np.linalg.norm(l_cheek - l_center, axis=1)
-        max_radius = 0.13
-        r_cheek = 1 - r_cheek / max_radius
-        l_cheek = 1 - l_cheek / max_radius
-        l_cheek_indices, = np.where(is_left_cheek)
-        r_cheek_indices, = np.where(is_right_cheek)
-        for val, idx in zip(l_cheek.tolist(), l_cheek_indices.tolist()):
-            l_glute_group.add(index=(idx,), weight=val, type='REPLACE')
-        for val, idx in zip(r_cheek.tolist(), r_cheek_indices.tolist()):
-            r_glute_group.add(index=(idx,), weight=val, type='REPLACE')
+        spine1, spine2, hip = intersect_two_weight_groups(body_mesh, 'spine_01', 'spine_02', 'tmp')
+        spine1_name = spine1.name
+        spine1.name = 'hip'
+        hip.name = spine1_name
 
     def reorient_bones(self):
         import mathutils
@@ -4909,6 +4926,15 @@ class DazOptimizer:
             clothes = clothes.obj
             name = clothes.name[:-len(' Mesh')] if clothes.name.endswith(' Mesh') else clothes.name
             self.export_to_fbx(rig, clothes, os.path.join(p, name + '.fbx'))
+
+    def export_cum_to_fbx(self):
+        rig = self.get_body_rig()
+        p = os.path.join(self.workdir, self.name + "_cum")
+        if not os.path.exists(p):
+            os.mkdir(p)
+        for cum in find_cum():
+            name = cum.name[:-len(' Mesh')] if cum.name.endswith(' Mesh') else cum.name
+            self.export_to_fbx(rig, cum, os.path.join(p, cum + '.fbx'))
 
     def export_to_fbx(self, rig, obj, path):
         if "Subsurf" in obj.modifiers:
@@ -5235,12 +5261,15 @@ class DazSaveBlend_operator(bpy.types.Operator):
             return {'CANCELLED'}
         if bpy.types.dazoptim_easy_import_panel.filepath is not None and 'duf_filepath' not in bpy.context.scene:
             bpy.context.scene['duf_filepath'] = bpy.types.dazoptim_easy_import_panel.filepath
-        save_blend_file(bpy.context.scene['duf_filepath'])
+
         body_mesh = find_body_mesh()
         is_t = bpy.context.scene['daz_optim_toon'] = is_toon(body_mesh)
         if is_t:
-            is_t = bpy.context.scene['is_nirv_zero'] = 'nirv zero' in body_mesh.name.lower()
-
+            bpy.context.scene['is_nirv_zero'] = 'nirv zero' in body_mesh.name.lower()
+        for o in bpy.data.objects:
+            if o.name.startswith("Love Loads"):
+                bpy.context.scene['has_love_loads'] = True
+        save_blend_file(bpy.context.scene['duf_filepath'])
         pass_stage(self)
         if os.path.isdir(DazOptimizer().textures_dir()):
             pass_stage(DazSaveTextures_operator)
@@ -5289,7 +5318,7 @@ class DazMergeCumMaterials_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazMergeCumMaterials_operator])
+        return UNLOCK or bpy.context.scene.get('has_love_loads') and check_stage(context, [DazSaveTextures_operator], [DazMergeCumMaterials_operator])
 
     def execute(self, context):
         DazOptimizer().merge_cum_materials()
@@ -5304,7 +5333,7 @@ class DazDecimateCumMeshes_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazDecimateCumMeshes_operator])
+        return UNLOCK or bpy.context.scene.get('has_love_loads') and check_stage(context, [DazSaveTextures_operator], [DazDecimateCumMeshes_operator])
 
     def execute(self, context):
         DazOptimizer().decimate_cum_meshes()
@@ -6046,6 +6075,21 @@ class DazTransferMissingBonesToClothes_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class DazTransferMissingBonesToCum_operator(bpy.types.Operator):
+    """ transfer new bones to cum """
+    bl_idname = "dazoptim.transfer_new_bones_to_cum"
+    bl_label = "transfer new bones to cum"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '+'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or bpy.context.scene.get('has_love_loads') and check_stage_any(context, [DazAddGluteBones_operator, DazAddBreastBones_operator, DazAddThighBones_operator], [DazTransferMissingBonesToCum_operator])
+
+    def execute(self, context):
+        DazOptimizer().transfer_missing_bones_to_cum()
+        pass_stage(self)
+        return {'FINISHED'}
 
 class DazApplyFitSkinTightClothes_operator(bpy.types.Operator):
     """ fit skin tight clothes """
@@ -6220,21 +6264,21 @@ class DazReorientBones_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
-class DazReweightPelvis_operator(bpy.types.Operator):
-    """ Reweight pelvis """
-    bl_idname = "dazoptim.reweight pelvis"
-    bl_label = "Reweight pelvis"
-    bl_options = {"REGISTER", "UNDO"}
-    stage_id = ']'
-
-    @classmethod
-    def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazConvertToUe5Skeleton_operator], [DazReweightPelvis_operator])
-
-    def execute(self, context):
-        DazOptimizer().reweight_pelvis()
-        pass_stage(self)
-        return {'FINISHED'}
+# class DazReweightPelvis_operator(bpy.types.Operator):
+#     """ Reweight pelvis """
+#     bl_idname = "dazoptim.reweight_pelvis"
+#     bl_label = "Reweight pelvis"
+#     bl_options = {"REGISTER", "UNDO"}
+#     stage_id = ']'
+#
+#     @classmethod
+#     def poll(cls, context):
+#         return UNLOCK or check_stage(context, [DazConvertToUe5Skeleton_operator], [DazReweightPelvis_operator])
+#
+#     def execute(self, context):
+#         DazOptimizer().reweight_pelvis()
+#         pass_stage(self)
+#         return {'FINISHED'}
 
 
 class DazOptimizeGoldenPalaceUVs(bpy.types.Operator):
@@ -6579,7 +6623,6 @@ class DazExportBodyFbx(bpy.types.Operator):
         DazOptimizer().export_body_to_fbx()
         return {'FINISHED'}
 
-
 class DazExportClothesFbx(bpy.types.Operator):
     """ export fbx """
     bl_idname = "dazoptim.export_clothes_fbx"
@@ -6593,6 +6636,21 @@ class DazExportClothesFbx(bpy.types.Operator):
 
     def execute(self, context):
         DazOptimizer().export_clothes_to_fbx()
+        return {'FINISHED'}
+
+class DazExportCumFbx(bpy.types.Operator):
+    """ export fbx """
+    bl_idname = "dazoptim.export_cum_fbx"
+    bl_label = "Export cum fbx"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().export_cum_to_fbx()
         return {'FINISHED'}
 
 
@@ -6698,6 +6756,22 @@ class ShowAllHair(bpy.types.Operator):
                 rig.hide_set(False)
         return {'FINISHED'}
 
+class HideAllRigs(bpy.types.Operator):
+    """ hide all rigs """
+    bl_idname = "dazoptim.hide_all_rigs"
+    bl_label = "hide all rigs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        for c in bpy.data.objects:
+            if isinstance(c.data, bpy.types.Armature):
+                c.hide_set(True)
+        return {'FINISHED'}
 
 class HideAllCum(bpy.types.Operator):
     """ hide all cum """
@@ -6887,17 +6961,20 @@ operators = [
     EntryProp("skin_tight_displacement"),
     EntryOp(DazApplyFitSkinTightClothes_operator, "Apply skin-tight clothes"),
     EntryOp(DazTransferMissingBonesToClothes_operator, "Transfer new bones to clothes"),
+    EntryOp(DazTransferMissingBonesToCum_operator, "Transfer new bones to cum"),
     EntryOp(TransferMorphsToClothes, "Transfer morphs to clothes"),
     EntryOp(DazScaleToQuinn, "Scale to Manny height"),
     EntryOp(DuplicateSkeleton, "Duplicate skeleton"),
     EntryOp(DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
     EntryOp(DazReorientBones_operator, "Reorient bones"),
+    # EntryOp(DazReweightPelvis_operator, "Reweight pelvis"),
     EntryOp(DazOptimizeHair_operator, "Optimize hair"),
     EntryOp(DazDetachHairFromSkeleton_operator, "Detach hair from skeleton"),
     EntryOp(AddUe5IkBones, "Add UE5 IK bones"),
     EntryOp(DazScaleToUnreal, "Scale to ue5 units"),
     EntryOp(DazExportBodyFbx, "Export body to fbx"),
     EntryOp(DazExportClothesFbx, "Export clothes to fbx"),
+    EntryOp(DazExportCumFbx, "Export cum to fbx"),
     EntryOp(DazExportHairFbx, "Export hair to fbx"),
     EntryLabel("Animation tools", -1),
     EntryOp(AttachDuplicateSkeleton, "Attach ue5 skeleton"),
@@ -6913,6 +6990,7 @@ operators = [
     EntryOp(ShowAllHair, "Show all hair"),
     EntryOp(HideAllCum, "Hide all cum"),
     EntryOp(ShowAllCum, "Show all cum"),
+    EntryOp(HideAllRigs, "Hide all rigs"),
     EntryOp(UnlockEverything, "Unlock everything"),
     EntryOp(DazAlignPoseQuinn, "Align pose to ue5"),
     EntryOp(RemoveDazBoneConstraints, "Remove daz bone constraints"),
