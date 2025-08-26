@@ -532,8 +532,8 @@ MATCH_PROFILE_MIN = PROFILE_MIN
 MATCH_PROFILE_MID = MATCH_PROFILE_MIN + PROFILE_MID
 MATCH_PROFILE_FULL = MATCH_PROFILE_MID + PROFILE_FULL
 USED_PROFILES = MATCH_PROFILE_MID
-GENERATE_MORPHS_FOR_CLOTHES = False
-GENERATE_MORPHS_FOR_HAIR = False
+GENERATE_MORPHS_FOR_CLOTHES = True
+GENERATE_MORPHS_FOR_HAIR = True
 MORPHS = {
     "/data/rudy studio/wtkt toon/wtkt toon":{
         "shapes": { "female":{
@@ -627,10 +627,10 @@ MORPHS = {
     },
     "/data/vyusur/body geo/body geo":{
         "shapes": { "female": {
-            "Navel":MorphMeta(CAT_BREAST,"Navel", FIGURE_G9, PROFILE_FULL),
-            "Nipples":MorphMeta(CAT_BREAST,"Nipples", FIGURE_G9, PROFILE_FULL),
-            "Nipples2":MorphMeta(CAT_BREAST,"Nipples 2", FIGURE_G9, PROFILE_MID),
-            "Nipples3":MorphMeta(CAT_BREAST,"Nipples 3", FIGURE_G9, PROFILE_FULL),
+            "Navel":MorphMeta(CAT_BREAST,"Navel", FIGURE_ANY, PROFILE_FULL),
+            "Nipples":MorphMeta(CAT_BREAST,"Nipples", FIGURE_ANY, PROFILE_FULL),
+            "Nipples2":MorphMeta(CAT_BREAST,"Nipples 2", FIGURE_ANY, PROFILE_MID),
+            "Nipples3":MorphMeta(CAT_BREAST,"Nipples 3", FIGURE_ANY, PROFILE_FULL),
         }},
     },
     "/data/daz 3d/genesis 9/base": {
@@ -3465,13 +3465,19 @@ class DazOptimizer:
             json.dump(fav_morphs, f, indent=2)
 
     def load_fav_morphs(self):
-        for obj in bpy.data.objects:
-            if (isinstance(obj.data, bpy.types.Mesh)
-                    and hasattr(obj.data, 'daz_importer')
-                    and is_clothes(obj) is None
-                    and not is_hair(obj)):
-                select_object(obj)
-                bpy.ops.daz.load_favo_morphs(filepath=self.get_fav_morphs_path())
+        fav_morphs_path = self.get_fav_morphs_path()
+        # with open(fav_morphs_path, 'r') as f:
+        #     fav_morphs = json.load(f)
+        # for obj in bpy.data.objects:
+        #     if not isinstance(obj.data, bpy.types.Mesh):
+        #         continue
+        #     if not hasattr(obj.data, 'daz_importer'):
+        #         continue
+        #     mesh_url = urllib.parse.quote(obj.daz_importer.DazUrl)
+        #     if mesh_url in fav_morphs:
+        #         print("===== loading for", repr(obj), "=====")
+        #         select_object(obj)
+        bpy.ops.daz.load_favo_morphs(filepath=fav_morphs_path)
 
     def rebind_loaded_fav_morphs(self):
         body = self.get_body_mesh()
