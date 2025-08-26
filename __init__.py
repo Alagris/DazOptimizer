@@ -532,6 +532,8 @@ MATCH_PROFILE_MIN = PROFILE_MIN
 MATCH_PROFILE_MID = MATCH_PROFILE_MIN + PROFILE_MID
 MATCH_PROFILE_FULL = MATCH_PROFILE_MID + PROFILE_FULL
 USED_PROFILES = MATCH_PROFILE_MID
+GENERATE_MORPHS_FOR_CLOTHES = False
+GENERATE_MORPHS_FOR_HAIR = False
 MORPHS = {
     "/data/rudy studio/wtkt toon/wtkt toon":{
         "shapes": { "female":{
@@ -627,7 +629,7 @@ MORPHS = {
         "shapes": { "female": {
             "Navel":MorphMeta(CAT_BREAST,"Navel", FIGURE_G9, PROFILE_FULL),
             "Nipples":MorphMeta(CAT_BREAST,"Nipples", FIGURE_G9, PROFILE_FULL),
-            "Nipples2":MorphMeta(CAT_BREAST,"Nipples 2", FIGURE_G9, PROFILE_FULL),
+            "Nipples2":MorphMeta(CAT_BREAST,"Nipples 2", FIGURE_G9, PROFILE_MID),
             "Nipples3":MorphMeta(CAT_BREAST,"Nipples 3", FIGURE_G9, PROFILE_FULL),
         }},
     },
@@ -1489,8 +1491,17 @@ def find_all_hair():
             hair.append(obj)
     return hair
 
+def is_cum(o):
+    return o.name.startswith("Love Loads")
+
 def find_cum():
-    return [o for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh) and o.name.startswith("Love Loads")]
+    return [o for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh) and is_cum(o)]
+
+def is_sub_rig(sub_rig, super_rig):
+    for bone in sub_rig.bones:
+        if bone.name not in super_rig.bones:
+            return False
+    return True
 
 def find_child_meshes(o):
     out = []
@@ -2600,7 +2611,7 @@ class DazOptimizer:
         meshes = []
         for o in bpy.data.objects:
             if isinstance(o.data, bpy.types.Armature):
-                if 'hair' in o.name.lower():
+                if 'hair' in o.name.lower() or is_clothes(o) and is_sub_rig(o.data, body_rig.data):
                     if o.parent != body_rig:
                         o.parent = body_rig
                     o.hide_viewport = True
@@ -3361,17 +3372,24 @@ class DazOptimizer:
         shape_keys = {}
         figure = FIGURE_TOON if bpy.context.scene.get('daz_optim_toon') else FIGURE_G9
         for obj in bpy.data.objects:
-            daz_dir = obj_daz_dir(obj).lower()
-            morphs_for_daz_obj = MORPHS.get(daz_dir)
-            if morphs_for_daz_obj is not None:
-                shapes = morphs_for_daz_obj['shapes']
-                for key in ['unisex', 'female' if is_fem else 'male']:
-                    if key in shapes:
-                        for shape_key, meta in shapes[key].items():
-                            if figure in meta.figure and (
-                                    categories_to_include is None or meta.category in categories_to_include) and (
-                                    profiles_to_include is None or meta.usage_profiles in profiles_to_include):
-                                shape_keys[shape_key] = meta
+            if isinstance(obj.data, bpy.types.Mesh):
+                if not GENERATE_MORPHS_FOR_CLOTHES and is_clothes(obj):
+                    continue
+                if not GENERATE_MORPHS_FOR_HAIR and is_hair(obj):
+                    continue
+                if is_cum(obj):
+                    continue
+                daz_dir = obj_daz_dir(obj).lower()
+                morphs_for_daz_obj = MORPHS.get(daz_dir)
+                if morphs_for_daz_obj is not None:
+                    shapes = morphs_for_daz_obj['shapes']
+                    for key in ['unisex', 'female' if is_fem else 'male']:
+                        if key in shapes:
+                            for shape_key, meta in shapes[key].items():
+                                if figure in meta.figure and (
+                                        categories_to_include is None or meta.category in categories_to_include) and (
+                                        profiles_to_include is None or meta.usage_profiles in profiles_to_include):
+                                    shape_keys[shape_key] = meta
         return shape_keys
 
     def make_fav_morphs_list(self, categories_to_include=None, load_all_conflicting_morphs=True):
@@ -3386,6 +3404,12 @@ class DazOptimizer:
         }
         for obj in bpy.data.objects:
             if not isinstance(obj.data, bpy.types.Mesh):
+                continue
+            if not GENERATE_MORPHS_FOR_CLOTHES and is_clothes(obj):
+                continue
+            if not GENERATE_MORPHS_FOR_HAIR and is_hair(obj):
+                continue
+            if is_cum(obj):
                 continue
             daz_dir = obj_daz_dir(obj)
             collected_shape_keys = {}
@@ -4918,14 +4942,22 @@ class DazOptimizer:
             root.name = 'root'
 
     def export_clothes_to_fbx(self):
-        rig = self.get_body_rig()
+        root = bpy.data.objects.get('root')
+        if root is not None:
+            root.name = 'root_tmp'
         p = os.path.join(self.workdir, self.name+"_clothes")
         if not os.path.exists(p):
             os.mkdir(p)
         for clothes in find_all_clothes():
             clothes = clothes.obj
             name = clothes.name[:-len(' Mesh')] if clothes.name.endswith(' Mesh') else clothes.name
-            self.export_to_fbx(rig, clothes, os.path.join(p, name + '.fbx'))
+            clothes_rig = get_rig_of(clothes)
+            prev_name = clothes.parent.name
+            clothes_rig.name = 'root'
+            self.export_to_fbx(clothes_rig, clothes, os.path.join(p, name + '.fbx'))
+            clothes_rig.name = prev_name
+        if root is not None:
+            root.name = 'root'
 
     def export_cum_to_fbx(self):
         rig = self.get_body_rig()
@@ -4934,7 +4966,7 @@ class DazOptimizer:
             os.mkdir(p)
         for cum in find_cum():
             name = cum.name[:-len(' Mesh')] if cum.name.endswith(' Mesh') else cum.name
-            self.export_to_fbx(rig, cum, os.path.join(p, cum + '.fbx'))
+            self.export_to_fbx(rig, cum, os.path.join(p, name + '.fbx'))
 
     def export_to_fbx(self, rig, obj, path):
         if "Subsurf" in obj.modifiers:
