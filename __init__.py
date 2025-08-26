@@ -584,7 +584,7 @@ MORPHS = {
             'ANUS IN OUT ROTATED':MorphMeta(CAT_GENITALS,"anus in out rotate",FIGURE_TOON, PROFILE_FULL),
             'ANUS IN OUT':MorphMeta(CAT_GENITALS,"anus in out",FIGURE_TOON, PROFILE_FULL),
             'ANUS SHAPE':MorphMeta(CAT_GENITALS,"anus shape",FIGURE_TOON, PROFILE_FULL),
-            'ANUS SIZE 2':MorphMeta(CAT_GENITALS,"anus size 2",FIGURE_TOON, PROFILE_MIN),
+            'ANUS SIZE 2':MorphMeta(CAT_GENITALS,"anus size 2",FIGURE_TOON, PROFILE_FULL),
             'ANUS SIZE':MorphMeta(CAT_GENITALS,"anus size",FIGURE_TOON, PROFILE_FULL),
             'ANUS SIZE3':MorphMeta(CAT_GENITALS,"anus size",FIGURE_TOON, PROFILE_FULL),
             'ANUS STRETCH 2':MorphMeta(CAT_GENITALS,"anus stretch 2",FIGURE_TOON, PROFILE_FULL),
@@ -614,10 +614,10 @@ MORPHS = {
             'LABIA MINORA SMALL':MorphMeta(CAT_GENITALS,"labia minora small",FIGURE_TOON, PROFILE_FULL),
             'LABIA MINORA FRONT  L BIG':MorphMeta(CAT_GENITALS,"labia minora front l big",FIGURE_TOON, PROFILE_FULL),
             'LABIA MINORA THICKNES 01':MorphMeta(CAT_GENITALS,"labia minora thicknes 01",FIGURE_TOON, PROFILE_FULL),
-            'LABIA MINORA FRONT  R BIG':MorphMeta(CAT_GENITALS,"labia minora front  r big",FIGURE_TOON, PROFILE_FULL),
+            'LABIA MINORA FRONT  R BIG':MorphMeta(CAT_GENITALS,"labia minora front r big",FIGURE_TOON, PROFILE_FULL),
             'LABIA MINORA THIKNESS':MorphMeta(CAT_GENITALS,"labia minora thiknes",FIGURE_TOON, PROFILE_FULL),
             'LABIA MINORA FRONT BIG':MorphMeta(CAT_GENITALS,"labia minora front big",FIGURE_TOON, PROFILE_FULL),
-            'CLITORIS FRONT BACK':MorphMeta(CAT_GENITALS,"clitoris front bac",FIGURE_TOON, PROFILE_MID),
+            'CLITORIS FRONT BACK':MorphMeta(CAT_GENITALS,"clitoris front back",FIGURE_TOON, PROFILE_MID),
             'CLITORIS IN OUT':MorphMeta(CAT_GENITALS,"clitoris in out",FIGURE_TOON, PROFILE_MID),
             'CLITORIS MOVE':MorphMeta(CAT_GENITALS,"clitoris move",FIGURE_TOON, PROFILE_MID),
             'CLITORIS SIZE - BACK':MorphMeta(CAT_GENITALS,"clitoris size - back",FIGURE_TOON, PROFILE_FULL),
@@ -4265,6 +4265,17 @@ class DazOptimizer:
             c.obj.select_set(True)
         bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='NoFace', useOverwrite=False)
 
+    def transfer_morphs_to_cum(self):
+        BODY_M = self.get_body_mesh()
+        select_object(BODY_M)
+        for c in find_cum():
+            hide_object(c, False)
+            c.select_set(True)
+        bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='NoFace', useOverwrite=False)
+
+    def clean_up_morphs(self):
+        pass
+
     def get_missing_bones(self):
         BODY_M = self.get_body_mesh()
         groups = []
@@ -6631,6 +6642,23 @@ class TransferMorphsToClothes(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class TransferMorphsToCum(bpy.types.Operator):
+    """ transfer morphs to cum """
+    bl_idname = "dazoptim.transfer_morphs_to_cum"
+    bl_label = "Transfer morphs to cum"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = "'"
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [LoadMorphs], [TransferMorphsToCum])
+
+    def execute(self, context):
+        DazOptimizer().transfer_morphs_to_cum()
+        pass_stage(self)
+        return {'FINISHED'}
+
+
 class RemoveShapeKeyDrivers(bpy.types.Operator):
     """ Remove shape key drivers """
     bl_idname = "dazoptim.remove_shape_key_drivers"
@@ -7001,6 +7029,7 @@ operators = [
     EntryOp(DazTransferMissingBonesToClothes_operator, "Transfer new bones to clothes"),
     EntryOp(DazTransferMissingBonesToCum_operator, "Transfer new bones to cum"),
     EntryOp(TransferMorphsToClothes, "Transfer morphs to clothes"),
+    EntryOp(TransferMorphsToCum, "Transfer morphs to cum"),
     EntryOp(DazScaleToQuinn, "Scale to Manny height"),
     EntryOp(DuplicateSkeleton, "Duplicate skeleton"),
     EntryOp(DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
