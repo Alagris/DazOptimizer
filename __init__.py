@@ -494,6 +494,16 @@ MALE_ONLY_GEOGRAFTS = DICK_GEOGRAFTS
 FEMALE_ONLY_GEOGRAFTS = ['GoldenPalace_G9', 'Wet Kitty TOON'] + BREAST_GEOGRAFTS
 GEOGRAFTS = FEMALE_ONLY_GEOGRAFTS + MALE_ONLY_GEOGRAFTS
 
+def is_graft(obj):
+    return obj.name in GEOGRAFTS
+
+def has_dick():
+    for dick in DICK_GEOGRAFTS:
+        d = bpy.data.objects.get(dick+' Mesh')
+        if d is not None:
+            return d
+
+
 def camel_case_to_spaces(text:str)->str:
     import re
     max_length = 0
@@ -1111,8 +1121,8 @@ MORPHS = {
     "/data/daz 3d/genesis 9/anatomical elements male": {
         "shapes": {
             "male": {
-                "body_ctrl_PenileLength":MorphMeta(CAT_GENITALS,"Penile Length", FIGURE_G9, PROFILE_MIN),
-                "body_ctrl_PenileWidth":MorphMeta(CAT_GENITALS,"Penile Width", FIGURE_G9, PROFILE_MIN),
+                "body_ctrl_PenileLength":MorphMeta(CAT_GENITALS,"Penile Length", FIGURE_ANY, PROFILE_MIN),
+                "body_ctrl_PenileWidth":MorphMeta(CAT_GENITALS,"Penile Width", FIGURE_ANY, PROFILE_MIN),
             }
         }
     },
@@ -1336,6 +1346,8 @@ CLOTHES = {
     'SAO Necklace': ClothesMeta('690-1380-690', -1, False),
     'G9 Base Bra': ClothesMeta('9748-19504-9754', CLOTHES_MIN_DIST_TO_SKIN, False),
     'G9 Base Panty': ClothesMeta('8624-17254-8630', -1, True),
+    'G9 Base Shirt': ClothesMeta('8038-16050-8010', -1, False),
+    'G9 Base Shorts': ClothesMeta('8256-16387-8130', -1, False),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -2374,6 +2386,79 @@ class DazOptimizer:
                 v.uv = new_uv
             body.data.uv_layers.remove(eyelashes_uvs)
 
+    def give_erection(self):
+        import mathutils
+        dick = has_dick()
+        if dick is not None:
+            if dick.name.startswith('Genesis 9 Anatomical Elements Male'):
+                length_factor = 0.1
+                rig = get_rig_of(dick)
+                select_object(rig)
+                bpy.ops.object.mode_set(mode='POSE')
+                genbase = rig.pose.bones['genbase']
+                base_direction = genbase.tail - genbase.head
+                movement_direction = base_direction.normalized()
+                for i in range(1, 7):
+                    gen = rig.pose.bones['gen'+str(i)]
+                    gen_direction = gen.tail-gen.head
+                    gen_len = gen_direction.length * length_factor
+                    quat_diff = gen_direction.rotation_difference(base_direction)
+                    if gen.rotation_mode == 'QUATERNION':
+                        gen.rotation_quaternion = quat_diff
+                    else:
+                        gen.rotation_euler = quat_diff.to_euler(gen.rotation_mode)
+                    base_direction = gen_direction
+
+                select_object(dick)
+                for mod in dick.modifiers:
+                    if isinstance(mod, bpy.types.ArmatureModifier):
+                        name = mod.name
+                        bpy.ops.object.modifier_apply(modifier=name)
+                        break
+                select_object(rig)
+                bpy.ops.object.mode_set(mode='POSE')
+                bpy.ops.pose.armature_apply(selected=False)
+                mod = dick.modifiers.new(name, type='ARMATURE')
+                mod.object = rig
+                    #gen.location.y = 0.08
+
+
+    def enlarge_dick(self):
+        import mathutils
+        dick = has_dick()
+        if dick is not None:
+            if dick.name.startswith('Genesis 9 Anatomical Elements Male'):
+                length_factor = 0.1
+                rig = get_rig_of(dick)
+                select_object(rig)
+                bpy.ops.object.mode_set(mode='POSE')
+                genbase = rig.pose.bones['genbase']
+                base_direction = genbase.tail - genbase.head
+                movement_direction = base_direction.normalized()
+                for i in range(1, 7):
+                    gen = rig.pose.bones['gen'+str(i)]
+                    gen_direction = gen.tail-gen.head
+                    gen_len = gen_direction.length * length_factor
+                    quat_diff = gen_direction.rotation_difference(base_direction)
+                    if gen.rotation_mode == 'QUATERNION':
+                        gen.rotation_quaternion = quat_diff
+                    else:
+                        gen.rotation_euler = quat_diff.to_euler(gen.rotation_mode)
+                    base_direction = gen_direction
+
+                select_object(dick)
+                for mod in dick.modifiers:
+                    if isinstance(mod, bpy.types.ArmatureModifier):
+                        name = mod.name
+                        bpy.ops.object.modifier_apply(modifier=name)
+                        break
+                select_object(rig)
+                bpy.ops.object.mode_set(mode='POSE')
+                bpy.ops.pose.armature_apply(selected=False)
+                mod = dick.modifiers.new(name, type='ARMATURE')
+                mod.object = rig
+
+
     def fix_toon_eyes(self):
         eyes = self.get_eyes_mesh()
         rig = self.get_body_rig()
@@ -2594,6 +2679,10 @@ class DazOptimizer:
             bpy.ops.object.modifier_apply(modifier='Decimate')
 
     def merge_multi_mesh_clothes(self):
+        for trash in ['BaseShortsGeoGraft Mesh']:
+            trash = bpy.data.objects.get(trash)
+            if trash is not None:
+                bpy.data.objects.remove(trash)
         for clothing_item in find_all_clothes():
             sub_clothes = find_child_meshes(clothing_item.obj)
             if len(sub_clothes)>0:
@@ -2611,17 +2700,17 @@ class DazOptimizer:
         meshes = []
         for o in bpy.data.objects:
             if isinstance(o.data, bpy.types.Armature):
-                if 'hair' in o.name.lower() or is_clothes(o) and is_sub_rig(o.data, body_rig.data):
-                    if o.parent != body_rig:
-                        o.parent = body_rig
-                    o.hide_viewport = True
-                    o.hide_set(True)
-                else:
+                if is_sub_rig(o.data, body_rig.data) or is_graft(o):
                     o.hide_viewport = False
                     o.hide_render = False
                     o.hide_set(False)
                     # o.data.hide_set(False)
                     o.select_set(True)
+                else:
+                    if o.parent != body_rig:
+                        o.parent = body_rig
+                    o.hide_viewport = True
+                    o.hide_set(True)
                 for c in o.children:
                     if isinstance(c.data, bpy.types.Mesh):
                         meshes.append(c.name)
@@ -3465,6 +3554,8 @@ class DazOptimizer:
             json.dump(fav_morphs, f, indent=2)
 
     def load_fav_morphs(self):
+        mesh = self.get_body_mesh()
+        select_object(mesh)
         fav_morphs_path = self.get_fav_morphs_path()
         # with open(fav_morphs_path, 'r') as f:
         #     fav_morphs = json.load(f)
@@ -4953,6 +5044,8 @@ class DazOptimizer:
             prev_name = hair_rig.name
             hair_rig.name = 'root'
             name = hair.name[:-len(' Mesh')]
+            hide_object(hair, False)
+            hide_object(hair_rig, False)
             self.export_to_fbx(None, hair, os.path.join(p, name + '.fbx'))
             hair_rig.name = prev_name
         if root is not None:
@@ -5336,6 +5429,21 @@ class FixToonEyes(bpy.types.Operator):
 
     def execute(self, context):
         DazOptimizer().fix_toon_eyes()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class DazGiveErection(bpy.types.Operator):
+    bl_idname = "dazoptim.give_erection"
+    bl_label = "Give erection"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '!'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazGiveErection]) and has_dick() is not None
+
+    def execute(self, context):
+        DazOptimizer().give_erection()
         pass_stage(self)
         return {'FINISHED'}
 
@@ -6972,6 +7080,7 @@ operators = [
     EntryOp(DazApplyDecimateCumMeshes_operator, "Apply decimate cum"),
     EntryOp(DazMergeMultiMeshClothes_operator, "Merge clothes sub-meshes"),
     EntryOp(FixToonEyes, "Fix Nirv Zero eyes"),
+    EntryOp(DazGiveErection, "Give erection"),
     EntryOp(SaveMorphs, "Generate fav morphs (all)"),
     EntryOp(SaveMorphsOnlyFACS, "Generate fav morphs (only FACS)"),
     EntryOp(SaveMorphsOnlyBody, "Generate fav morphs (only body)"),
