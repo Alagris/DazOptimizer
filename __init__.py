@@ -2699,18 +2699,18 @@ class DazOptimizer:
         select_object(body_rig)
         meshes = []
         for o in bpy.data.objects:
+            if o == body_rig:
+                continue
             if isinstance(o.data, bpy.types.Armature):
-                if is_sub_rig(o.data, body_rig.data) or is_graft(o):
+                if not is_sub_rig(o.data, body_rig.data) and (is_hair(o) or is_clothes(o) or is_cum(o)):
+                    o.hide_viewport = True
+                    o.hide_set(True)
+                else:
                     o.hide_viewport = False
                     o.hide_render = False
                     o.hide_set(False)
                     # o.data.hide_set(False)
                     o.select_set(True)
-                else:
-                    if o.parent != body_rig:
-                        o.parent = body_rig
-                    o.hide_viewport = True
-                    o.hide_set(True)
                 for c in o.children:
                     if isinstance(c.data, bpy.types.Mesh):
                         meshes.append(c.name)
