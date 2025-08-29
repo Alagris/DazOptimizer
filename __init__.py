@@ -1494,7 +1494,7 @@ def find_all_non_skin_tight_clothes():
     return find_all_clothes(is_not_skin_tight)
 
 def is_hair(obj):
-    return 'hair' in obj.name.lower() and obj.name.endswith(" Mesh")
+    return 'hair' in obj.name.lower()
 
 def find_all_hair():
     hair = []
@@ -2694,6 +2694,12 @@ class DazOptimizer:
                     sub.select_set(True)
                 bpy.ops.object.join()
 
+    def remove_all_subsurfs(self):
+        for o in bpy.data.objects:
+            for m in o.modifiers:
+                if m.type == "SUBSURF":
+                    o.modifiers.remove(m)
+
     def merge_all_rigs(self):
         body_rig = self.get_body_rig()
         select_object(body_rig)
@@ -2705,6 +2711,7 @@ class DazOptimizer:
                 if not is_sub_rig(o.data, body_rig.data) and (is_hair(o) or is_clothes(o) or is_cum(o)):
                     o.hide_viewport = True
                     o.hide_set(True)
+                    print("Ignore", o)
                 else:
                     o.hide_viewport = False
                     o.hide_render = False
@@ -4976,11 +4983,20 @@ class DazOptimizer:
         rig = self.get_body_rig()
         self.export_to_fbx(rig, body, os.path.join(self.workdir, self.name + '.fbx'))
 
+    def export_grafts_to_fbx(self):
+        p = os.path.join(self.workdir, self.name + "_grafts")
+        if not os.path.exists(p):
+            os.mkdir(p)
+        for g in GEOGRAFTS:
+            o = bpy.data.objects.get(g+" Mesh")
+            if o is not None:
+                rig = get_rig_of(o)
+                self.export_to_fbx(rig, o, os.path.join(p, o.name + '.fbx'))
+
     def export_animation_to_fbx(self):
         body = self.get_body_mesh()
         rig = self.get_body_rig()
-        if "Subsurf" in body.modifiers:
-            body.modifiers.remove(body.modifiers["Subsurf"])
+
         select_object(rig)
         body.select_set(True)
         p = os.path.join(self.workdir, self.name + "_anims")
@@ -5528,6 +5544,20 @@ class DazMergeAllMaterials_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class DazRemoveAllSubsurf_operator(bpy.types.Operator):
+    bl_idname = "dazoptim.remove_subsurf"
+    bl_label = "Remove subsurface modifiers"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '@'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazRemoveAllSubsurf_operator])
+
+    def execute(self, context):
+        DazOptimizer().remove_all_subsurfs()
+        pass_stage(self)
+        return {'FINISHED'}
 
 class DazMergeAllRigs_operator(bpy.types.Operator):
     bl_idname = "dazoptim.merge_all_rigs"
@@ -6827,6 +6857,20 @@ class DazExportCumFbx(bpy.types.Operator):
         DazOptimizer().export_cum_to_fbx()
         return {'FINISHED'}
 
+class DazExportGraftsFbx(bpy.types.Operator):
+    """ export fbx """
+    bl_idname = "dazoptim.export_grafts_fbx"
+    bl_label = "Export grafts fbx"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().export_grafts_to_fbx()
+        return {'FINISHED'}
 
 class DazExportHairFbx(bpy.types.Operator):
     """ export fbx """
@@ -7074,6 +7118,7 @@ operators = [
     EntryOp(DazSaveBlend_operator, "Save blend file"),
     EntryOp(DazSaveTextures_operator, "Save textures"),
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
+    EntryOp(DazRemoveAllSubsurf_operator, "Remove subsurf mods"),
     EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
     EntryOp(DazMergeCumMaterials_operator, "Merge cum materials"),
     EntryOp(DazDecimateCumMeshes_operator, "Decimate cum meshes"),
@@ -7152,6 +7197,7 @@ operators = [
     EntryOp(DazExportClothesFbx, "Export clothes to fbx"),
     EntryOp(DazExportCumFbx, "Export cum to fbx"),
     EntryOp(DazExportHairFbx, "Export hair to fbx"),
+    EntryOp(DazExportGraftsFbx, "Export geografts to fbx"),
     EntryLabel("Animation tools", -1),
     EntryOp(AttachDuplicateSkeleton, "Attach ue5 skeleton"),
     EntryOp(DetachDuplicateSkeleton, "Detach ue5 skeleton"),
