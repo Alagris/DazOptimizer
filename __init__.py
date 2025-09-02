@@ -1497,11 +1497,7 @@ def is_hair(obj):
     return 'hair' in obj.name.lower()
 
 def find_all_hair():
-    hair = []
-    for obj in bpy.data.objects:
-        if is_hair(obj):
-            hair.append(obj)
-    return hair
+    return [obj for obj in bpy.data.objects if isinstance(obj.data, bpy.types.Mesh) and is_hair(obj)]
 
 def is_cum(o):
     return o.name.startswith("Love Loads")
