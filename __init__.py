@@ -13,6 +13,41 @@ import bmesh
 import json
 from collections import namedtuple
 
+def rle_encode(x:np.ndarray, dropna=False):
+    """
+    Run length encoding.
+    Based on http://stackoverflow.com/a/32681075, which is based on the rle
+    function from R.
+
+    Parameters
+    ----------
+    x : 1D array_like
+        Input array to encode
+    dropna: bool, optional
+        Drop all runs of NaNs.
+
+    Returns
+    -------
+    start positions, run lengths, run values
+
+    """
+    where = np.flatnonzero
+    x = x.reshape(-1)
+    n = len(x)
+    if n == 0:
+        return (np.array([], dtype=int),
+                np.array([], dtype=int),
+                np.array([], dtype=x.dtype))
+
+    starts = np.r_[0, where(~np.isclose(x[1:], x[:-1], equal_nan=True)) + 1]
+    lengths = np.diff(np.r_[starts, n])
+    values = x[starts]
+
+    if dropna:
+        mask = ~np.isnan(values)
+        starts, lengths, values = starts[mask], lengths[mask], values[mask]
+
+    return lengths
 
 def rle_decode(rle: [int], shape)->np.ndarray:
     mat = np.empty(shape, dtype=bool)
@@ -1245,7 +1280,7 @@ class ClothesMeta:
 
 PANTIE_SCALING = 0.02
 
-# [print("'"+o.name[:-len(" Mesh")]+"': ClothesMeta('"+o.data.daz_importer.DazFingerPrint+"', -1, "+str('panties' in o.name.lower())+"),") for o in bpy.data.objects if not o.hide_get() and isinstance(o.data, bpy.types.Mesh) and o.name.endswith(" Mesh")];
+
 
 CLOTHES = {
     "Romance Bra": ClothesMeta('13332-26195-12864', CLOTHES_MIN_DIST_TO_SKIN, False),
@@ -1348,6 +1383,11 @@ CLOTHES = {
     'G9 Base Panty': ClothesMeta('8624-17254-8630', -1, True),
     'G9 Base Shirt': ClothesMeta('8038-16050-8010', -1, False),
     'G9 Base Shorts': ClothesMeta('8256-16387-8130', -1, False),
+    'VALBattleMage_Bracers': ClothesMeta('16106-30990-14938', -1, False),
+    'VALBattleMage_Pantie': ClothesMeta('582-1067-484', PANTIE_SCALING, True),
+    'BattleMage_Medallion': ClothesMeta('16291-32492-16202', -1, False),
+    'BattleMage_Shirt': ClothesMeta('59984-117646-57745', -1, False),
+    'BattleMage_Skirt': ClothesMeta('62529-124028-61617', -1, False),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -1378,6 +1418,7 @@ UE5_IK_BONES = {
     'ik_hand_r': 'hand_r',
     'center_of_mass': ''
 }
+
 DAZ_G9_TO_UE5_BONES = {
     'r_toes': 'ball_r',
     'l_toes': 'ball_l',
@@ -1457,6 +1498,64 @@ DAZ_G9_TO_UE5_BONES = {
     'r_ringmetacarpal': 'ring_metacarpal_r',
     'r_pinkymetacarpal': 'pinky_metacarpal_r',
 }
+OTHER_DAZ_BONES = {
+    'l_bigtoe1',
+    'l_bigtoe2',
+    'l_indextoe1',
+    'l_indextoe2',
+    'l_midtoe1',
+    'l_midtoe2',
+    'l_ringtoe1',
+    'l_ringtoe2',
+    'l_pinkytoe1',
+    'l_pinkytoe2',
+    'l_metatarsal',
+    'r_bigtoe1',
+    'r_bigtoe2',
+    'r_indextoe1',
+    'r_indextoe2',
+    'r_midtoe1',
+    'r_midtoe2',
+    'r_ringtoe1',
+    'r_ringtoe2',
+    'r_pinkytoe1',
+    'r_pinkytoe2',
+    'r_metatarsal',
+    'lowerjaw',
+    'lowerteeth',
+    'l_lipcorner',
+    'l_liplower',
+    'liplowermiddle',
+    'r_liplower',
+    'r_lipcorner',
+    'l_cheeklower',
+    'r_cheeklower',
+    'chin',
+    'l_browinner',
+    'l_browouter',
+    'r_browinner',
+    'r_browouter',
+    'centerbrow',
+    'l_eyelidupper',
+    'l_eyelidlower',
+    'r_eyelidupper',
+    'r_eyelidlower',
+    'l_squint',
+    'r_squint',
+    'l_cheek',
+    'r_cheek',
+    'l_nostril',
+    'r_nostril',
+    'lipuppermiddle',
+    'l_lipupper',
+    'r_lipupper',
+    'l_infraorbital',
+    'r_infraorbital',
+    'l_ear',
+    'r_ear',
+    'l_pectoral',
+    'r_pectoral',
+}
 
 def is_clothes(obj)->ClothesMeta:
     name = obj.name
@@ -1510,6 +1609,82 @@ def is_sub_rig(sub_rig, super_rig):
         if bone.name not in super_rig.bones:
             return False
     return True
+
+
+def contains_group(vertex, group_index):
+    for g in vertex.groups:
+        if g.group == group_index:
+            return g
+    return None
+
+def get_group_weight(vertex, group_index):
+    for g in vertex.groups:
+        if g.group == group_index:
+            return g.weight
+    return 0
+
+def get_weights_as_array(mesh, vertex_group):
+    if isinstance(vertex_group, str):
+        vertex_group = mesh.vertex_groups[vertex_group]
+    i1 = vertex_group.index
+    return np.array([get_group_weight(v, i1) for v in mesh.data.vertices])
+
+def get_weights_as_sparse(mesh, vertex_group):
+    arr = get_weights_as_array(mesh, vertex_group)
+    is_non_zero = arr>0
+    weights = arr[is_non_zero]
+    indices = rle_encode(is_non_zero)
+    #indices, = np.where(is_non_zero)
+    return weights, indices, is_non_zero
+
+NUM_OF_VERTICES_IN_DAZ_BASE_MESH = 25182
+ADDITIONAL_BONES = {
+    'l_thigh_jiggle':(b'AAAA4CMHfz8AAADA9GTGPwAAAADUwsU/AAAAoPNWuD8AAADAigu+PwAAAMCRR7I/AAAAgHj0yj8AAACg7sLaPwAAAMAEE9k/AAAAAAGu0T8AAABgxu7BPwAAAMD5PoI/AAAAIN5o1T8AAACgBJ3WPwAAAEAUhOA/AAAAQKoN6D8AAACA5KfoPwAAAGBHrsY/AAAAoJ0RlD8AAACgfMPkPwAAAICc8tg/AAAAgF00xj8AAAAg+NrlPwAAAABHcZo/AAAAQPolaD8AAACA0QaYPwAAAKAuDdQ/AAAA4N9S2z8AAABAIxrXPwAAAEC6psw/AAAA4HCj3z8AAAAAb7XdPwAAAMA8D8c/AAAAYPzyuT8AAACgQGdSPwAAAMCTW7g/AAAAQNDqyT8AAABA0rnJPwAAAGDXZc0/AAAAgDvlwT8AAADg8beaPwAAAICQbsI/AAAAAKrs4z8AAABg6aPdPwAAAKBQ1eY/AAAAwNtv6D8AAABg463iPwAAAEDoq9U/AAAAYNV/wz8AAADAW1vTPwAAAEBLrL4/AAAAYEmAlz8AAADgIcacPwAAAKAZSOM+AAAAQG4xTT8AAAAAEBSsPwAAAEA1kbM/AAAAwORz1T8AAAAAVWbfPwAAAGBRIeg/AAAAoNce6D8AAAAgw+rDPwAAAEDg5kA/AAAA4Ll95D8AAACg5pHVPwAAAECsJMM/AAAAQFp/5D8AAAAAhY9EPwAAAIBEq9g/AAAAwHCZzT8AAABgy6riPwAAAGBXR+M/AAAA4ODZqT8AAABg86rPPwAAAKBlWds/AAAAILcWuj8AAABAiw3hPwAAAODViYQ/AAAAgHTOuj4AAACgNIvqPgAAAACS+5k+',np.array([25, 1, 1, 1, 1, 1, 426, 1, 839, 1, 53, 4, 2, 3, 9, 1, 4, 9, 9, 2, 7083, 1, 3, 1, 47, 16, 226, 9, 1, 1, 39, 1, 441, 1, 2, 1, 6, 1, 5, 1, 283, 9, 5, 2, 1571, 5, 1, 3, 5, 1, 50, 1, 3, 1, 1, 1, 2, 1, 13958],dtype=np.int64)),
+    'l_thigh_jiggle2':(b'AAAAYENsxD8AAABgjB3IPwAAAMDgBtg/AAAAICW14T8AAAAA8WPjPwAAAGB+QeE/AAAAQNBd3j8AAAAAx2+7PwAAAMCc9L0/AAAAIKs7sz8AAADgS57TPwAAAECcjAY/AAAA4ASUnD8AAABA5gGnPwAAAKBFj4A/AAAAAIyBcz8AAABgiU6xPwAAAKAeZ7M/AAAA4AGo2j8AAADgaXXNPwAAAICqCdU/AAAAgLWGtD8AAABAOcjHPwAAAACZXsc/AAAAIKPRtz8AAAAgdeBBPwAAAEAeltI/AAAAgFhB0T8AAADA+06ePwAAAADDAr4/AAAAoMu0yD8AAACgBV6zPwAAAKCUt0U/AAAAYNQppD8AAADA6KK8PwAAAEAqGOI/AAAAAKFY0D8AAAAAJbHdPwAAAKC4vSs/AAAAAAM+wT8AAADgz5zOPwAAAGA1xdw/AAAAIDSc2D8AAADgheamPwAAAOBLCNE/AAAAgG9dxT8AAADgb4m1PwAAAEAkadk/AAAAYOndnz8AAACgcxVhPwAAAMBtDVU/AAAA4EJcuz8AAAAA2XPIPwAAAGA6zto/AAAAQPxK4j8AAAAAiZvgPwAAAEAziLU/AAAA4GrGkj8AAAAgDz/ePwAAACAv2M4/AAAAwKkh4T8AAABg8wq7PwAAAKDkB0A/AAAAQLjX4T4AAADAkSCGPgAAAGCycUw+AAAAgM7eOz8AAADgP4GfPwAAAMBEXrc/AAAAIFTwtD8AAADgNJ+wPwAAAKABgKM/AAAAYHO5sz8AAABg/dfAPwAAACCALbE/AAAAIDMRyT8AAACAOtfKPwAAAIAFSVY/AAAAAJ7UuD8AAAAgAovDPwAAAEDz5KY/AAAAoDT9yD8AAAAAd9g8Pw==',np.array([23, 12, 1, 1, 1, 1, 21, 2, 361, 2, 31, 3, 4, 2, 68, 5, 5, 1, 2, 2, 139, 1, 1, 1, 3, 1, 600, 1, 1, 1, 2, 2, 13, 1, 35, 5, 1, 3, 9, 3, 8, 1, 636, 1, 335, 8, 10, 1, 1, 2, 6650, 1, 20, 1, 28, 1, 487, 4, 2, 2, 6, 1, 1572, 5, 1, 3, 5, 1, 1, 1, 14016],dtype=np.int64)),
+    'l_thigh_jiggle_side':(b'AAAAwCZxRD8AAACAgPCSPwAAAAAo3Y4/AAAAwPQwpD8AAAAgqjJUPwAAAABZBp8/AAAAIBBurj8AAACAV+OxPwAAAMCnsaA/AAAAoPwCrT8AAADgJNN6PwAAAACPqss/AAAAICXetD8AAADgpJHEPwAAAADhctU/AAAAIHzi2T8AAABAlXU8PwAAAICXYsY+AAAAoH+YgT8AAABAita+PwAAAEDb1Lw/AAAA4LoNpD4AAABA2ZukPwAAAIDUE7Q/AAAAQEW0RT4AAAAAZRQ6PwAAACAxfIk/AAAAYEpMeD8AAABgPwJ7PwAAAGAWGKg/AAAA4BKRvj8AAADA03+LPwAAACBiFKg/AAAAgJ0/DT4AAABgeAKdPwAAAMAZRG8/AAAAwCUwjT8AAABAJj8kPwAAAOAU4dE/AAAAgGxCsz8AAABg+aGYPwAAAEDp+rI+AAAAAKKs1z8AAAAApiCoPwAAACB9Ecs/AAAA4F7l4z8AAAAgu6fKPwAAAOBz6+M/AAAAwP6k1z8AAADAw3FKPwAAAED0Ga8/AAAAoPh5UD8AAABguKbgPwAAAMDOa3I/AAAAgAAGtD8AAACA7uDSPwAAACCsat8/AAAAgDyZqT8AAAAgcv1JPwAAAOCf9Zw/AAAA4CXXxT8AAAAA2HDEPwAAAADTHaE/AAAAABkUfz8AAAAgIlI8PwAAAIC7wqY/AAAAoIDIyT8AAAAAfL27PwAAAABd/+E/AAAAwESz3T8AAABApiqyPwAAAECsG9E/AAAAgNjEwz8AAACgesmAPwAAAEC/yKo/AAAAgMTh0T8AAACgLH7WPwAAAOANK7M/AAAAQDCzlj8AAADARjPbPwAAAABKdAU/AAAAgDn34D8AAAAg9nVpPwAAAACJ5OI/AAAAoE7N5D8AAAAgBTC1PwAAAGAY0ak/AAAA4E5JpT8AAABArc64PwAAAABJ2bg/AAAAIDpdAz8AAADgfZB8PwAAAOD6/6Q+AAAA4M0plz8AAADgRlCoPwAAAEBztrQ/AAAAAPMAuj8AAADABJLBPwAAAGC7frA/AAAAADS7wD8AAABgQG3FPwAAACCxp8U/AAAAIFlCtz4AAACghKphPwAAAOA7rXk/AAAAgL39hD8AAABASaaOPwAAAGAw6Y4/AAAAAAsOWD8AAAAA/zKJPwAAAKCsXYQ/AAAA4CoszT4AAAAANQWgPwAAAKCJvbE/AAAAoDjcvz8AAADAlC/EPwAAAMBM1M8/AAAAQECGpj8AAABgVp+5PwAAACC3tck/AAAAIDwY0j8AAAAgTffTPwAAAOAeUtY+AAAAgPZ0mj8AAACA3R+VPwAAAID2SKA/AAAAQPTyQT8AAACAas6vPwAAACBLVbw/AAAAADLLzD8AAAAAjXrDPwAAACC+QLM/AAAAwN/Wxz8AAABAdErQPwAAAGCoptM/AAAAwBzaMz8AAACgulhqPwAAAOB2IrI/AAAA4ELPoT8AAABgTLa2PwAAAIAytsA/AAAAgNU9pT8AAACAcqy7PwAAAIAz7cM/AAAAwLGiwj8AAADgFX2KPwAAAGCLVdM+AAAAALncpD8AAABgLp63PwAAAADvHsY/AAAAQM7KzD8AAAAAsEbYPwAAAGDcCLA/AAAAQEgqwT8AAABgt07SPwAAACClW90/AAAAoGR+5D8AAACgupVPPw==',np.array([350, 1, 5, 2, 1003, 1, 7, 4, 8, 4, 7, 4, 967, 2, 3629, 2, 2495, 3, 1, 2, 7, 2, 5, 1, 19, 1, 3, 3, 4, 2, 26, 2, 1, 1, 24, 3, 6, 2, 1, 3, 17, 4, 9, 4, 5, 2, 1, 1, 1, 1, 33, 1, 2, 1, 4, 1, 27, 4, 44, 2, 2, 3, 16, 4, 11, 1, 156, 3, 3, 5, 4, 1, 3, 2, 2, 3, 2, 3, 116, 3, 1, 1, 2, 1, 5, 2, 2, 1, 5, 3, 144, 2, 4, 3, 9, 1, 1, 2, 34, 3, 1, 1, 1, 8, 2, 2, 209, 3, 4, 4, 8, 4, 1564, 1, 1, 1, 4, 4, 8, 4, 40, 3, 1, 1, 1, 8, 5, 1, 13942],dtype=np.int64)),
+    'r_thigh_jiggle':(b'AAAA4CMHfz8AAADA9GTGPwAAAADUwsU/AAAAoPNWuD8AAADAigu+PwAAAMCRR7I/AAAAgHj0yj8AAACg7sLaPwAAAMAEE9k/AAAAAAGu0T8AAABgxu7BPwAAAMD5PoI/AAAAIN5o1T8AAACgBJ3WPwAAAEAUhOA/AAAAQKoN6D8AAACA5KfoPwAAAGBHrsY/AAAAoJ0RlD8AAACgfMPkPwAAAICc8tg/AAAAgF00xj8AAAAg+NrlPwAAAABHcZo/AAAAQPolaD8AAACA0QaYPwAAAKAuDdQ/AAAA4N9S2z8AAABAIxrXPwAAAEC6psw/AAAA4HCj3z8AAAAAb7XdPwAAAMA8D8c/AAAAYPzyuT8AAACgQGdSPwAAAMCTW7g/AAAAQNDqyT8AAABA0rnJPwAAAGDXZc0/AAAAgDvlwT8AAADg8beaPwAAAICQbsI/AAAAAKrs4z8AAABg6aPdPwAAAKBQ1eY/AAAAwNtv6D8AAABg463iPwAAAEDoq9U/AAAAYNV/wz8AAADAW1vTPwAAAEBLrL4/AAAAYEmAlz8AAADgIcacPwAAAKAZSOM+AAAAQG4xTT8AAAAAEBSsPwAAAEA1kbM/AAAAwORz1T8AAAAAVWbfPwAAAGBRIeg/AAAAoNce6D8AAAAgw+rDPwAAAEDg5kA/AAAA4Ll95D8AAACg5pHVPwAAAECsJMM/AAAAQFp/5D8AAAAAhY9EPwAAAIBEq9g/AAAAwHCZzT8AAABgy6riPwAAAGBXR+M/AAAA4ODZqT8AAABg86rPPwAAAKBlWds/AAAAILcWuj8AAABAiw3hPwAAAODViYQ/AAAAgHTOuj4AAACgNIvqPgAAAACS+5k+',np.array([12029, 1, 1, 1, 1, 1, 426, 1, 838, 1, 53, 4, 2, 3, 9, 1, 4, 9, 9, 2, 6902, 1, 3, 1, 47, 16, 215, 9, 1, 1, 38, 1, 438, 1, 2, 1, 5, 1, 4, 1, 274, 9, 5, 2, 1568, 5, 1, 3, 5, 1, 50, 1, 2, 1, 1, 1, 2, 1, 2166],dtype=np.int64)),
+    'r_thigh_jiggle2':(b'AAAAYENsxD8AAABgjB3IPwAAAMDgBtg/AAAAICW14T8AAAAA8WPjPwAAAGB+QeE/AAAAQNBd3j8AAAAAx2+7PwAAAMCc9L0/AAAAIKs7sz8AAADgS57TPwAAAECcjAY/AAAA4ASUnD8AAABA5gGnPwAAAKBFj4A/AAAAAIyBcz8AAABgiU6xPwAAAKAeZ7M/AAAA4AGo2j8AAADgaXXNPwAAAICqCdU/AAAAgLWGtD8AAABAOcjHPwAAAACZXsc/AAAAIKPRtz8AAAAgdeBBPwAAAEAeltI/AAAAgFhB0T8AAADA+06ePwAAAADDAr4/AAAAoMu0yD8AAACgBV6zPwAAAKCUt0U/AAAAYNQppD8AAADA6KK8PwAAAEAqGOI/AAAAAKFY0D8AAAAAJbHdPwAAAKC4vSs/AAAAAAM+wT8AAADgz5zOPwAAAGA1xdw/AAAAIDSc2D8AAADgheamPwAAAOBLCNE/AAAAgG9dxT8AAADgb4m1PwAAAEAkadk/AAAAYOndnz8AAACgcxVhPwAAAMBtDVU/AAAA4EJcuz8AAAAA2XPIPwAAAGA6zto/AAAAQPxK4j8AAAAAiZvgPwAAAEAziLU/AAAA4GrGkj8AAAAgDz/ePwAAACAv2M4/AAAAwKkh4T8AAABg8wq7PwAAAKDkB0A/AAAAQLjX4T4AAADAkSCGPgAAAGCycUw+AAAAgM7eOz8AAADgP4GfPwAAAMBEXrc/AAAAIFTwtD8AAADgNJ+wPwAAAKABgKM/AAAAYHO5sz8AAABg/dfAPwAAACCALbE/AAAAIDMRyT8AAACAOtfKPwAAAIAFSVY/AAAAAJ7UuD8AAAAgAovDPwAAAEDz5KY/AAAAoDT9yD8AAAAAd9g8Pw==',np.array([12027, 12, 1, 1, 1, 1, 21, 2, 361, 2, 31, 3, 4, 2, 68, 5, 5, 1, 2, 2, 139, 1, 1, 1, 3, 1, 599, 1, 1, 1, 2, 2, 13, 1, 35, 5, 1, 3, 9, 3, 8, 1, 630, 1, 331, 8, 10, 1, 1, 2, 6467, 1, 20, 1, 28, 1, 473, 4, 2, 2, 6, 1, 1569, 5, 1, 3, 5, 1, 1, 1, 2223],dtype=np.int64)),
+    'r_thigh_jiggle_side':(b'AAAAwCZxRD8AAACAgPCSPwAAAAAo3Y4/AAAAwPQwpD8AAAAgqjJUPwAAAABZBp8/AAAAIBBurj8AAACAV+OxPwAAAMCnsaA/AAAAoPwCrT8AAADgJNN6PwAAAACPqss/AAAAICXetD8AAADgpJHEPwAAAADhctU/AAAAIHzi2T8AAABAlXU8PwAAAICXYsY+AAAAoH+YgT8AAABAita+PwAAAEDb1Lw/AAAA4LoNpD4AAABA2ZukPwAAAIDUE7Q/AAAAQEW0RT4AAAAAZRQ6PwAAACAxfIk/AAAAYEpMeD8AAABgPwJ7PwAAAGAWGKg/AAAA4BKRvj8AAADA03+LPwAAACBiFKg/AAAAgJ0/DT4AAABgeAKdPwAAAMAZRG8/AAAAwCUwjT8AAABAJj8kPwAAAOAU4dE/AAAAgGxCsz8AAABg+aGYPwAAAEDp+rI+AAAAAKKs1z8AAAAApiCoPwAAACB9Ecs/AAAA4F7l4z8AAAAgu6fKPwAAAOBz6+M/AAAAwP6k1z8AAADAw3FKPwAAAED0Ga8/AAAAoPh5UD8AAABguKbgPwAAAMDOa3I/AAAAgAAGtD8AAACA7uDSPwAAACCsat8/AAAAgDyZqT8AAAAgcv1JPwAAAOCf9Zw/AAAA4CXXxT8AAAAA2HDEPwAAAADTHaE/AAAAABkUfz8AAAAgIlI8PwAAAIC7wqY/AAAAoIDIyT8AAAAAfL27PwAAAABd/+E/AAAAwESz3T8AAABApiqyPwAAAECsG9E/AAAAgNjEwz8AAACgesmAPwAAAEC/yKo/AAAAgMTh0T8AAACgLH7WPwAAAOANK7M/AAAAQDCzlj8AAADARjPbPwAAAABKdAU/AAAAgDn34D8AAAAg9nVpPwAAAACJ5OI/AAAAoE7N5D8AAAAgBTC1PwAAAGAY0ak/AAAA4E5JpT8AAABArc64PwAAAABJ2bg/AAAAIDpdAz8AAADgfZB8PwAAAOD6/6Q+AAAA4M0plz8AAADgRlCoPwAAAEBztrQ/AAAAAPMAuj8AAADABJLBPwAAAGC7frA/AAAAADS7wD8AAABgQG3FPwAAACCxp8U/AAAAIFlCtz4AAACghKphPwAAAOA7rXk/AAAAgL39hD8AAABASaaOPwAAAGAw6Y4/AAAAAAsOWD8AAAAA/zKJPwAAAKCsXYQ/AAAA4CoszT4AAAAANQWgPwAAAKCJvbE/AAAAoDjcvz8AAADAlC/EPwAAAMBM1M8/AAAAQECGpj8AAABgVp+5PwAAACC3tck/AAAAIDwY0j8AAAAgTffTPwAAAOAeUtY+AAAAgPZ0mj8AAACA3R+VPwAAAID2SKA/AAAAQPTyQT8AAACAas6vPwAAACBLVbw/AAAAADLLzD8AAAAAjXrDPwAAACC+QLM/AAAAwN/Wxz8AAABAdErQPwAAAGCoptM/AAAAwBzaMz8AAACgulhqPwAAAOB2IrI/AAAA4ELPoT8AAABgTLa2PwAAAIAytsA/AAAAgNU9pT8AAACAcqy7PwAAAIAz7cM/AAAAwLGiwj8AAADgFX2KPwAAAGCLVdM+AAAAALncpD8AAABgLp63PwAAAADvHsY/AAAAQM7KzD8AAAAAsEbYPwAAAGDcCLA/AAAAQEgqwT8AAABgt07SPwAAACClW90/AAAAoGR+5D8AAACgupVPPw==',np.array([12354, 1, 5, 2, 1002, 1, 7, 4, 8, 4, 7, 4, 957, 2, 3470, 2, 2483, 3, 1, 2, 7, 2, 5, 1, 19, 1, 3, 3, 4, 2, 26, 2, 1, 1, 24, 3, 5, 2, 1, 3, 16, 4, 8, 4, 5, 2, 1, 1, 1, 1, 30, 1, 2, 1, 4, 1, 26, 4, 40, 2, 2, 3, 15, 4, 11, 1, 156, 3, 3, 5, 4, 1, 3, 2, 2, 3, 2, 3, 115, 3, 1, 1, 2, 1, 5, 2, 2, 1, 5, 3, 140, 2, 4, 3, 8, 1, 1, 2, 33, 3, 1, 1, 1, 8, 2, 2, 202, 3, 4, 4, 8, 4, 1561, 1, 1, 1, 4, 4, 8, 4, 39, 3, 1, 1, 1, 8, 5, 1, 2150],dtype=np.int64)),
+    'r_glute':(b'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',np.array([8453, 2, 1, 1, 1, 1, 158, 1, 491, 3, 145, 1, 51, 2, 102, 2, 1771, 3, 3, 1, 2, 2, 48, 1, 1, 1, 1, 2, 3, 1, 3, 2, 2, 6, 2, 4, 1, 1, 9013, 1, 1, 1, 1, 2, 1, 2, 2, 1, 7, 2, 4, 2, 1, 17, 16, 2, 2, 2, 4, 4, 1, 1, 19, 1, 5, 7, 14, 6, 10, 3, 3, 11, 62, 1, 2, 1, 293, 1, 3, 1, 96, 2, 6, 2, 3, 3, 3, 9, 20, 8, 103, 1, 6, 2, 5, 2, 7, 14, 12, 2, 28, 9, 8, 2, 30, 14, 10, 2, 25, 1, 8, 2, 1, 6, 4, 1, 1708, 1, 1, 10, 2, 4, 12, 1, 1, 3, 1, 6, 1, 1, 8, 4, 2, 11, 3, 1, 2, 3, 2, 6, 1, 5, 2116],dtype=np.int64)),
+    'r_glute2':(b'AAAAYHZrwj4AAADg767gPgAAACD6mTs/AAAAIAw92D8AAADAnB5vPwAAAOAqj4E/AAAAwFcDZj8AAADAKM4APwAAAGArunA/AAAAILwUoT8AAABATVTJPwAAAACxi8E/AAAAoNiyyz8AAAAAAUnFPwAAAECdyM0/AAAAIPK+zj8AAAAgJP6zPwAAAICJP9c/AAAA4PLquj8AAADARBXiPwAAAMDK9eE/AAAAIO6n4j8AAAAATWLfPwAAAMBHleA/AAAAIAPOyT8AAABAqgDDPwAAAIDIDcY/AAAA4K7ntz8AAADA3eqtPwAAAMDwWsY/AAAAgKTKwj8AAACg05W8PwAAAKCsQIQ/AAAA4LRawj8AAABgbKDSPwAAAOCKx9M/AAAAAAvJ1D8AAACgtfzQPwAAAMAQY7I/AAAAYPfuyz8AAADgNDfjPwAAAIAVbb8/AAAAAEJs2z8AAACgcz7nPwAAAMDHssw/AAAAYE6h6D8AAAAA1JHnPwAAAGBFiSg/AAAAII3xvz8AAABgnPHkPwAAAKACGOE/AAAAYLLXoT8AAAAA3sWGPwAAAMCo9fk+AAAAwFZgqT8AAABAGHlfPwAAACAwBJE/AAAA4HC0kT8AAADAw29+PgAAAEAgxis/AAAAAD7GGD8AAADgtUGyPwAAAKADja0/AAAAoI6FsT8AAACA9gOnPwAAAIBIZnQ/AAAAgAwEoD8AAACAJqRwPwAAACChgbU/AAAAwOvguj8AAADgVPtbPwAAAIARd+s/AAAAwPkW7T8AAAAgTqzaPwAAAECKTuU/AAAAQLnjzD8AAADAVLbrPwAAAKDTgr4/AAAAwN275z8AAAAAoyniPwAAACBziag/AAAA4CryhD8AAADgOSK4PwAAAGBvoNA/AAAAQN9w1T8AAACAfggAPwAAAEANEog/AAAAYFYF1z8AAADgL3gvPwAAAOBzhao/AAAAYHn0wT8AAAAgDtrJPwAAAODGoJM/AAAAgJUdsj8AAACAL5+9PgAAAMAkj7w/AAAAoG7O2D8AAAAAQi7bPwAAAOBVmds/AAAAYIl1wj8AAADARMqxPwAAAIBy5NY/AAAAQLWyzz8AAAAgLnzUPwAAAID/Vc8/AAAAgGG4kD8AAACgjGNkPwAAAGDtKQ4/AAAAAFpxxT8AAAAAaQa6PwAAAIC6SOw/AAAAAPXh6j8AAADA+ZbVPwAAAKCpR+E/AAAAYDaKyD8AAACAXrTmPwAAAOAFGbg/AAAAYGF/5D8AAABAfNugPwAAAGC41YM/AAAAwG4gvj4AAACADYrePwAAAOCjZdM/AAAAICSJWD4AAACAk32YPwAAAADsHbk/AAAAwINstT8AAACglsu2PwAAACC0QyA/AAAAQM/JVj8AAAAAi2yVPwAAAGDctrA/AAAAII5Crj8AAACA/gGtPwAAAAAiMQc/AAAAgD+X0z4AAACgvsKlPwAAAIA9K5Y/AAAAoHLQcD8AAABAcobUPgAAAODP82o/AAAAQPidyT4AAABALHBlPwAAAGCB+T0/AAAAoLgU1D4AAABAqEfiPgAAACAx68g/AAAAoCllyj8AAAAgCBjEPwAAAMAq9NM+AAAAgLaEtz8AAABAnDekPwAAAMAOlrs/AAAAgFOM4T8AAACAyZDgPwAAAKA+rc0/AAAAgHJy1z8AAABgcxLBPwAAAEDSnd8/AAAAYLMprT8AAABA7+TaPwAAAGDSP40/AAAAoHVhcz8AAABg5VTSPwAAAMCrP8s/AAAAYAw8xz8AAAAARq20PwAAAMCoX6I/AAAAIFYPwj8AAAAgX2SuPwAAAMB6T5s/AAAAwFtNrD8AAAAggiGgPwAAAEDqpYo/AAAAgBcSpj8AAADAdr5PPwAAAGAEwqY/AAAAQPA+qD8AAACAxPzuPgAAAGCfWBQ/AAAAQL5CXD8AAACgUZN3PwAAAGAvKHQ/AAAAIDJdej8=',np.array([13378, 1, 15, 1, 6898, 1, 6, 1, 1, 1, 10, 3, 1, 17, 16, 8, 1, 7, 25, 7, 15, 4, 11, 2, 1, 2, 1, 3, 4, 1, 9, 1, 58, 1, 70, 5, 2, 2, 315, 2, 6, 1, 10, 10, 15, 1, 3, 5, 1, 1, 109, 1, 1, 2, 5, 2, 3, 1, 2, 2, 1, 12, 13, 1, 28, 10, 4, 2, 1, 2, 30, 13, 12, 1, 1756, 2, 1, 4, 4, 1, 2, 4, 12, 5, 1, 9, 4, 1, 2, 4, 2, 11, 3, 1, 1, 3, 4, 2, 2125],dtype=np.int64)),
+    'l_glute':(b'AAAAAO/Fpj4AAACgLicqPgAAAMDS9eI+AAAAoIrzBj8AAADgEt+RPwAAAIBDCrM/AAAAgH4Ryz8AAADAY63CPwAAAEBKG7c/AAAA4FV1NT8AAAAg2EjgPwAAAEDjDME/AAAAoPyFzT8AAAAAKVBZPwAAAKDyDnw/AAAAQDGjLD8AAABAH7u9PwAAAOCgVOE/AAAAIEjs1z8AAADA5rbnPwAAAABpC+U/AAAAgP4a5T8AAACA1gTnPwAAACCVdc0/AAAAoC+b1T8AAAAAP0W0PwAAAEDHjec/AAAAIL+p5j8AAADA+nLpPwAAAAB0JeM/AAAAYH6k4T8AAAAgEWvIPwAAAABVmFY/AAAAQNBteD8AAAAglAqAPwAAAOB0YWA/AAAAgJBpgj8AAACgYKmIPwAAAICfZ4k/AAAAwPfFjD8AAABAmmxzPwAAAEDZRyk/AAAAAI0J2z8AAADAmNidPwAAAMD7GdA/AAAA4DY34j8AAADgMWq+PwAAAGBQ1+I/AAAAIBuG4T8AAAAguPN+PwAAAEBqmNI/AAAAwONq4j8AAADAE13dPwAAAKC/e9Y/AAAA4IyeSD8AAABAGWKZPwAAAIDyTJo/AAAAAHN0iz8AAADgpR/hPwAAAACR29w/AAAAAMH31j8AAACgzeJfPwAAAOCHQaA+AAAAAHzH4D8AAADgxHDbPwAAACDwWtU/AAAAQCKm1T8AAADAa73VPwAAAIDEJ9E/AAAAwNSQyT8AAAAAQPZMPwAAAKBUau0+AAAAwKFtLz4AAADA+hQOPwAAAAClJbc/AAAAIExhrT8AAADA++7BPwAAAMCcuLk/AAAAICLZlT8AAABApBeEPwAAAGB98mE/AAAAgIxl2T8AAAAgrUvYPwAAAKBvM8A/AAAA4LPr0T8AAABg9WqwPwAAAEBO7Nc/AAAAoBbheT8AAAAABqDVPwAAAIDw5Ms/AAAAwA9Q2T8AAABAAWjUPwAAAOB9BM4/AAAAAIAvxD8AAADgAUzOPwAAAMBCDz8/AAAAQCnQwj8AAACg1mOkPwAAAMCMOGA+AAAA4Kg0jz8AAAAgX8hAPwAAAMAJ6Yo/AAAAgLhaxD4AAACgk3WKPwAAAODwfqU/AAAAgI1F6T8AAABAYgrpPwAAAMAeV+c/AAAAYG0PzT8AAADgnfG7PwAAAOAA+uE/AAAA4N8g2D8AAABAq+nlPwAAAADdGOI/AAAAQG3RoT8AAAAgBjBoPwAAAEA3y+0+AAAAgE2Vvj4AAABgG6yPPwAAACAVYdg/AAAA4N+Rlz8AAABga+zOPwAAAECpIs0/AAAAgCUUtj8AAABAU6zGPwAAAOCm6Zk/AAAAoAPAzj8AAACg0t8sPwAAAIA3fcg/AAAAAKU0vj8AAAAARDi3PwAAAGDEjKc/AAAAwFE/xz8AAAAAB0bkPwAAAOAuIOQ/AAAAQMz74T8AAADgK0+7PwAAAEDM0ck/AAAAoMhG1D8AAAAg7oTcPwAAAOCGYuI/AAAA4EYv4D8AAACAJwigPwAAAIBolXY/AAAAYM2UFz8AAACAmKpiPgAAAGDHmVw/AAAAII7k0j8AAABgY8ONPwAAAMD5XSo/AAAA4Jgdpj8AAADAWrK7PwAAACDHdsA/AAAAgL5wvz8AAADAbY+1PwAAAACdtcI/AAAAQPiwwj8AAACgRdSzPwAAAABb4mQ/AAAAoJM3sT8AAADAxmGzPwAAAGBbP7g/AAAAQGEFkz8AAAAgZpaVPwAAAKCL8JY/AAAAoF5gkz8AAABAjoKSPwAAAAAXW40/AAAAQLynnD8AAACgpASgPwAAAMALFoY/AAAAYCuzwD8AAAAglyyzPwAAACAcTcc/AAAAQPIhkz8AAADAOC0tPgAAAIA2JM0/AAAAACTvwD8AAACgxnW7PwAAAKAZF6E/AAAA4L6DsD8AAADgNXc0PwAAAAA2m7o/AAAAQGnCuT8AAABg+FWkPwAAAMB7Bmw/AAAAAODJlT8AAABAJjOUPwAAAOB6aZ0/AAAAIDhrlD8AAABgdUfNPwAAAMA/6Lo/AAAAwFRfuj8AAAAAZSelPwAAAKDcEqQ/AAAAoKQRkz8AAAAg+VqnPwAAAKA3M54/AAAAwAgXhT8AAADA6udaPwAAAABq7uQ+AAAAYENOiT8AAACgdV78PgAAAECgNZA/AAAAoFgUqj8AAAAAXTyiPwAAAKAvLk8/AAAAALF9ZD8AAADgVaxpPwAAAIB4G+E+AAAAID3VEj8AAABA86BDPgAAAOBGGOk+AAAAoK82JD8AAABA9ZK9PgAAAACV1Co+AAAAAINUvT4AAADASp+mPQAAAMBMeVQ+AAAAIAwDXj0AAABgKQtyPgAAAADXono+AAAAAFPZkz0AAABg5Fo2PgAAAGAiOQM+AAAAAL04Mz4AAAAAe77oPAAAAGDPsY09AAAAwPsQoj0AAAAA/dHVPQAAAMCYYaA9AAAAgONFij0AAABAUORsPQAAAMAEuJY+AAAAAO/2Yj4AAABgr4gmPgAAAEAMqBM+AAAAwLfrXz4AAADgCneHPgAAAKC9cMU9AAAAgBa7JT4AAABgY9HIPAAAAKBOzFw+AAAAYPGqXT4=',np.array([8453, 2, 1, 1, 1, 1, 8, 1, 1, 1, 1, 2, 1, 2, 2, 1, 7, 2, 4, 2, 1, 17, 16, 2, 2, 2, 4, 4, 1, 1, 19, 1, 5, 7, 14, 6, 11, 3, 3, 12, 66, 1, 2, 1, 299, 1, 3, 1, 97, 2, 6, 2, 3, 3, 3, 9, 20, 8, 105, 1, 6, 2, 6, 2, 8, 14, 13, 3, 28, 9, 8, 2, 30, 14, 10, 3, 26, 1, 8, 2, 2, 6, 4, 1, 1715, 1, 1, 10, 2, 4, 12, 1, 1, 3, 2, 6, 1, 1, 8, 4, 2, 11, 3, 1, 2, 3, 2, 6, 2, 4, 1, 1, 9642, 3, 143, 1, 48, 1, 102, 1, 1762, 3, 3, 1, 2, 2, 47, 1, 1, 1, 1, 2, 3, 1, 3, 2, 2, 6, 1, 5, 2116],dtype=np.int64)),
+    'l_glute2':(b'AAAAYHZrwj4AAADg767gPgAAACD6mTs/AAAAIAw92D8AAADAnB5vPwAAAOAqj4E/AAAAwFcDZj8AAADAKM4APwAAAGArunA/AAAAILwUoT8AAABATVTJPwAAAACxi8E/AAAAoNiyyz8AAAAAAUnFPwAAAECdyM0/AAAAIPK+zj8AAAAgJP6zPwAAAICJP9c/AAAA4PLquj8AAADARBXiPwAAAMDK9eE/AAAAIO6n4j8AAAAATWLfPwAAAMBHleA/AAAAIAPOyT8AAABAqgDDPwAAAIDIDcY/AAAA4K7ntz8AAADA3eqtPwAAAMDwWsY/AAAAgKTKwj8AAACg05W8PwAAAKCsQIQ/AAAA4LRawj8AAABgbKDSPwAAAOCKx9M/AAAAAAvJ1D8AAACgtfzQPwAAAMAQY7I/AAAAYPfuyz8AAADgNDfjPwAAAIAVbb8/AAAAAEJs2z8AAACgcz7nPwAAAMDHssw/AAAAYE6h6D8AAAAA1JHnPwAAAGBFiSg/AAAAII3xvz8AAABgnPHkPwAAAKACGOE/AAAAYLLXoT8AAAAA3sWGPwAAAMCo9fk+AAAAwFZgqT8AAABAGHlfPwAAACAwBJE/AAAA4HC0kT8AAADAw29+PgAAAEAgxis/AAAAAD7GGD8AAADgtUGyPwAAAKADja0/AAAAoI6FsT8AAACA9gOnPwAAAIBIZnQ/AAAAgAwEoD8AAACAJqRwPwAAACChgbU/AAAAwOvguj8AAADgVPtbPwAAAIARd+s/AAAAwPkW7T8AAAAgTqzaPwAAAECKTuU/AAAAQLnjzD8AAADAVLbrPwAAAKDTgr4/AAAAwN275z8AAAAAoyniPwAAACBziag/AAAA4CryhD8AAADgOSK4PwAAAGBvoNA/AAAAQN9w1T8AAACAfggAPwAAAEANEog/AAAAYFYF1z8AAADgL3gvPwAAAOBzhao/AAAAYHn0wT8AAAAgDtrJPwAAAODGoJM/AAAAgJUdsj8AAACAL5+9PgAAAMAkj7w/AAAAoG7O2D8AAAAAQi7bPwAAAOBVmds/AAAAYIl1wj8AAADARMqxPwAAAIBy5NY/AAAAQLWyzz8AAAAgLnzUPwAAAID/Vc8/AAAAgGG4kD8AAACgjGNkPwAAAGDtKQ4/AAAAAFpxxT8AAAAAaQa6PwAAAIC6SOw/AAAAAPXh6j8AAADA+ZbVPwAAAKCpR+E/AAAAYDaKyD8AAACAXrTmPwAAAOAFGbg/AAAAYGF/5D8AAABAfNugPwAAAGC41YM/AAAAwG4gvj4AAACADYrePwAAAOCjZdM/AAAAICSJWD4AAACAk32YPwAAAADsHbk/AAAAwINstT8AAACglsu2PwAAACC0QyA/AAAAQM/JVj8AAAAAi2yVPwAAAGDctrA/AAAAII5Crj8AAACA/gGtPwAAAAAiMQc/AAAAgD+X0z4AAACgvsKlPwAAAIA9K5Y/AAAAoHLQcD8AAABAcobUPgAAAODP82o/AAAAQPidyT4AAABALHBlPwAAAGCB+T0/AAAAoLgU1D4AAABAqEfiPgAAACAx68g/AAAAoCllyj8AAAAgCBjEPwAAAMAq9NM+AAAAgLaEtz8AAABAnDekPwAAAMAOlrs/AAAAgFOM4T8AAACAyZDgPwAAAKA+rc0/AAAAgHJy1z8AAABgcxLBPwAAAEDSnd8/AAAAYLMprT8AAABA7+TaPwAAAGDSP40/AAAAoHVhcz8AAABg5VTSPwAAAMCrP8s/AAAAYAw8xz8AAAAARq20PwAAAMCoX6I/AAAAIFYPwj8AAAAgX2SuPwAAAMB6T5s/AAAAwFtNrD8AAAAggiGgPwAAAEDqpYo/AAAAgBcSpj8AAADAdr5PPwAAAGAEwqY/AAAAQPA+qD8AAACAxPzuPgAAAGCfWBQ/AAAAQL5CXD8AAACgUZN3PwAAAGAvKHQ/AAAAIDJdej8=',np.array([1375, 1, 15, 1, 7079, 1, 6, 1, 1, 1, 10, 3, 1, 17, 16, 8, 1, 7, 25, 7, 15, 4, 12, 2, 1, 2, 1, 3, 5, 1, 9, 1, 62, 1, 75, 5, 2, 2, 317, 2, 6, 1, 10, 10, 15, 1, 3, 5, 1, 1, 111, 1, 1, 2, 6, 2, 4, 1, 2, 2, 1, 12, 15, 1, 28, 10, 4, 2, 1, 2, 30, 13, 13, 1, 1765, 2, 1, 4, 4, 1, 2, 4, 12, 5, 2, 9, 4, 1, 2, 4, 2, 11, 3, 1, 1, 3, 4, 2, 13917],dtype=np.int64)),
+}
+
+def is_additional_bone(bone_name):
+    return bone_name in ADDITIONAL_BONES
+
+def is_daz_bone(bone_name):
+    return bone_name in DAZ_G9_TO_UE5_BONES or bone_name in OTHER_DAZ_BONES
+
+def is_known_bone(bone_name):
+    return is_additional_bone(bone_name) or is_daz_bone(bone_name)
+
+def serialize_bone_and_weights(obj, bone_names):
+    import base64
+    for bone_name in bone_names:
+        vg = obj.vertex_groups.get(bone_name)
+        if vg is not None:
+            weights, indices, is_non_zero = get_weights_as_sparse(obj, vg)
+            #print("indices.dtype=",indices.dtype)
+            #print("weights.dtype=", weights.dtype)
+            print(f"'{bone_name}':({base64.b64encode(weights)},np.array({indices.tolist()},dtype=np.{indices.dtype})),")
+            #print(f"'{bone_name}':({base64.b64encode(weights)},{base64.b64encode(indices)})")
+
+def apply_additional_bone(obj, bone_names):
+    import base64
+    for bone_name in bone_names:
+        if bone_name in ADDITIONAL_BONES:
+            weights, indices = ADDITIONAL_BONES.get(bone_name)
+            vg = obj.vertex_groups.get(bone_name)
+            if vg is None:
+                vg = obj.vertex_groups.new(name=bone_name)
+            weights = base64.decodebytes(weights)
+            indices = rle_decode(indices, (NUM_OF_VERTICES_IN_DAZ_BASE_MESH,))
+            weights = np.frombuffer(weights, dtype=np.float64)
+            for val, idx in zip(weights.tolist(), indices.tolist()):
+                vg.add(index=(idx,), weight=val, type='REPLACE')
+
 
 def find_child_meshes(o):
     out = []
@@ -1734,14 +1909,7 @@ def subdivide_bone(cuts, mesh, rig, bone_name):
     select_object(mesh)
     bpy.ops.object.mode_set(mode='EDIT')
 
-    def contains_group(vertex, group_index):
-        for g in vertex.groups:
-            if g.group == group_index:
-                return g.weight
-        return 0
-
-    group_idx = old_group.index
-    old_weights = np.array([contains_group(v, group_idx) for v in mesh.data.vertices])
+    old_weights = get_weights_as_array(mesh, old_group)
     bpy.ops.object.mode_set(mode='OBJECT')
     max_weight = np.max(old_weights)
     steps = len(vertex_groups) + 1
@@ -1754,7 +1922,6 @@ def subdivide_bone(cuts, mesh, rig, bone_name):
     vertex_groups.append(old_group)
     return vertex_groups
 
-
 def intersect_two_weight_groups(mesh, group1, group2, new_group, method="L0"):
     select_object(mesh)
     prev_mode = mesh.mode
@@ -1765,16 +1932,8 @@ def intersect_two_weight_groups(mesh, group1, group2, new_group, method="L0"):
     if gn is None:
         gn = mesh.vertex_groups.new(name=new_group)
 
-    def contains_group(vertex, group_index):
-        for g in vertex.groups:
-            if g.group == group_index:
-                return g.weight
-        return 0
-
-    i1 = g1.index
-    weights1 = np.array([contains_group(v, i1) for v in mesh.data.vertices])
-    i2 = g2.index
-    weights2 = np.array([contains_group(v, i2) for v in mesh.data.vertices])
+    weights1 = get_weights_as_array(mesh, g1)
+    weights2 = get_weights_as_array(mesh, g2)
     bpy.ops.object.mode_set(mode='OBJECT')
     if method=="GEOM":
         ##### Here is a method based on geometric mean
@@ -2031,6 +2190,55 @@ def add_drivers_for_all_shape_keys(body_obj, objs=None):
 def remove_shape_key(body, sk_name):
     if sk_name in body.data.shape_keys.key_blocks:
         body.shape_key_remove(body.data.shape_keys.key_blocks[sk_name])
+
+def do_edges_share_a_face(edge1, edge2):
+    for linked_face in edge1.link_faces:
+        if linked_face in edge2.link_faces:
+            return True
+    return False
+
+def do_edges_share_a_vert(edge1, edge2):
+    for v in edge1.verts:
+        if v in edge2.verts:
+            return True
+    return False
+
+def get_edges_that_share_a_face(edge, vert):
+    for linked_edge in vert.link_edges:
+        if do_edges_share_a_face(linked_edge, edge):
+            yield linked_edge
+
+def iterate_parallel_edges(edge):
+    for face in edge.link_faces:
+        parallel_edge = None
+        perpendicular_egde = None
+        for other_edge in face.edges:
+            if do_edges_share_a_vert(edge, other_edge):
+                perpendicular_egde = other_edge
+                if parallel_edge is not None:
+                    yield perpendicular_egde.calc_length(), parallel_edge
+                    break
+            else:
+                parallel_edge = other_edge
+                if perpendicular_egde is not None:
+                    yield perpendicular_egde.calc_length(), parallel_edge
+                    break
+
+
+def iterate_edge_loop(start_edge):
+    current_edge = start_edge
+    current_vert = current_edge.verts[0]
+    while True:
+        if len(current_vert.link_edges) != 4:
+            return
+        for next_edge in current_vert.link_edges:
+            if not do_edges_share_a_face(current_edge, next_edge):
+                yield next_edge
+                current_edge = next_edge
+                current_vert = current_edge.verts[1] if current_edge.verts[0] == current_vert else current_edge.verts[0]
+                break
+        if current_edge == start_edge:
+            return
 
 
 class DazOptimizer:
@@ -4271,8 +4479,23 @@ class DazOptimizer:
                     if w > diff + epsilon:
                         l_thigh_jiggle.add(index=(idx,), weight=w - diff, type='REPLACE')
 
+    def apply_additional_bone(self, bone_names):
+        body_mesh = self.get_body_mesh()
+        apply_additional_bone(body_mesh, bone_names)
 
-    def add_glute_bones(self):
+    def add_double_small_glute_bones(self):
+        self.apply_additional_bone(['r_glute', 'r_glute2', 'l_glute', 'l_glute2'])
+
+    def add_high_thigh_jiggle(self):
+        self.apply_additional_bone(['l_thigh_jiggle', 'r_thigh_jiggle'])
+
+    def add_low_thigh_jiggle(self):
+        self.apply_additional_bone(['l_thigh_jiggle2', 'r_thigh_jiggle2'])
+
+    def add_side_thigh_jiggle(self):
+        self.apply_additional_bone(['l_thigh_jiggle_side', 'r_thigh_jiggle_side'])
+
+    def add_single_big_glute_bones(self):
         body_mesh = self.get_body_mesh()
         body_rig = self.get_body_rig()
         select_object(body_rig)
@@ -4499,7 +4722,165 @@ class DazOptimizer:
                     spine1.name = 'pelvis'
 
     @staticmethod
-    def remove_daz_bone_constraints(self):
+    def get_gp_mesh():
+        return bpy.data.objects.get('GoldenPalace_G9 Mesh')
+
+    @staticmethod
+    def remove_tentacles(self):
+        pass
+
+    @staticmethod
+    def remove_clitzilla():
+        clit_center_uv = np.array((0.264921, 0.645213))
+        clit_end_uv = np.array((0.265918, 0.614961))
+        clit_radius = np.linalg.norm(clit_end_uv-clit_center_uv)
+        gp_mesh = DazOptimizer.get_gp_mesh()
+        gp_rig = get_rig_of(gp_mesh)
+
+        select_object(gp_mesh)
+
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.context.scene.tool_settings.use_uv_select_sync = False
+        bpy.ops.uv.select_all(action='DESELECT')
+        bpy.ops.mesh.select_all(action='DESELECT')
+
+        me = bpy.context.object.data
+        bm = bmesh.from_edit_mesh(me)
+        uv_layer = bm.loops.layers.uv.verify()
+        #for v in bm.verts:
+        #    v.select = False
+        def edge_vector(l):
+            a,b = l.edge.verts
+            return b.co-a.co
+        suspected_edges = set()
+        for face in bm.faces:
+            if len(face.loops) == 4:
+
+                v0, v1, v2, v3 = face.loops
+                is_clit = False
+                for loop in face.loops:
+                    loop_uv = loop[uv_layer]
+                    uv = np.array(loop_uv.uv)
+                    dist = np.linalg.norm(uv-clit_center_uv)
+                    if dist < clit_radius:
+                        is_clit = True
+                        break
+
+                if is_clit:
+                    e0 = edge_vector(v0).length
+                    e1 = edge_vector(v1).length
+                    e2 = edge_vector(v2).length
+                    e3 = edge_vector(v3).length
+                    e02 = e0+e2
+                    e13 = e1+e3
+                    if e02 > e13*2:
+                        v0.edge.select_set(True)
+                        v2.edge.select_set(True)
+                        suspected_edges.add(v0.edge.index)
+                        suspected_edges.add(v2.edge.index)
+                    elif e13 > e02*2:
+                        v1.edge.select_set(True)
+                        v3.edge.select_set(True)
+                        suspected_edges.add(v1.edge.index)
+                        suspected_edges.add(v3.edge.index)
+                        #face.select_set(True)
+        visited_edges = {}
+        max_non_selected_edges = 15
+        edge_loops = []
+        bm.edges.ensure_lookup_table()
+        class Loop:
+            def __init__(self, edge_list):
+                self.edge_list = edge_list
+                self.next_loop = None
+                self.prev_loop = None
+                self.dist_to_next = -1
+                self.neighbour_loops = {}
+                self.is_valid=False
+        for edge_index in suspected_edges:
+            if edge_index not in visited_edges:
+                start_edge = bm.edges[edge_index]
+                edges_in_this_loop = Loop(list(iterate_edge_loop(start_edge)))
+                visited_edges.update({e.index: edges_in_this_loop for e in edges_in_this_loop.edge_list})
+                if len(edges_in_this_loop.edge_list)>0 and edges_in_this_loop.edge_list[-1]==start_edge:
+                    number_of_non_selected_edges_in_loop = sum(not e.select for e in edges_in_this_loop.edge_list)
+                    if number_of_non_selected_edges_in_loop < max_non_selected_edges:
+                        edges_in_this_loop.is_valid = True
+                        edge_loops.append(edges_in_this_loop)
+        for edge_loop in edge_loops:
+            edge = edge_loop.edge_list[0]
+            for distance, parallel_edge in iterate_parallel_edges(edge):
+                neighbour_loop = visited_edges.get(parallel_edge.index)
+                if neighbour_loop is not None and neighbour_loop.is_valid:
+                    edge_loop.neighbour_loops[neighbour_loop] = distance
+        for edge_loop in edge_loops:
+            if len(edge_loop.neighbour_loops)==1:
+                starting_loop = edge_loop
+                break
+        prev_loop = starting_loop
+        (next_loop, next_loop_dist), = prev_loop.neighbour_loops.items()
+        while True:
+            prev_loop.next_loop = next_loop
+            prev_loop.dist_to_next = next_loop_dist
+            next_loop.prev_loop = prev_loop
+            if len(next_loop.neighbour_loops)==1:
+                break
+            else:
+                (a, ad), (b, bd) = next_loop.neighbour_loops.items()
+                if a != prev_loop:
+                    prev_loop = next_loop
+                    next_loop = a
+                    next_loop_dist = ad
+                elif b != prev_loop:
+                    prev_loop = next_loop
+                    next_loop = b
+                    next_loop_dist = bd
+                else:
+                    break
+        idx = 0
+        edge_loop = starting_loop
+        bpy.ops.mesh.select_all(action='DESELECT')
+        min_distance = max(edge_loop.dist_to_next for edge_loop in edge_loops)*2
+        cumulative_distance = 0
+        while edge_loop is not None:
+            cumulative_distance += edge_loop.dist_to_next
+            if cumulative_distance > min_distance:
+                cumulative_distance = 0
+            else:
+                for edge in edge_loop.edge_list:
+                    edge.select_set(True)
+            edge_loop = edge_loop.next_loop
+            idx += 1
+
+
+
+        #for v in bm.verts:
+        #    if v.select:
+        #        bm.verts.remove(v)
+        bmesh.update_edit_mesh(me)
+        bpy.ops.mesh.dissolve_edges()
+
+        select_object(gp_rig)
+        bpy.ops.object.mode_set(mode='EDIT')
+        clitzilla_bones = [bone for bone in gp_rig.data.edit_bones if 'clitzilla' in bone.name.lower()]
+        clit_vertex_group = gp_mesh.vertex_groups['clitoris']
+        clit_weights = get_weights_as_array(gp_mesh, clit_vertex_group)
+        for bone in clitzilla_bones:
+            clit_weights += get_weights_as_array(gp_mesh, bone.name)
+            gp_rig.data.edit_bones.remove(bone)
+        apply_vertex_group_weights(clit_vertex_group, clit_weights)
+        #bpy.ops.object.mode_set(mode='OBJECT')
+
+    @staticmethod
+    def remove_daz_bone_drivers():
+        for o in bpy.data.objects:
+            if isinstance(o.data, bpy.types.Mesh):
+                if o.data.shape_keys is not None:
+                    keys = o.data.shape_keys.key_blocks
+                    for key in keys:
+                        key.driver_remove('value')
+
+    @staticmethod
+    def remove_daz_bone_constraints():
         for rig in bpy.data.objects:
             if isinstance(rig.data, bpy.types.Armature):
                 for bone in rig.pose.bones:
@@ -5044,6 +5425,18 @@ class DazOptimizer:
                                  axis_forward='-Z',
                                  axis_up='Y')
 
+    def serialize_extra_bones(self):
+        body = self.get_body_mesh()
+        rig = self.get_body_rig()
+        select_object(rig)
+        bones = [bone.name for bone in rig.data.bones if not is_known_bone(bone.name)]
+        serialize_bone_and_weights(body, bones)
+
+    def serialize_extra_clothes(self):
+        for o in bpy.data.objects:
+            if not o.hide_get() and isinstance(o.data, bpy.types.Mesh) and o.name.endswith(" Mesh"):
+                print("'"+o.name[:-len(" Mesh")]+"': ClothesMeta('"+o.data.daz_importer.DazFingerPrint+"', -1, "+str('panties' in o.name.lower())+"),")
+
     def export_hair_to_fbx(self):
         root = bpy.data.objects.get('root')
         if root is not None:
@@ -5509,6 +5902,35 @@ class DazDecimateCumMeshes_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class DazRemoveClitzilla(bpy.types.Operator):
+    bl_idname = "dazoptim.remove_clitzilla"
+    bl_label = "Remove clitzilla"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '$'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or (has_gp() and check_stage(context, [DazFemaleLoad_operator], [DazRemoveClitzilla]))
+
+    def execute(self, context):
+        DazOptimizer.remove_clitzilla()
+        #pass_stage(self)
+        return {'FINISHED'}
+
+class DazRemoveTentacles(bpy.types.Operator):
+    bl_idname = "dazoptim.remove_tentacles"
+    bl_label = "Remove tentacles"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '='
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or (has_gp() and check_stage(context, [DazFemaleLoad_operator], [DazRemoveTentacles]))
+
+    def execute(self, context):
+        DazOptimizer.remove_tentacles()
+        #pass_stage(self)
+        return {'FINISHED'}
 
 class DazApplyDecimateCumMeshes_operator(bpy.types.Operator):
     bl_idname = "dazoptim.apply_decimate_cum_meshes"
@@ -6114,38 +6536,86 @@ class DazAddBreastBones_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
-class DazAddGluteBones_operator(bpy.types.Operator):
+class DazAddGluteOneBigBones_operator(bpy.types.Operator):
     """ Add glute bones """
-    bl_idname = "dazoptim.glute_bones"
+    bl_idname = "dazoptim.add_glute_single_big_bone"
     bl_label = "Optimize UVs"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = '6'
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddGluteBones_operator])
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddGluteOneBigBones_operator])
 
     def execute(self, context):
-        DazOptimizer().add_glute_bones()
+        DazOptimizer().add_single_big_glute_bones()
         pass_stage(self)
         return {'FINISHED'}
 
-
-class DazAddThighBones_operator(bpy.types.Operator):
-    """ Add thigh bones """
-    bl_idname = "dazoptim.thigh_bones"
+class DazAddGluteTwoSmallerBones_operator(bpy.types.Operator):
+    """ Add glute bones """
+    bl_idname = "dazoptim.add_glute_two_small_bones"
     bl_label = "Optimize UVs"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = '7'
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighBones_operator])
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddGluteTwoSmallerBones_operator])
 
     def execute(self, context):
-        DazOptimizer().add_thigh_bones()
+        DazOptimizer().add_double_small_glute_bones()
         pass_stage(self)
         return {'FINISHED'}
+
+class DazAddThighUpperBones_operator(bpy.types.Operator):
+    """ Add glute bones """
+    bl_idname = "dazoptim.add_thigh_upper_bones"
+    bl_label = "Optimize UVs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '#'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighUpperBones_operator])
+
+    def execute(self, context):
+        DazOptimizer().add_high_thigh_jiggle()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class DazAddThighLowerBones_operator(bpy.types.Operator):
+    """ Add glute bones """
+    bl_idname = "dazoptim.add_thigh_lower_bones"
+    bl_label = "Optimize UVs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '%'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighLowerBones_operator])
+
+    def execute(self, context):
+        DazOptimizer().add_low_thigh_jiggle()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class DazAddThighSideBones_operator(bpy.types.Operator):
+    """ Add glute bones """
+    bl_idname = "dazoptim.add_thigh_side_bones"
+    bl_label = "Add thigh side bones"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '^'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighSideBones_operator])
+
+    def execute(self, context):
+        DazOptimizer().add_side_thigh_jiggle()
+        pass_stage(self)
+        return {'FINISHED'}
+
 
 class DazFitSkinTightClothes_operator(bpy.types.Operator):
     """ fit skin tight clothes """
@@ -6241,7 +6711,10 @@ class DazFitPanties_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
-
+BONE_ADDING_OPS = [
+            DazAddGluteOneBigBones_operator, DazAddBreastBones_operator, DazAddGluteTwoSmallerBones_operator,
+            DazAddThighLowerBones_operator, DazAddThighUpperBones_operator, DazAddThighSideBones_operator
+]
 class DazTransferMissingBonesToClothes_operator(bpy.types.Operator):
     """ transfer new bones to clothes """
     bl_idname = "dazoptim.transfer_new_bones_to_clothes"
@@ -6251,7 +6724,7 @@ class DazTransferMissingBonesToClothes_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage_any(context, [DazAddGluteBones_operator, DazAddBreastBones_operator, DazAddThighBones_operator], [DazTransferMissingBonesToClothes_operator])
+        return UNLOCK or check_stage_any(context, BONE_ADDING_OPS, [DazTransferMissingBonesToClothes_operator])
 
     def execute(self, context):
         DazOptimizer().transfer_missing_bones_to_clothes()
@@ -6267,7 +6740,7 @@ class DazTransferMissingBonesToCum_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or bpy.context.scene.get('has_love_loads') and check_stage_any(context, [DazAddGluteBones_operator, DazAddBreastBones_operator, DazAddThighBones_operator], [DazTransferMissingBonesToCum_operator])
+        return UNLOCK or bpy.context.scene.get('has_love_loads') and check_stage_any(context, BONE_ADDING_OPS, [DazTransferMissingBonesToCum_operator])
 
     def execute(self, context):
         DazOptimizer().transfer_missing_bones_to_cum()
@@ -6883,6 +7356,38 @@ class DazExportHairFbx(bpy.types.Operator):
         DazOptimizer().export_hair_to_fbx()
         return {'FINISHED'}
 
+
+class SerializeExtraBones(bpy.types.Operator):
+    """ Print morph csv """
+    bl_idname = "dazoptim.serialize_extra_bones"
+    bl_label = "Serialize extra bones"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazFemaleLoad_operator], [DazMergeGrografts_operator, DazConvertToUe5Skeleton_operator])
+
+    def execute(self, context):
+        DazOptimizer().serialize_extra_bones()
+        return {'FINISHED'}
+
+
+class SerializeExtraClothes(bpy.types.Operator):
+    """ Serialize extra clothes """
+    bl_idname = "dazoptim.serialize_extra_clothes"
+    bl_label = "Serialize extra clothes"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazFemaleLoad_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().serialize_extra_clothes()
+        return {'FINISHED'}
+
 class PrintMorphCsv(bpy.types.Operator):
     """ Print morph csv """
     bl_idname = "dazoptim.print_morph_csv"
@@ -7035,6 +7540,22 @@ class RemoveDazBoneConstraints(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class RemoveDazBoneDrivers(bpy.types.Operator):
+    """ remove daz bone drivers """
+    bl_idname = "dazoptim.remove_daz_bone_drivers"
+    bl_label = "remove daz bone drivers"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        DazOptimizer.remove_daz_bone_drivers()
+        return {'FINISHED'}
+
+
 class ShowAllClothes(bpy.types.Operator):
     """ show all clothes """
     bl_idname = "dazoptim.show_all_clothes"
@@ -7130,9 +7651,14 @@ operators = [
     EntryOp(LoadMorphs, "Load fav morphs"),
     EntryOp(RebindFavMorphs, "Rebind fav morphs"),
     EntryOp(TransferMorphsToGeografts, "Transfer morphs to geografts"),
+    EntryOp(DazRemoveClitzilla, "Remove GP clitzilla"),
+    EntryOp(DazRemoveTentacles, "Remove GP tentacles"),
     EntryOp(DazAddBreastBones_operator, "Subdivide breast bones"),
-    EntryOp(DazAddGluteBones_operator, "Add glute bones"),
-    EntryOp(DazAddThighBones_operator, "Add thigh bones"),
+    EntryOp(DazAddGluteOneBigBones_operator, "Add glute bones (one big)"),
+    EntryOp(DazAddGluteTwoSmallerBones_operator, "Add glute bones (two smaller)"),
+    EntryOp(DazAddThighUpperBones_operator, "Add thigh bones (upper)"),
+    EntryOp(DazAddThighLowerBones_operator, "Add thigh bones (lower)"),
+    EntryOp(DazAddThighSideBones_operator, "Add thigh bones (sides)"),
     EntryOp(DazSimplifyMaterials_operator, "Simplify materials"),
     EntryOp(DazOptimizeEyes_operator, "Optimize eyes mesh"),
     EntryOp(DazOptimizeEyesForToon_operator, "Optimize eyes for toon"),
@@ -7201,7 +7727,6 @@ operators = [
     EntryOp(ExportAction, "Export action to fbx"),
     EntryLabel("Utilities", -1),
     EntryOp(DazCompareToUe5Skeleton_operator, "Compare to UE5 Skeleton"),
-    EntryOp(PrintMorphCsv, "Print Morphs CSV"),
     EntryOp(HideAllClothes, "Hide all clothes"),
     EntryOp(ShowAllClothes, "Show all clothes"),
     EntryOp(HideAllHair, "Hide all hair"),
@@ -7212,7 +7737,12 @@ operators = [
     EntryOp(UnlockEverything, "Unlock everything"),
     EntryOp(DazAlignPoseQuinn, "Align pose to ue5"),
     EntryOp(RemoveDazBoneConstraints, "Remove daz bone constraints"),
+    EntryOp(RemoveDazBoneDrivers, "Remove bone drivers"),
     EntryOp(DazApplyPose, "Apply pose"),
+    EntryLabel("Programmer utilities", -1),
+    EntryOp(PrintMorphCsv, "Print Morphs CSV"),
+    EntryOp(SerializeExtraBones, "Serialize extra bones"),
+    EntryOp(SerializeExtraClothes, "Serialize extra clothes"),
 
 ]
 
