@@ -2240,6 +2240,21 @@ def iterate_edge_loop(start_edge):
         if current_edge == start_edge:
             return
 
+def iterate_edge_loop_over_allowed_verts(start_edge, allowed_verts: np.ndarray):
+    current_edge = start_edge
+    current_vert = current_edge.verts[0]
+    while allowed_verts[current_vert.index]:
+        if len(current_vert.link_edges) != 4:
+            return
+        for next_edge in current_vert.link_edges:
+            if not do_edges_share_a_face(current_edge, next_edge):
+                yield next_edge
+                current_edge = next_edge
+                current_vert = current_edge.verts[1] if current_edge.verts[0] == current_vert else current_edge.verts[0]
+                break
+        if current_edge == start_edge:
+            return
+
 
 class DazOptimizer:
 
@@ -4726,8 +4741,45 @@ class DazOptimizer:
         return bpy.data.objects.get('GoldenPalace_G9 Mesh')
 
     @staticmethod
-    def remove_tentacles(self):
-        pass
+    def remove_tentacles():
+        gp_mesh = DazOptimizer.get_gp_mesh()
+        gp_rig = get_rig_of(gp_mesh)
+        select_object(gp_rig)
+        tentacle_bones = [bone.name for bone in gp_rig.data.bones if 'tentacle' in bone.name.lower()]
+        select_object(gp_mesh)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.context.scene.tool_settings.use_uv_select_sync = False
+        bpy.ops.uv.select_all(action='DESELECT')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        me = bpy.context.object.data
+        bm = bmesh.from_edit_mesh(me)
+        bm.verts.ensure_lookup_table()
+        vagina_vertex_group = gp_mesh.vertex_groups['vagina']
+        vagina_weights = get_weights_as_array(gp_mesh, vagina_vertex_group)
+        for bone_name in tentacle_bones:
+            tentacle_weights = get_weights_as_array(gp_mesh, bone_name)
+            is_tentacle_vert = tentacle_weights > 0
+            tentacle_vert_indices, = np.where(is_tentacle_vert)
+            for vert_idx in tentacle_vert_indices:
+                start_vert = bm.verts[vert_idx]
+                for start_edge in start_vert.link_edges:
+                    edges_in_this_loop = list(iterate_edge_loop_over_allowed_verts(start_edge, is_tentacle_vert))
+                    if len(edges_in_this_loop) > 0 and edges_in_this_loop[-1] == start_edge:
+                        for edge in edges_in_this_loop:
+                            edge.select_set(True)
+            vagina_weights += tentacle_weights
+        bmesh.update_edit_mesh(me)
+        select_object(gp_rig)
+        bpy.ops.object.mode_set(mode='EDIT')
+        for bone_name in tentacle_bones:
+            gp_rig.data.edit_bones.remove(gp_rig.data.edit_bones[bone_name])
+        apply_vertex_group_weights(gp_mesh.vertex_groups['vagina'], vagina_weights)
+        select_object(gp_mesh)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.dissolve_edges()
+        #uv_layer = bm.loops.layers.uv.verify()
+
+
 
     @staticmethod
     def remove_clitzilla():
