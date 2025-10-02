@@ -4034,12 +4034,13 @@ class DazOptimizer:
         out_of_bounds = np.logical_and(1 < base_layer_np[:, 0], is_arms_legs_head_body)
         base_layer_np[out_of_bounds] += [-1, 0.5]
         gp_np = None
+        is_t = bpy.context.scene.get('daz_optim_toon')
         if NEW_GP_UV_MAP in BODY_M.data.uv_layers:
             gp_layer = BODY_M.data.uv_layers[NEW_GP_UV_MAP]
             gp_layer_np = np.array([v.uv for v in gp_layer.data])
             gp_layer_np = np.mod(gp_layer_np, 1)
             is_gp = gp_layer_np[:, 0] > 0
-            if not use_full_gp:
+            if is_t or not use_full_gp:
                 is_outer_gp = gp_layer_np[:, 0] > 0.5
                 is_gp = np.logical_and(is_gp, np.logical_not(is_outer_gp))
             gp_np = gp_layer_np[is_gp]
@@ -4483,7 +4484,8 @@ class DazOptimizer:
 
     def make_single_material(self):
         body_m = self.select_body()
-        mat = NodesUtils.remove_all_mats(body_m, "UnifiedSkin", excpt=["Facial hair", TRANSPARENT_TOON_EYEBROWS_MAT_NAME, TRANSPARENT_TOON_EYELASHES_MAT_NAME])
+        exceptions = ["Facial hair", TRANSPARENT_TOON_EYEBROWS_MAT_NAME, TRANSPARENT_TOON_EYELASHES_MAT_NAME]
+        mat = NodesUtils.remove_all_mats(body_m, "UnifiedSkin", excpt=exceptions)
         filepaths = {}
         for channel in ['Base Color', 'Roughness', 'Normal']:
             fp = self.get_concat_image_path(channel)
@@ -4491,10 +4493,17 @@ class DazOptimizer:
         print("unified filepaths", filepaths)
         NodesUtils.gen_simple_material(mat.node_tree, filepaths)
         old_uv_maps = [o.name for o in body_m.data.uv_layers]
+        base_uv_layer_name = 'Base Multi UDIM'
         for uv_layer_name in old_uv_maps:
-            if uv_layer_name != 'Base Multi UDIM':
+            if uv_layer_name != base_uv_layer_name:
                 l = body_m.data.uv_layers[uv_layer_name]
                 body_m.data.uv_layers.remove(l)
+        for e in exceptions:
+            e_mat = body_m.material_slots.get(e)
+            if e_mat is not None:
+                nt = e_mat.material.node_tree
+                for uv_node in NodesUtils.find_all_by_type(nt, bpy.types.ShaderNodeUVMap):
+                    nt.nodes.remove(uv_node)
         for g in DICK_GEOGRAFTS:
             if g+' Mesh' in bpy.data.objects:
                 dick = bpy.data.objects[g+' Mesh']
@@ -6600,7 +6609,7 @@ class DazOptimizeUVsHalfGP_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSimplifyMaterials_operator, DazSimplifyGoldenPalaceMaterials_operator], [DazOptimizeUVsHalfGP_operator])
+        return UNLOCK or check_stage(context, [DazSimplifyMaterials_operator, DazOptimizeGoldenPalaceUVs if bpy.context.scene.get('daz_optim_toon') else DazSimplifyGoldenPalaceMaterials_operator] , [DazOptimizeUVsHalfGP_operator])
 
     def execute(self, context):
         DazOptimizer().pack_uvs(use_full_gp=False)
