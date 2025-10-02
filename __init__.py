@@ -1649,6 +1649,17 @@ ADDITIONAL_BONES = {
     'l_glute2':({'head': [0.08702501654624939, 0.08861622959375381, 0.9432905912399292], 'tail': [0.08978187292814255, 0.10098331421613693, 0.927352786064148], 'parent': 'pelvis', 'connect': False, 'local': True},b'AAAAYHZrwj4AAADg767gPgAAACD6mTs/AAAAIAw92D8AAADAnB5vPwAAAOAqj4E/AAAAwFcDZj8AAADAKM4APwAAAGArunA/AAAAILwUoT8AAABATVTJPwAAAACxi8E/AAAAoNiyyz8AAAAAAUnFPwAAAECdyM0/AAAAIPK+zj8AAAAgJP6zPwAAAICJP9c/AAAA4PLquj8AAADARBXiPwAAAMDK9eE/AAAAIO6n4j8AAAAATWLfPwAAAMBHleA/AAAAIAPOyT8AAABAqgDDPwAAAIDIDcY/AAAA4K7ntz8AAADA3eqtPwAAAMDwWsY/AAAAgKTKwj8AAACg05W8PwAAAKCsQIQ/AAAA4LRawj8AAABgbKDSPwAAAOCKx9M/AAAAAAvJ1D8AAACgtfzQPwAAAMAQY7I/AAAAYPfuyz8AAADgNDfjPwAAAIAVbb8/AAAAAEJs2z8AAACgcz7nPwAAAMDHssw/AAAAYE6h6D8AAAAA1JHnPwAAAGBFiSg/AAAAII3xvz8AAABgnPHkPwAAAKACGOE/AAAAYLLXoT8AAAAA3sWGPwAAAMCo9fk+AAAAwFZgqT8AAABAGHlfPwAAACAwBJE/AAAA4HC0kT8AAADAw29+PgAAAEAgxis/AAAAAD7GGD8AAADgtUGyPwAAAKADja0/AAAAoI6FsT8AAACA9gOnPwAAAIBIZnQ/AAAAgAwEoD8AAACAJqRwPwAAACChgbU/AAAAwOvguj8AAADgVPtbPwAAAIARd+s/AAAAwPkW7T8AAAAgTqzaPwAAAECKTuU/AAAAQLnjzD8AAADAVLbrPwAAAKDTgr4/AAAAwN275z8AAAAAoyniPwAAACBziag/AAAA4CryhD8AAADgOSK4PwAAAGBvoNA/AAAAQN9w1T8AAACAfggAPwAAAEANEog/AAAAYFYF1z8AAADgL3gvPwAAAOBzhao/AAAAYHn0wT8AAAAgDtrJPwAAAODGoJM/AAAAgJUdsj8AAACAL5+9PgAAAMAkj7w/AAAAoG7O2D8AAAAAQi7bPwAAAOBVmds/AAAAYIl1wj8AAADARMqxPwAAAIBy5NY/AAAAQLWyzz8AAAAgLnzUPwAAAID/Vc8/AAAAgGG4kD8AAACgjGNkPwAAAGDtKQ4/AAAAAFpxxT8AAAAAaQa6PwAAAIC6SOw/AAAAAPXh6j8AAADA+ZbVPwAAAKCpR+E/AAAAYDaKyD8AAACAXrTmPwAAAOAFGbg/AAAAYGF/5D8AAABAfNugPwAAAGC41YM/AAAAwG4gvj4AAACADYrePwAAAOCjZdM/AAAAICSJWD4AAACAk32YPwAAAADsHbk/AAAAwINstT8AAACglsu2PwAAACC0QyA/AAAAQM/JVj8AAAAAi2yVPwAAAGDctrA/AAAAII5Crj8AAACA/gGtPwAAAAAiMQc/AAAAgD+X0z4AAACgvsKlPwAAAIA9K5Y/AAAAoHLQcD8AAABAcobUPgAAAODP82o/AAAAQPidyT4AAABALHBlPwAAAGCB+T0/AAAAoLgU1D4AAABAqEfiPgAAACAx68g/AAAAoCllyj8AAAAgCBjEPwAAAMAq9NM+AAAAgLaEtz8AAABAnDekPwAAAMAOlrs/AAAAgFOM4T8AAACAyZDgPwAAAKA+rc0/AAAAgHJy1z8AAABgcxLBPwAAAEDSnd8/AAAAYLMprT8AAABA7+TaPwAAAGDSP40/AAAAoHVhcz8AAABg5VTSPwAAAMCrP8s/AAAAYAw8xz8AAAAARq20PwAAAMCoX6I/AAAAIFYPwj8AAAAgX2SuPwAAAMB6T5s/AAAAwFtNrD8AAAAggiGgPwAAAEDqpYo/AAAAgBcSpj8AAADAdr5PPwAAAGAEwqY/AAAAQPA+qD8AAACAxPzuPgAAAGCfWBQ/AAAAQL5CXD8AAACgUZN3PwAAAGAvKHQ/AAAAIDJdej8=',np.array([1375, 1, 15, 1, 7079, 1, 6, 1, 1, 1, 10, 3, 1, 17, 16, 8, 1, 7, 25, 7, 15, 4, 12, 2, 1, 2, 1, 3, 5, 1, 9, 1, 62, 1, 75, 5, 2, 2, 317, 2, 6, 1, 10, 10, 15, 1, 3, 5, 1, 1, 111, 1, 1, 2, 6, 2, 4, 1, 2, 2, 1, 12, 15, 1, 28, 10, 4, 2, 1, 2, 30, 13, 13, 1, 1765, 2, 1, 4, 4, 1, 2, 4, 12, 5, 2, 9, 4, 1, 2, 4, 2, 11, 3, 1, 1, 3, 4, 2, 13917],dtype=np.int64)),
 }
 
+
+class AddBoneChainAlongEdgeLoop:
+    def __init__(self, first_edge, first_vertex):
+        self.first_edge = first_edge
+        self.first_vertex = first_vertex
+
+
+ADDITIONAL_CLOTHING_BONES = {
+    'Soaring Dragon Kung Fu Dress': AddBoneChainAlongEdgeLoop(16416,2700),
+}
+
 def is_additional_bone(bone_name):
     return bone_name in ADDITIONAL_BONES
 
@@ -4654,6 +4665,7 @@ class DazOptimizer:
         subdivide_bone(cuts, BODY_M, BODY_RIG, 'l_glute')
         subdivide_bone(cuts, BODY_M, BODY_RIG, 'r_glute')
 
+
     def transfer_morphs_to_clothes(self):
         BODY_M = self.get_body_mesh()
         select_object(BODY_M)
@@ -4676,29 +4688,25 @@ class DazOptimizer:
 
     def get_missing_bones(self):
         BODY_M = self.get_body_mesh()
-        groups = []
-
+        groups = set(b for b in ADDITIONAL_BONES.keys() if b in BODY_M.vertex_groups)
         def add_subdivided(name):
             i = 1
             while True:
                 group = 'l_' + name + str(i)
                 if group in BODY_M.vertex_groups:
-                    groups.append(group)
-                    groups.append('r_' + name + str(i))
+                    groups.add(group)
+                    groups.add('r_' + name + str(i))
                     i += 1
                 else:
                     break
 
         if 'l_glute' in BODY_M.vertex_groups:
-            groups.append('l_glute')
-            groups.append('r_glute')
             add_subdivided('glute')
-        if 'l_thigh_jiggle' in BODY_M.vertex_groups:
-            groups.append('l_thigh_jiggle')
-            groups.append('r_thigh_jiggle')
-            add_subdivided('thigh_jiggle')
         add_subdivided('pectoral')
         return groups
+
+    def rig_physics_bones(self):
+        pass
 
     def transfer_missing_bones_to_clothes(self):
         BODY_M = self.get_body_mesh()
@@ -4845,7 +4853,38 @@ class DazOptimizer:
         select_object(gp_mesh)
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.dissolve_edges()
+        for bone_name in tentacle_bones:
+            vg = gp_mesh.vertex_groups.get(bone_name)
+            if vg is not None:
+                gp_mesh.vertex_groups.remove(vg)
         #uv_layer = bm.loops.layers.uv.verify()
+
+    def remove_rectum_bones(self):
+        gp_mesh = self.get_gp_or_body()
+        gp_rig = get_rig_of(gp_mesh)
+        bone_names = ['rectum_'+str(i).zfill(2) for i in range(1, 8)]
+
+        select_object(gp_rig)
+        bpy.ops.object.mode_set(mode='EDIT')
+        for bone_name in bone_names[1:]:
+            bone = gp_rig.data.edit_bones[bone_name]
+            gp_rig.data.edit_bones.remove(bone)
+        gp_rig.data.edit_bones[bone_names[0]].name = 'rectum'
+
+        vgs = [gp_mesh.vertex_groups[i] for i in bone_names]
+        vg_indices = np.array([i.index for i in vgs], dtype=int)
+        select_object(gp_mesh)
+
+        def rectum_weight(vertex):
+            return sum(g.weight for g in vertex.groups if g.group in vg_indices)
+
+        rectum_weights = np.array([rectum_weight(v) for v in gp_mesh.data.vertices])
+        rectum_vg = gp_mesh.vertex_groups.get('rectum')
+        if rectum_vg is None:
+            rectum_vg = gp_mesh.vertex_groups.new(name='rectum')
+        apply_vertex_group_weights(rectum_vg, rectum_weights)
+        for vg in vgs:
+            gp_mesh.vertex_groups.remove(vg)
 
     def remove_clitzilla(self):
         clit_center_uv = np.array((0.264921, 0.645213))
@@ -4862,8 +4901,8 @@ class DazOptimizer:
         bpy.ops.mesh.select_all(action='DESELECT')
 
         me = gp_mesh.data
-
-        clitzilla_vg_indices = np.array([gp_mesh.vertex_groups['clitzilla'+str(i).zfill(2)].index for i in range(4, 15)], dtype=int)
+        clitzilla_vgs = [gp_mesh.vertex_groups['clitzilla'+str(i).zfill(2)] for i in range(4, 15)]
+        clitzilla_vg_indices = np.array([cvg.index for cvg in clitzilla_vgs], dtype=int)
 
         def is_clitzilla_weight(vertex):
             clitzilla_sum = 0
@@ -4983,8 +5022,6 @@ class DazOptimizer:
             edge_loop = edge_loop.next_loop
             idx += 1
 
-
-
         #for v in bm.verts:
         #    if v.select:
         #        bm.verts.remove(v)
@@ -5000,6 +5037,8 @@ class DazOptimizer:
             clit_weights += get_weights_as_array(gp_mesh, bone.name)
             gp_rig.data.edit_bones.remove(bone)
         apply_vertex_group_weights(clit_vertex_group, clit_weights)
+        for cvg in clitzilla_vgs:
+            gp_mesh.vertex_groups.remove(cvg)
         #bpy.ops.object.mode_set(mode='OBJECT')
 
     @staticmethod
@@ -6052,6 +6091,21 @@ class DazRemoveClitzilla(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
+class DazRemoveRectum(bpy.types.Operator):
+    bl_idname = "dazoptim.remove_rectum"
+    bl_label = "Remove rectum"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '~'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or (had_gp() and check_stage(context, [DazMergeGrografts_operator], [DazRemoveRectum]))
+
+    def execute(self, context):
+        DazOptimizer().remove_rectum_bones()
+        pass_stage(self)
+        return {'FINISHED'}
+
 class DazRemoveTentacles(bpy.types.Operator):
     bl_idname = "dazoptim.remove_tentacles"
     bl_label = "Remove tentacles"
@@ -6859,7 +6913,7 @@ class DazTransferMissingBonesToClothes_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage_any(context, BONE_ADDING_OPS, [DazTransferMissingBonesToClothes_operator])
+        return UNLOCK or check_stage_any(context, BONE_ADDING_OPS, [DazTransferMissingBonesToClothes_operator, RigPhysicsBones])
 
     def execute(self, context):
         DazOptimizer().transfer_missing_bones_to_clothes()
@@ -7401,6 +7455,38 @@ class TransferMorphsToCum(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class RigPhysicsBones(bpy.types.Operator):
+    """ rig physics bones """
+    bl_idname = "dazoptim.rig_physics_bones"
+    bl_label = "Rig Physics Bones"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = "6"
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMaleLoad_operator], [RigPhysicsBones, DazMergeAllRigs_operator])
+
+    def execute(self, context):
+        DazOptimizer().rig_physics_bones()
+        pass_stage(self)
+        return {'FINISHED'}
+
+class RigPhysicsHair(bpy.types.Operator):
+    """ rig physics hair """
+    bl_idname = "dazoptim.rig_physics_hair"
+    bl_label = "Rig Physics Hair"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = "*"
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMaleLoad_operator], [RigPhysicsHair, DazMergeAllRigs_operator])
+
+    def execute(self, context):
+        DazOptimizer().rig_physics_hair()
+        pass_stage(self)
+        return {'FINISHED'}
+
 class RemoveShapeKeyDrivers(bpy.types.Operator):
     """ Remove shape key drivers """
     bl_idname = "dazoptim.remove_shape_key_drivers"
@@ -7769,6 +7855,8 @@ operators = [
     EntryOp(DazFemaleLoad_operator, "Load Daz (female)"),
     EntryOp(DazSaveBlend_operator, "Save blend file"),
     EntryOp(DazSaveTextures_operator, "Save textures"),
+    EntryOp(RigPhysicsBones, "Rig skirts/dresses/etc"),
+    EntryOp(RigPhysicsHair, "Rig anime hair"),
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
     EntryOp(DazRemoveAllSubsurf_operator, "Remove subsurf mods"),
     EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
@@ -7818,6 +7906,7 @@ operators = [
     EntryOp(DazSimplifyGoldenPalaceMaterials_operator, "Simplify golden palace materials"),
     EntryOp(DazRemoveClitzilla, "Remove GP clitzilla"),
     EntryOp(DazRemoveTentacles, "Remove GP tentacles"),
+    EntryOp(DazRemoveRectum, "Simplify GP rectum"),
     EntryOp(DazMergeEyes_operator, "Merge eyes"),
     EntryOp(DazMergeMouth_operator, "Merge mouth"),
     EntryOp(DazRemoveTear_operator, "Remove tear"),
