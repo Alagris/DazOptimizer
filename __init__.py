@@ -459,21 +459,25 @@ class NodesUtils:
 
 
 def install_libraries():
-    pil_missing = False
-
+    to_install = ""
     try:
         import PIL
     except ModuleNotFoundError:
-        pil_missing = True
+        to_install+=" Pillow"
 
-    if pil_missing:
+    try:
+        import scpipy
+    except ModuleNotFoundError:
+        to_install+=" scipy==1.10"
+
+    if to_install!="":
         py_exe = sys.executable
         res_path = os.path.realpath(os.path.join(py_exe, "../../lib/site-packages"))
         target = '"--target='+res_path+'"'
         print("=========================================================")
         print("=========================================================")
         print("Run the following command as an admin: ")
-        print('&"' + py_exe + '" -m pip install Pillow')
+        print('&"' + py_exe + '" -m pip install'+to_install)
         print("=========================================================")
         print("=========================================================")
 
@@ -1649,16 +1653,49 @@ ADDITIONAL_BONES = {
     'l_glute2':({'head': [0.08702501654624939, 0.08861622959375381, 0.9432905912399292], 'tail': [0.08978187292814255, 0.10098331421613693, 0.927352786064148], 'parent': 'pelvis', 'connect': False, 'local': True},b'AAAAYHZrwj4AAADg767gPgAAACD6mTs/AAAAIAw92D8AAADAnB5vPwAAAOAqj4E/AAAAwFcDZj8AAADAKM4APwAAAGArunA/AAAAILwUoT8AAABATVTJPwAAAACxi8E/AAAAoNiyyz8AAAAAAUnFPwAAAECdyM0/AAAAIPK+zj8AAAAgJP6zPwAAAICJP9c/AAAA4PLquj8AAADARBXiPwAAAMDK9eE/AAAAIO6n4j8AAAAATWLfPwAAAMBHleA/AAAAIAPOyT8AAABAqgDDPwAAAIDIDcY/AAAA4K7ntz8AAADA3eqtPwAAAMDwWsY/AAAAgKTKwj8AAACg05W8PwAAAKCsQIQ/AAAA4LRawj8AAABgbKDSPwAAAOCKx9M/AAAAAAvJ1D8AAACgtfzQPwAAAMAQY7I/AAAAYPfuyz8AAADgNDfjPwAAAIAVbb8/AAAAAEJs2z8AAACgcz7nPwAAAMDHssw/AAAAYE6h6D8AAAAA1JHnPwAAAGBFiSg/AAAAII3xvz8AAABgnPHkPwAAAKACGOE/AAAAYLLXoT8AAAAA3sWGPwAAAMCo9fk+AAAAwFZgqT8AAABAGHlfPwAAACAwBJE/AAAA4HC0kT8AAADAw29+PgAAAEAgxis/AAAAAD7GGD8AAADgtUGyPwAAAKADja0/AAAAoI6FsT8AAACA9gOnPwAAAIBIZnQ/AAAAgAwEoD8AAACAJqRwPwAAACChgbU/AAAAwOvguj8AAADgVPtbPwAAAIARd+s/AAAAwPkW7T8AAAAgTqzaPwAAAECKTuU/AAAAQLnjzD8AAADAVLbrPwAAAKDTgr4/AAAAwN275z8AAAAAoyniPwAAACBziag/AAAA4CryhD8AAADgOSK4PwAAAGBvoNA/AAAAQN9w1T8AAACAfggAPwAAAEANEog/AAAAYFYF1z8AAADgL3gvPwAAAOBzhao/AAAAYHn0wT8AAAAgDtrJPwAAAODGoJM/AAAAgJUdsj8AAACAL5+9PgAAAMAkj7w/AAAAoG7O2D8AAAAAQi7bPwAAAOBVmds/AAAAYIl1wj8AAADARMqxPwAAAIBy5NY/AAAAQLWyzz8AAAAgLnzUPwAAAID/Vc8/AAAAgGG4kD8AAACgjGNkPwAAAGDtKQ4/AAAAAFpxxT8AAAAAaQa6PwAAAIC6SOw/AAAAAPXh6j8AAADA+ZbVPwAAAKCpR+E/AAAAYDaKyD8AAACAXrTmPwAAAOAFGbg/AAAAYGF/5D8AAABAfNugPwAAAGC41YM/AAAAwG4gvj4AAACADYrePwAAAOCjZdM/AAAAICSJWD4AAACAk32YPwAAAADsHbk/AAAAwINstT8AAACglsu2PwAAACC0QyA/AAAAQM/JVj8AAAAAi2yVPwAAAGDctrA/AAAAII5Crj8AAACA/gGtPwAAAAAiMQc/AAAAgD+X0z4AAACgvsKlPwAAAIA9K5Y/AAAAoHLQcD8AAABAcobUPgAAAODP82o/AAAAQPidyT4AAABALHBlPwAAAGCB+T0/AAAAoLgU1D4AAABAqEfiPgAAACAx68g/AAAAoCllyj8AAAAgCBjEPwAAAMAq9NM+AAAAgLaEtz8AAABAnDekPwAAAMAOlrs/AAAAgFOM4T8AAACAyZDgPwAAAKA+rc0/AAAAgHJy1z8AAABgcxLBPwAAAEDSnd8/AAAAYLMprT8AAABA7+TaPwAAAGDSP40/AAAAoHVhcz8AAABg5VTSPwAAAMCrP8s/AAAAYAw8xz8AAAAARq20PwAAAMCoX6I/AAAAIFYPwj8AAAAgX2SuPwAAAMB6T5s/AAAAwFtNrD8AAAAggiGgPwAAAEDqpYo/AAAAgBcSpj8AAADAdr5PPwAAAGAEwqY/AAAAQPA+qD8AAACAxPzuPgAAAGCfWBQ/AAAAQL5CXD8AAACgUZN3PwAAAGAvKHQ/AAAAIDJdej8=',np.array([1375, 1, 15, 1, 7079, 1, 6, 1, 1, 1, 10, 3, 1, 17, 16, 8, 1, 7, 25, 7, 15, 4, 12, 2, 1, 2, 1, 3, 5, 1, 9, 1, 62, 1, 75, 5, 2, 2, 317, 2, 6, 1, 10, 10, 15, 1, 3, 5, 1, 1, 111, 1, 1, 2, 6, 2, 4, 1, 2, 2, 1, 12, 15, 1, 28, 10, 4, 2, 1, 2, 30, 13, 13, 1, 1765, 2, 1, 4, 4, 1, 2, 4, 12, 5, 2, 9, 4, 1, 2, 4, 2, 11, 3, 1, 1, 3, 4, 2, 13917],dtype=np.int64)),
 }
 
+def first_non_zero(x):
+    idx = x.view(bool).argmax() // x.itemsize
+    return idx if x[idx] else -1
 
-class AddBoneChainAlongEdgeLoop:
-    def __init__(self, first_edge, first_vertex):
-        self.first_edge = first_edge
-        self.first_vertex = first_vertex
+def get_disconnected_components(bm):
+    not_visited = np.ones(len(bm.verts), dtype=bool)
+    disconnected_components = np.zeros(len(bm.verts), dtype=np.int16)
+    comp_num=0
+    while True:
+        i = first_non_zero(not_visited)
+        if i < 0:
+            break
+        stack = [i]
+        disconnected_components[i] = comp_num
+        not_visited[i] = False
+        while len(stack) > 0:
+            next_idx = stack.pop()
+            for e in bm.verts[next_idx].link_edges:
+                for neighbour in e.verts:
+                    i = neighbour.index
+                    if not_visited[i]:
+                        disconnected_components[i] = comp_num
+                        not_visited[i] = False
+                        stack.append(i)
+        comp_num += 1
+    return disconnected_components, comp_num
 
 
-ADDITIONAL_CLOTHING_BONES = {
-    'Soaring Dragon Kung Fu Dress': AddBoneChainAlongEdgeLoop(16416,2700),
-}
+def count_vectors_in_dcomps(dcomps, dcomps_num):
+    counts = np.bincount(dcomps, minlength=dcomps_num)
+    return counts
+
+def sum_vectors_in_dcomps(vectors, dcomps, dcomps_num):
+    average_vector = [np.bincount(dcomps, weights=vectors[:, i], minlength=dcomps_num) for i in range(3)]
+    average_vector = np.stack(average_vector)
+    return average_vector
+
+def average_vectors_in_dcomps(vectors, dcomps, dcomps_num):
+    counts = count_vectors_in_dcomps(dcomps, dcomps_num)
+    average_vector = sum_vectors_in_dcomps(vectors, dcomps, dcomps_num)
+    average_vector /= counts
+    return average_vector
+
 
 def is_additional_bone(bone_name):
     return bone_name in ADDITIONAL_BONES
@@ -2274,9 +2311,9 @@ def iterate_parallel_edges(edge):
                     break
 
 
-def iterate_edge_loop(start_edge):
+def iterate_edge_loop(start_edge, start_vert=None):
     current_edge = start_edge
-    current_vert = current_edge.verts[0]
+    current_vert = current_edge.verts[0] if start_vert is None else start_vert
     while True:
         if len(current_vert.link_edges) != 4:
             return
@@ -2304,6 +2341,109 @@ def iterate_edge_loop_over_allowed_verts(start_edge, allowed_verts: np.ndarray):
         if current_edge == start_edge:
             return
 
+def get_last_vert_of_edge_loop(edge_loop, start_vert=None):
+    current_edge = edge_loop[-1]
+    if len(edge_loop)==1:
+        current_vert = current_edge.verts[0] if start_vert is None else start_vert
+        return current_vert
+    else:
+        prev_edge = edge_loop[-2]
+        return current_edge.verts[1] if current_edge.verts[0] in prev_edge.verts else current_edge.verts[0]
+
+def collect_edge_loop(start_edge):
+    one_end = list(iterate_edge_loop(start_edge, start_edge.verts[0]))
+    if len(one_end)>0 and one_end[-1] == start_edge:
+        return one_end, True
+    second_end = list(iterate_edge_loop(start_edge, start_edge.verts[1]))
+    second_end.reverse()
+    second_end.append(start_edge)
+    second_end.extend(one_end)
+    return second_end, False
+
+def select_edge_loop(edge_loop):
+    for e in edge_loop:
+        e.select_set(True)
+
+def edge_loop_length(edge_loop):
+    return sum(e.calc_length() for e in edge_loop)
+
+
+def edge_vector(l):
+    a, b = l.edge.verts
+    return b.co - a.co
+
+def rev_edge_vector(l):
+    a, b = l.edge.verts
+    return a.co - b.co
+
+
+def edge_angle(l):
+    a, b = l.edge.verts
+    return b.co - a.co
+
+def angle_between_3_verts(a,b,c):
+    ab = b.co - a.co
+    bc = c.co - b.co
+    return ab.angle(bc), ab.length+bc.length, b
+
+def angle_between_connected_edges(edge1, edge2):
+    a, b = edge1.verts
+    c, d = edge2.verts
+    if a == c:
+        return angle_between_3_verts(b, a, d)
+    elif a == d:
+        return angle_between_3_verts(b, a, c)
+    elif b == c:
+        return angle_between_3_verts(a, b, d)
+    elif b == d:
+        return angle_between_3_verts(a, b, c)
+    else:
+        return np.inf, 0, None
+
+def edge_loop_find_sharp_points(edge_loop):
+    prev_edge = edge_loop[-1]
+    if len(edge_loop)==1:
+        yield np.inf, 1, prev_edge.verts[0]
+        yield np.inf, 1, prev_edge.verts[1]
+    else:
+        next_edge = edge_loop[0]
+        angle, length, mid_vertex = angle_between_connected_edges(prev_edge, next_edge)
+        if mid_vertex is None:
+            next_next_edge = edge_loop[1]
+            if next_edge.verts[0] in next_next_edge.verts:
+                yield np.inf, 1, next_edge.verts[1]
+            else:
+                yield np.inf, 1, next_edge.verts[0]
+            prev_prev_edge = edge_loop[-2]
+            if prev_edge.verts[0] in prev_prev_edge.verts:
+                yield np.inf, 1, prev_edge.verts[1]
+            else:
+                yield np.inf, 1, prev_edge.verts[0]
+        else:
+            yield angle, length, mid_vertex
+        prev_edge = next_edge
+        for next_edge in edge_loop[1:]:
+            angle, length, mid_vertex = angle_between_connected_edges(prev_edge, next_edge)
+            yield angle, length, mid_vertex
+            prev_edge = next_edge
+
+def edge_loop_find_sharpest_points(edge_loop, num_of_points=2):
+    l = [(angle/length, mid_vertex) for angle, length, mid_vertex in edge_loop_find_sharp_points(edge_loop)]
+    l.sort(key=lambda x:x[0], reverse=True)
+    return l[:num_of_points]
+
+
+def edge_loop_find_sharp_ends(edge_loop):
+    total_len = edge_loop_length(edge_loop)
+    l = [(angle / length, mid_vertex) for angle, length, mid_vertex in edge_loop_find_sharp_points(edge_loop)]
+    l.sort(key=lambda x: x[0], reverse=True)
+    _, first = l[0]
+    _, second = l[1]
+    _, third = l[2]
+    if (first.co-second.co).length < total_len/10:
+        return first, third
+    else:
+        return first, second
 
 class DazOptimizer:
 
@@ -4706,7 +4846,124 @@ class DazOptimizer:
         return groups
 
     def rig_physics_bones(self):
-        pass
+
+        class AddBoneChainAlongEdgeLoop:
+            def __init__(self, first_edge, first_vertex):
+                self.first_edge = first_edge
+                self.first_vertex = first_vertex
+
+
+        additional_clothing_bones = {
+            'Soaring Dragon Kung Fu Dress': AddBoneChainAlongEdgeLoop(16416, 2700),
+        }
+
+    def rig_physics_hair(self):
+
+
+        class AnimeHair:
+
+            def __init__(self, num_of_bones):
+                self.num_of_bones = num_of_bones
+
+            def run(self, mesh, rig):
+                print("Rigging ",mesh," on ",rig)
+                import scipy
+                select_object(mesh)
+                bpy.ops.object.mode_set(mode='EDIT')
+                bpy.context.scene.tool_settings.use_uv_select_sync = False
+                bpy.ops.mesh.select_all(action='DESELECT')
+                me = mesh.data
+                bm = bmesh.from_edit_mesh(me)
+                bm.verts.ensure_lookup_table()
+                dcomps, dcomps_num = get_disconnected_components(bm)
+                sharp_ends_per_dcomp = [None] * dcomps_num
+                for f in bm.faces:
+                    if len(f.verts)==4:
+                        vert = f.verts[0]
+                        vert_idx = vert.index
+                        dcomp_idx = dcomps[vert_idx]
+                        if sharp_ends_per_dcomp[dcomp_idx] is None:
+                            longest_edge_loop = None
+                            longest_edge_loop_length = 0
+                            for edge in f.edges:
+                                if vert in edge.verts:
+                                    edge_loop, is_circular = collect_edge_loop(edge)
+                                    edge_loop_l = edge_loop_length(edge_loop)
+                                    if not is_circular:
+                                        edge_loop_l *= 2
+                                    if longest_edge_loop_length < edge_loop_l:
+                                        longest_edge_loop_length = edge_loop_l
+                                        longest_edge_loop = edge_loop
+                            if longest_edge_loop is not None:
+                                # select_edge_loop(longest_edge_loop)
+                                sharp_ends = edge_loop_find_sharp_ends(longest_edge_loop)
+                                sharp_ends_per_dcomp[dcomp_idx] = sharp_ends
+                                #select_edge_loop(sharp_ends)
+                sharp_end_co_per_dcomp = np.array([end.co for ends in sharp_ends_per_dcomp for end in ends])
+                point_count = len(sharp_end_co_per_dcomp)
+                half_point_count = point_count/2
+
+                def get_the_one_further_from_closer_to_most_points(e1, e2):
+                    dist1 = np.linalg.norm(sharp_end_co_per_dcomp - e1.co, axis=1)
+                    dist2 = np.linalg.norm(sharp_end_co_per_dcomp - e2.co, axis=1)
+                    closer_to_e1 = dist1 < dist2
+                    is_most_closer_to_e1 = closer_to_e1.sum()>half_point_count
+                    return e2 if is_most_closer_to_e1 else e1
+
+
+                hair_ends = [get_the_one_further_from_closer_to_most_points(end1, end2) for end1, end2 in sharp_ends_per_dcomp]
+                hair_ends_coords = np.array([e.co for e in hair_ends])
+                #select_edge_loop(hair_ends)
+                _, cluster_labels = scipy.cluster.vq.kmeans2(hair_ends_coords, self.num_of_bones)
+                verts = np.array([e.co for e in bm.verts])
+                dcomps_sums = sum_vectors_in_dcomps(verts, dcomps, dcomps_num)
+                dcomps_counts = count_vectors_in_dcomps(dcomps, dcomps_num)
+                cluster_sums = np.zeros((self.num_of_bones,3))
+                cluster_counts = np.bincount(cluster_labels, weights=dcomps_counts, minlength=self.num_of_bones)
+                hair_ends_sum = np.zeros((self.num_of_bones, 3))
+                hair_ends_count = np.zeros(self.num_of_bones)
+                for label, dcomps_sum, hair_end_coords in zip(cluster_labels, dcomps_sums.T, hair_ends_coords):
+                    cluster_sums[label] += dcomps_sum
+                    hair_ends_sum[label] += hair_end_coords
+                    hair_ends_count[label] += 1
+                hair_ends_averaged = np.divide(hair_ends_sum.T, hair_ends_count).T
+                controids = np.divide(cluster_sums.T, cluster_counts).T
+                bm.select_flush(True)
+                bmesh.update_edit_mesh(me)
+
+                select_object(rig)
+                bpy.ops.object.mode_set(mode='EDIT')
+                head_bone = rig.data.edit_bones.get('head')
+                for i, (hair_end_averaged, controid) in enumerate(zip(hair_ends_averaged, controids)):
+                    hair_bone = rig.data.edit_bones.new('hair_'+str(i))
+                    hair_bone.head = controid
+                    hair_bone.tail = hair_end_averaged
+                    hair_bone.use_connect = False
+                    hair_bone.parent = head_bone
+                #edge_lengths = np.array([e.calc_length() for e in bm.edges])
+                # edge_vert0_indices = np.array([e.verts[0].index for e in bm.edges])
+                # edge_vert1_indices = np.array([e.verts[1].index for e in bm.edges])
+
+                # edge_vectors = verts[edge_vert1_indices]-verts[edge_vert0_indices]
+                # edge_dcomps = dcomps[edge_vert0_indices]
+
+                #average_vector = sum_vectors_in_dcomps(edge_vectors, edge_dcomps, dcomps_num)
+                # k_means = scipy.cluster.vq.kmeans(centroids, self.num_of_bones)
+
+
+
+
+
+        additional_hair_bones = {
+            #'Toon Style Side Part Bob Hair': AddBoneChainAlongEdgeLoop(16416, 2700),
+            #'MB Avani Toon Character for Genesis 9': AnimeHair(8),
+            'MAH Mirai Anime Hair': AnimeHair(8),
+        }
+        for hair in find_all_hair():
+            rig = get_rig_of(hair)
+            method = additional_hair_bones.get(rig.name)
+            if method is not None:
+                method.run(hair, rig)
 
     def transfer_missing_bones_to_clothes(self):
         BODY_M = self.get_body_mesh()
@@ -4923,9 +5180,7 @@ class DazOptimizer:
         # uv_layer = bm.loops.layers.uv.verify()
         #for v in bm.verts:
         #    v.select = False
-        def edge_vector(l):
-            a, b = l.edge.verts
-            return b.co-a.co
+
         suspected_edges = set()
         for face in bm.faces:
             if len(face.loops) == 4:
@@ -7855,8 +8110,8 @@ operators = [
     EntryOp(DazFemaleLoad_operator, "Load Daz (female)"),
     EntryOp(DazSaveBlend_operator, "Save blend file"),
     EntryOp(DazSaveTextures_operator, "Save textures"),
-    EntryOp(RigPhysicsBones, "Rig skirts/dresses/etc"),
-    EntryOp(RigPhysicsHair, "Rig anime hair"),
+    EntryOp(RigPhysicsBones, "Rig skirts/dresses for physics"),
+    EntryOp(RigPhysicsHair, "Rig anime hair for physics"),
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
     EntryOp(DazRemoveAllSubsurf_operator, "Remove subsurf mods"),
     EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
