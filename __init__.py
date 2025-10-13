@@ -1270,11 +1270,12 @@ CLOTHES_MIN_DIST_TO_SKIN = 0.004
 
 class ClothesMeta:
 
-    def __init__(self, fingerprint, skin_tight, panties):
+    def __init__(self, fingerprint, skin_tight, panties, transfer_jiggle_bones=False):
         self.fingerprint = fingerprint
         self.skin_tight = skin_tight
         self.panties = panties
         self.obj = None
+        self.transfer_jiggle_bones = transfer_jiggle_bones
 
 PANTIE_SCALING = 0.02
 
@@ -1390,6 +1391,17 @@ CLOTHES = {
     'KuJ Bracelet 02 R': ClothesMeta('3252-6456-3208', -1, False),
     'KuJ Cloth Shoes': ClothesMeta('4622-9194-4574', -1, False),
     'Soaring Dragon Kung Fu Dress': ClothesMeta('15905-31513-15606', -1, False),
+    'LLA Choker L01': ClothesMeta('1595-3150-1555', -1, False),
+    'LLA Choker L02': ClothesMeta('7194-14321-7127', -1, False),
+    'LLA Choker L03': ClothesMeta('1228-2409-1181', -1, False),
+    'BW KK Panty G9': ClothesMeta('5031-9894-4862', PANTIE_SCALING, True),
+    'DGA Collar 01': ClothesMeta('4619-10165-5564', -1, False),
+    'DGA Collar 02': ClothesMeta('4298-9067-4858', -1, False),
+    'DGA Collar 03': ClothesMeta('5312-11216-5904', -1, False),
+    'DGA Handcuffs': ClothesMeta('8620-18253-9587', -1, False),
+    'G9 Base Bikini': ClothesMeta('4046-7915-3870',PANTIE_SCALING, True),
+    'AWl Bra': ClothesMeta('4604-8988-4376', -1, False),
+    'SU Latex Outfit G9': ClothesMeta('46879-93730-46852', -1, False),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -1612,6 +1624,10 @@ def is_sub_rig(sub_rig, super_rig):
             return False
     return True
 
+def find_object_containing(infix):
+    for o in bpy.data.objects:
+        if isinstance(o.data, bpy.types.Mesh) and infix in o.name:
+            return o
 
 def contains_group(vertex, group_index):
     for g in vertex.groups:
@@ -2724,6 +2740,8 @@ class DazOptimizer:
     def merge_eyebrows_and_eyelashes(self):
         eyelashes = self.get_eyelashes_mesh()
         eyebrows = self.get_eyebrows()
+        if eyebrows is None or eyelashes is None:
+            return
         if bpy.context.scene.get('daz_optim_toon'):
             def find_material(mesh, name):
                 if len(mesh.data.materials)>1:
@@ -3009,12 +3027,20 @@ class DazOptimizer:
                     bpy.ops.daz.merge_materials()
 
     def merge_cum_materials(self):
-        cum_material = None
+        mat_per_texture = {}
         for o in find_cum():
-            if cum_material is None:
-                cum_material = o.material_slots[0].material
+            cum_material = o.material_slots[0].material
+            nt = cum_material.node_tree
+            textures = NodesUtils.find_all_by_type(nt, bpy.types.ShaderNodeTexImage)
+            if len(textures)>0:
+                texture = textures[0]
+                image = texture.image
+                unified_mat = mat_per_texture.get(image)
+                if unified_mat is None:
+                    unified_mat = mat_per_texture[image] = cum_material
             else:
-                o.material_slots[0].material = cum_material
+                unified_mat = cum_material
+            o.material_slots[0].material = unified_mat
 
     def decimate_cum_meshes(self):
         ng = bpy.data.node_groups.get('DecimateCum')
@@ -3083,6 +3109,7 @@ class DazOptimizer:
 
     def apply_decimate_cum_meshes(self):
         for o in find_cum():
+            select_object(o)
             bpy.ops.object.modifier_apply(modifier='Geometry Nodes')
             bpy.ops.object.modifier_apply(modifier='Decimate')
 
@@ -4410,8 +4437,8 @@ class DazOptimizer:
         BODY_M.select_set(True)
         bpy.context.view_layer.objects.active = BODY_M
         tex_dir = self.textures_dir()
-        if os.path.exists(tex_dir):
-            shutil.rmtree(tex_dir)
+        #if os.path.exists(tex_dir):
+        #    shutil.rmtree(tex_dir)
         bpy.ops.daz.save_local_textures()
 
     def select_gp(self):
@@ -4502,7 +4529,8 @@ class DazOptimizer:
                 filepaths[channel] = bpy.data.images[name]
             else:
                 p = os.path.join(self.workdir, self.name + "_" + channel + '_gp_baked.png')
-                filepaths[channel] = bpy.data.images.load(p)
+                if os.path.exists(p):
+                    filepaths[channel] = bpy.data.images.load(p)
         for mat in mesh.data.materials:
             if mat.name.startswith("GP_"):
                 mat.node_tree.nodes.clear()
@@ -4547,17 +4575,20 @@ class DazOptimizer:
                 diffuse_node.name = 'simple_material_diffuse'
                 for idx, channel in enumerate(['Base Color', 'Roughness', 'Normal']):
                     bsdf_links = bsdf_node.inputs[channel].links
-                    before_bsdf = bsdf_links[0].from_socket
-                    diffuse_socket_name = 'Color' if channel == 'Base Color' else channel
-                    l.new(diffuse_node.inputs[diffuse_socket_name], before_bsdf)
+                    if len(bsdf_links)==0:
+                        bpy.context.scene['gp_lacks_'+channel]=True
+                    else:
+                        before_bsdf = bsdf_links[0].from_socket
+                        diffuse_socket_name = 'Color' if channel == 'Base Color' else channel
+                        l.new(diffuse_node.inputs[diffuse_socket_name], before_bsdf)
 
-                    name = 'GP_Baked_' + channel
-                    target_texture = n.new('ShaderNodeTexImage')
-                    target_texture.image = baked_gp_imgs[channel]
-                    target_texture.name = name+' Texture'
-                    target_texture.location = (0, 200 + 300 * idx)
-                    l.new(target_texture.inputs['Vector'], uv_map.outputs['UV'])
-                    n.active = target_texture
+                        name = 'GP_Baked_' + channel
+                        target_texture = n.new('ShaderNodeTexImage')
+                        target_texture.image = baked_gp_imgs[channel]
+                        target_texture.name = name+' Texture'
+                        target_texture.location = (0, 200 + 300 * idx)
+                        l.new(target_texture.inputs['Vector'], uv_map.outputs['UV'])
+                        n.active = target_texture
                 l.new(bsdf_node.outputs['BSDF'].links[0].to_socket, diffuse_node.outputs['BSDF'])
 
 
@@ -4598,39 +4629,42 @@ class DazOptimizer:
             if mat.name.startswith('GP_'):
                 n = mat.node_tree.nodes
                 l = mat.node_tree.links
-                target_texture = n[ 'GP_Baked_' + channel+' Texture']
-                target_texture.select = True
-                n.active = target_texture
-                # color_texture = n['simple_material_Base Color']
-                # bsdf_node = n['simple_material_bsdf']
-                # bsdf_out = bsdf_node.outputs['BSDF']
-                # color_out = color_texture.outputs['Color']
-                # is_bsdf_connected = len(bsdf_out.links)>0
-                # if channel == 'Base Color':
-                #     if is_bsdf_connected:
-                #         after_bsdf = bsdf_out.links[0].to_socket
-                #         l.remove(bsdf_out.links[0])
-                #         l.new(after_bsdf, color_out)
-                # else:
-                #     if not is_bsdf_connected:
-                #         for color_link in color_out.links:
-                #             if color_link.to_node != bsdf_node:
-                #                 after_bsdf = color_link.to_socket
-                #                 l.remove(color_link)
-                #                 l.new(after_bsdf, bsdf_out)
-                #                 break
+                target_texture = n.get('GP_Baked_' + channel+' Texture')
+                if target_texture is not None:
+                    target_texture.select = True
+                    n.active = target_texture
+                    # color_texture = n['simple_material_Base Color']
+                    # bsdf_node = n['simple_material_bsdf']
+                    # bsdf_out = bsdf_node.outputs['BSDF']
+                    # color_out = color_texture.outputs['Color']
+                    # is_bsdf_connected = len(bsdf_out.links)>0
+                    # if channel == 'Base Color':
+                    #     if is_bsdf_connected:
+                    #         after_bsdf = bsdf_out.links[0].to_socket
+                    #         l.remove(bsdf_out.links[0])
+                    #         l.new(after_bsdf, color_out)
+                    # else:
+                    #     if not is_bsdf_connected:
+                    #         for color_link in color_out.links:
+                    #             if color_link.to_node != bsdf_node:
+                    #                 after_bsdf = color_link.to_socket
+                    #                 l.remove(color_link)
+                    #                 l.new(after_bsdf, bsdf_out)
+                    #                 break
 
 
     def get_gp_texture_path(self, channel):
         return os.path.join(self.workdir, self.name + "_" + channel + '_gp_baked.png')
 
     def save_gp_textures(self):
+
         for channel in ['Base Color', 'Roughness', 'Normal']:
-            gp_baked_path = self.get_gp_texture_path(channel)
-            name = 'GP_Baked_' + channel
-            if name in bpy.data.images:
-                bpy.data.images[name].save(filepath=gp_baked_path)
-                bpy.data.images[name].filepath = gp_baked_path
+            if not bpy.context.scene.get('gp_lacks_'+channel):
+                gp_baked_path = self.get_gp_texture_path(channel)
+                name = 'GP_Baked_' + channel
+                if name in bpy.data.images:
+                    bpy.data.images[name].save(filepath=gp_baked_path)
+                    bpy.data.images[name].filepath = gp_baked_path
 
 
     def make_single_material(self):
@@ -5119,7 +5153,15 @@ class DazOptimizer:
     def remove_rectum_bones(self):
         gp_mesh = self.get_gp_or_body()
         gp_rig = get_rig_of(gp_mesh)
+        select_object(gp_mesh)
         bone_names = ['rectum_'+str(i).zfill(2) for i in range(1, 8)]
+        vgs = [gp_mesh.vertex_groups[i] for i in bone_names]
+        vg_indices = np.array([i.index for i in vgs], dtype=int)
+
+        def rectum_weight(vertex):
+            return sum(g.weight for g in vertex.groups if g.group in vg_indices)
+
+        rectum_weights = np.array([rectum_weight(v) for v in gp_mesh.data.vertices])
 
         select_object(gp_rig)
         bpy.ops.object.mode_set(mode='EDIT')
@@ -5128,19 +5170,9 @@ class DazOptimizer:
             gp_rig.data.edit_bones.remove(bone)
         gp_rig.data.edit_bones[bone_names[0]].name = 'rectum'
 
-        vgs = [gp_mesh.vertex_groups[i] for i in bone_names]
-        vg_indices = np.array([i.index for i in vgs], dtype=int)
         select_object(gp_mesh)
-
-        def rectum_weight(vertex):
-            return sum(g.weight for g in vertex.groups if g.group in vg_indices)
-
-        rectum_weights = np.array([rectum_weight(v) for v in gp_mesh.data.vertices])
-        rectum_vg = gp_mesh.vertex_groups.get('rectum')
-        if rectum_vg is None:
-            rectum_vg = gp_mesh.vertex_groups.new(name='rectum')
-        apply_vertex_group_weights(rectum_vg, rectum_weights)
-        for vg in vgs:
+        apply_vertex_group_weights(vgs[0], rectum_weights)
+        for vg in vgs[1:]:
             gp_mesh.vertex_groups.remove(vg)
 
     def remove_clitzilla(self):
@@ -6505,7 +6537,7 @@ class DazSelectGoldenPalaceNormals_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSetupGoldenPalaceForBaking], [DazMergeGrografts_operator])
+        return UNLOCK or not bpy.context.scene.get('gp_lacks_Normal') and check_stage(context, [DazSetupGoldenPalaceForBaking], [DazMergeGrografts_operator])
 
     def execute(self, context):
         DazOptimizer().select_gp_normals_for_baking()
@@ -6520,7 +6552,7 @@ class DazSelectGoldenPalaceRoughness_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSetupGoldenPalaceForBaking], [DazMergeGrografts_operator])
+        return UNLOCK or not bpy.context.scene.get('gp_lacks_Roughness') and check_stage(context, [DazSetupGoldenPalaceForBaking], [DazMergeGrografts_operator])
 
     def execute(self, context):
         DazOptimizer().select_gp_roughness_for_baking()
@@ -6535,7 +6567,7 @@ class DazSaveGoldenPalaceBaked_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazBakeGoldenPalaceNormal, DazBakeGoldenPalaceDiffuse, DazBakeGoldenPalaceRoughness],[])
+        return UNLOCK or check_stage_any(context, [DazBakeGoldenPalaceNormal, DazBakeGoldenPalaceDiffuse, DazBakeGoldenPalaceRoughness],[])
 
     def execute(self, context):
         DazOptimizer().save_gp_textures()
@@ -6827,17 +6859,13 @@ class DazRemoveTear_operator(bpy.types.Operator):
         return UNLOCK or check_stage(context, [DazMaleLoad_operator], [DazRemoveTear_operator])
 
     def execute(self, context):
-        body = DazOptimizer().get_body_mesh()
-        character_name = body.name[:-len(" Mesh")]
+        # body = DazOptimizer().get_body_mesh()
         if bpy.context.scene.get('daz_optim_toon'):
-            rig_name = character_name + ' Eyelash Base'
+            tear = find_object_containing(' Eyelash Base')
         else:
-            rig_name = character_name +' Tear'
-        tear_name = rig_name + ' Mesh'
-        if tear_name in bpy.data.objects:
-            bpy.data.objects.remove(bpy.data.objects[tear_name])
-        if rig_name in bpy.data.objects:
-            bpy.data.objects.remove(bpy.data.objects[rig_name])
+            tear = find_object_containing(' Tear')
+        if tear is not None:
+            bpy.data.objects.remove(tear)
         pass_stage(self)
         return {'FINISHED'}
 
