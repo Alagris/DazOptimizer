@@ -1402,6 +1402,12 @@ CLOTHES = {
     'G9 Base Bikini': ClothesMeta('4046-7915-3870',PANTIE_SCALING, True),
     'AWl Bra': ClothesMeta('4604-8988-4376', -1, False),
     'SU Latex Outfit G9': ClothesMeta('46879-93730-46852', -1, False),
+    'POU Belt': ClothesMeta('27423-54450-27111', -1, False),
+    'POU Cap': ClothesMeta('13515-27015-13492', -1, False),
+    'POU Pant': ClothesMeta('18229-36133-17924', -1, False),
+    'POU Shirt Long': ClothesMeta('22328-44172-21861', -1, False),
+    'POU Shoes': ClothesMeta('15784-31230-15446', -1, False),
+    'POU Vest': ClothesMeta('12914-25398-12508', -1, False),
 }
 HairMeta = namedtuple('HairMeta', ['fingerprint', 'is_cards'])
 # {o.name: o.data.daz_importer.DazFingerPrint for o in bpy.data.objects if isinstance(o.data, bpy.types.Mesh)}
@@ -1607,7 +1613,8 @@ def find_all_non_skin_tight_clothes():
     return find_all_clothes(is_not_skin_tight)
 
 def is_hair(obj):
-    return 'hair' in obj.name.lower()
+    l = obj.name.lower()
+    return 'hair' in l or 'ponytail' in l
 
 def find_all_hair():
     return [obj for obj in bpy.data.objects if isinstance(obj.data, bpy.types.Mesh) and is_hair(obj)]
@@ -5041,6 +5048,11 @@ class DazOptimizer:
         body_rig = self.get_body_rig()
         body_mesh = self.get_body_mesh()
         hierarchy = self.get_hierarchy()
+        height = body_mesh.dimensions[2]
+        ue5_height = QUINN_HEIGHT if self.is_female() else MANNY_HEIGHT
+        scl = height / ue5_height
+
+
         def convert_rig(rig):
             select_object(rig)
             bpy.ops.object.mode_set(mode='EDIT')
@@ -5069,6 +5081,8 @@ class DazOptimizer:
                     old_daz_bone = daz_bone.head.copy()
                     daz_bone.head = ue5_bone
                     daz_bone.tail += ue5_bone-old_daz_bone
+                    daz_bone.head.z *= scl
+                    daz_bone.tail.z *= scl
             bpy.ops.object.mode_set(mode='POSE')
             for bone in rig.data.bones:
                 bone.inherit_scale = 'FULL'
@@ -5752,7 +5766,6 @@ class DazOptimizer:
         s = bpy.context.scene.unit_settings.scale_length
         bpy.context.scene.unit_settings.scale_length = 0.01
         z = s / 0.01
-        self.scale(z)
         for workspace in bpy.data.workspaces:
             for screen in workspace.screens:
                 for area in screen.areas:
@@ -5761,11 +5774,20 @@ class DazOptimizer:
                             if space.type == 'VIEW_3D':
                                 space.clip_start = 1
                                 space.clip_end = 100000
+        self.scale(z)
 
     def scale_to_quinn(self):
         mesh = self.get_body_mesh()
         height = mesh.dimensions[2]
         ue5_height = QUINN_HEIGHT if self.is_female() else MANNY_HEIGHT
+        rig = self.get_body_rig()
+        select_object(rig)
+        scl = ue5_height / height
+        scl = (scl, scl, scl)
+        apply_recursive(rig, scale=scl)
+
+    def translate_to_quinn(self):
+        mesh = self.get_body_mesh()
         rig = self.get_body_rig()
         select_object(rig)
         if 'hip' in rig.data.bones:
@@ -5780,9 +5802,7 @@ class DazOptimizer:
             hierarchy = self.get_hierarchy()
             ue5_pevis_pos = hierarchy['pelvis'][0]
             loc = (0,ue5_pevis_pos[1]/100 - root.head.y,0)
-        scl = ue5_height / height
-        scl = (scl, scl, scl)
-        apply_recursive(rig, location=loc, scale=scl)
+        apply_recursive(rig, location=loc)
 
     def scale(self, z):
         rig = self.get_body_rig()
@@ -7526,6 +7546,23 @@ class DazScaleToQuinn(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class DazTranslateToQuinn(bpy.types.Operator):
+    """ Translate to quinn """
+    bl_idname = "dazoptim.translate_to_quinn"
+    bl_label = "Translate to quinn"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = '6'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazScaleToUnreal, DazTranslateToQuinn])
+
+    def execute(self, context):
+        DazOptimizer().translate_to_quinn()
+        pass_stage(self)
+        return {'FINISHED'}
+
+
 class DazAlignPoseQuinn(bpy.types.Operator):
     """ Align pose to quinn """
     bl_idname = "dazoptim.align_pose_to_quinn"
@@ -7566,7 +7603,7 @@ class DazScaleToUnreal(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazScaleToQuinn], [DazScaleToUnreal])
+        return UNLOCK or check_stage(context, [], [DazScaleToUnreal])
 
     def execute(self, context):
         DazOptimizer().scale_to_ue5_units()
@@ -8142,11 +8179,11 @@ operators = [
     EntryOp(RigPhysicsHair, "Rig anime hair for physics"),
     EntryOp(DazMergeAllRigs_operator, "Merge all rigs"),
     EntryOp(DazRemoveAllSubsurf_operator, "Remove subsurf mods"),
+    EntryOp(DazMergeMultiMeshClothes_operator, "Merge clothes sub-meshes"),
     EntryOp(DazMergeAllMaterials_operator, "Merge all materials"),
     EntryOp(DazMergeCumMaterials_operator, "Merge cum materials"),
     EntryOp(DazDecimateCumMeshes_operator, "Decimate cum meshes"),
     EntryOp(DazApplyDecimateCumMeshes_operator, "Apply decimate cum"),
-    EntryOp(DazMergeMultiMeshClothes_operator, "Merge clothes sub-meshes"),
     EntryOp(FixToonEyes, "Fix Nirv Zero eyes"),
     EntryOp(DazGiveErection, "Give erection"),
     EntryOp(SaveMorphs, "Generate fav morphs (all)"),
@@ -8214,6 +8251,7 @@ operators = [
     EntryOp(TransferMorphsToClothes, "Transfer morphs to clothes"),
     EntryOp(TransferMorphsToCum, "Transfer morphs to cum"),
     EntryOp(DazScaleToQuinn, "Scale to Manny height"),
+    EntryOp(DazTranslateToQuinn, "Translate to Manny position"),
     EntryOp(DuplicateSkeleton, "Duplicate skeleton"),
     EntryOp(DazConvertToUe5Skeleton_operator, "Convert to UE5 Skeleton"),
     EntryOp(DazReorientBones_operator, "Reorient bones"),
