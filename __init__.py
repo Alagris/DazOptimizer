@@ -2297,8 +2297,9 @@ def add_drivers_for_all_shape_keys(body_obj, objs=None):
 
 
 def remove_shape_key(body, sk_name):
-    if sk_name in body.data.shape_keys.key_blocks:
-        body.shape_key_remove(body.data.shape_keys.key_blocks[sk_name])
+    if body.data.shape_keys is not None:
+        if sk_name in body.data.shape_keys.key_blocks:
+            body.shape_key_remove(body.data.shape_keys.key_blocks[sk_name])
 
 def do_edges_share_a_face(edge1, edge2):
     for linked_face in edge1.link_faces:
@@ -3121,6 +3122,7 @@ class DazOptimizer:
             bpy.ops.object.modifier_apply(modifier='Decimate')
 
     def merge_multi_mesh_clothes(self):
+        body = self.get_body_mesh()
         for trash in ['BaseShortsGeoGraft Mesh']:
             trash = bpy.data.objects.get(trash)
             if trash is not None:
@@ -3128,6 +3130,7 @@ class DazOptimizer:
         for clothing_item in find_all_clothes():
             sub_clothes = find_child_meshes(clothing_item.obj)
             if len(sub_clothes)>0:
+                transfer_weights(body, sub_clothes)
                 select_object(clothing_item.obj)
                 for sub in sub_clothes:
                     sub.hide_viewport = False
@@ -4346,6 +4349,8 @@ class DazOptimizer:
         body = self.get_body_mesh()
         select_object(body)
         remove_shape_key(body, EXTRUDED_SK_NAME)
+        if body.data.shape_keys is None:
+            bpy.ops.object.shape_key_add(from_mix=False)
         sk = body.shape_key_add(name=EXTRUDED_SK_NAME, from_mix=False)
         sk_idx = body.data.shape_keys.key_blocks.find(sk.name)
         body.active_shape_key_index = sk_idx
@@ -5801,7 +5806,7 @@ class DazOptimizer:
         else:
             hierarchy = self.get_hierarchy()
             ue5_pevis_pos = hierarchy['pelvis'][0]
-            loc = (0,ue5_pevis_pos[1]/100 - root.head.y,0)
+            loc = (0, ue5_pevis_pos[1] / 100 - root.head.y, 0)
         apply_recursive(rig, location=loc)
 
     def scale(self, z):
@@ -7544,7 +7549,6 @@ class DazScaleToQuinn(bpy.types.Operator):
         DazOptimizer().scale_to_quinn()
         pass_stage(self)
         return {'FINISHED'}
-
 
 class DazTranslateToQuinn(bpy.types.Operator):
     """ Translate to quinn """
