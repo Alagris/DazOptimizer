@@ -1,0 +1,3720 @@
+{
+  "/data/rudy studio/wtkt toon/wtkt toon": {
+    "shapes": {
+      "female": {
+        "OPEN 02": {
+          "category": "CAT_SPECIAL",
+          "name": "open 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "OPEN 03": {
+          "category": "CAT_SPECIAL",
+          "name": "open 03",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "OPEN 04": {
+          "category": "CAT_SPECIAL",
+          "name": "open 04",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "OPEN EXTREME MORE": {
+          "category": "CAT_SPECIAL",
+          "name": "open extreme more",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "OPEN EXTREME": {
+          "category": "CAT_SPECIAL",
+          "name": "open extreme",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "FULL OPEN 01": {
+          "category": "CAT_SPECIAL",
+          "name": "full open 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "FULL OPEN 02": {
+          "category": "CAT_SPECIAL",
+          "name": "full open 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "FULL OPEN 03": {
+          "category": "CAT_SPECIAL",
+          "name": "full open 03",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "URETHRA OPEN": {
+          "category": "CAT_SPECIAL",
+          "name": "urethra open",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "OPEN 01": {
+          "category": "CAT_SPECIAL",
+          "name": "open 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLOSED 02": {
+          "category": "CAT_SPECIAL",
+          "name": "closed 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLOSED 03": {
+          "category": "CAT_SPECIAL",
+          "name": "closed 03",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLOSED 04": {
+          "category": "CAT_SPECIAL",
+          "name": "closed 04",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLOSED 01": {
+          "category": "CAT_SPECIAL",
+          "name": "closed 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "FBM CAMEL TOE": {
+          "category": "CAT_GENITALS",
+          "name": "fbm camel toe",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "FULL IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "full in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "PERINEUM": {
+          "category": "CAT_GENITALS",
+          "name": "perineum",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "REN_02 corr": {
+          "category": "CAT_GENITALS",
+          "name": "ren_02 corr",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "URETHRA IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "urethra in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CAMEL TOE": {
+          "category": "CAT_GENITALS",
+          "name": "camel to",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "MONS PUBIS BIG": {
+          "category": "CAT_GENITALS",
+          "name": "mons pubis big",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "PERPUCE FRONT BACK": {
+          "category": "CAT_GENITALS",
+          "name": "perpuce front back",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "PERPUCE MOVE 2": {
+          "category": "CAT_GENITALS",
+          "name": "perpuce move 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "PERPUCE MOVE": {
+          "category": "CAT_GENITALS",
+          "name": "perpuce move",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "PERPUCE SHAPE": {
+          "category": "CAT_GENITALS",
+          "name": "perpuce shape",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "PERPUCE SIZE": {
+          "category": "CAT_GENITALS",
+          "name": "perpuce size",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "PERPUCE THICKNESS": {
+          "category": "CAT_GENITALS",
+          "name": "perpuce thickness",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MAJORA OPEN BACK": {
+          "category": "CAT_SPECIAL",
+          "name": "labia majora open back",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MAJORA BIG 02": {
+          "category": "CAT_GENITALS",
+          "name": "labia majora big 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MAJORA BIG": {
+          "category": "CAT_GENITALS",
+          "name": "labia majora big",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MID"
+        },
+        "LABIA MAJORA DEPTH": {
+          "category": "CAT_GENITALS",
+          "name": "labia majora depth",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MAJORA SHAPE 01": {
+          "category": "CAT_GENITALS",
+          "name": "labia majora shape 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MID"
+        },
+        "LABIA MAJORA SHAPE 02": {
+          "category": "CAT_GENITALS",
+          "name": "labia majora shape 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MID"
+        },
+        "VAGINA OPEN 01": {
+          "category": "CAT_SPECIAL",
+          "name": "vagina open 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "VAGINA DIAMETER": {
+          "category": "CAT_GENITALS",
+          "name": "vagina diameter",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "VAGINA IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "vagina in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "VAGINA SHAPE 02": {
+          "category": "CAT_GENITALS",
+          "name": "vagina shape 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "VAGINA SHAPE": {
+          "category": "CAT_GENITALS",
+          "name": "vagina shape",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS OPEN MORE": {
+          "category": "CAT_SPECIAL",
+          "name": "anus open more",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS OPEN verse 2": {
+          "category": "CAT_SPECIAL",
+          "name": "anus open verse 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS OPEN verse": {
+          "category": "CAT_SPECIAL",
+          "name": "anus open verse",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS OPEN": {
+          "category": "CAT_SPECIAL",
+          "name": "anus open",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS 01": {
+          "category": "CAT_GENITALS",
+          "name": "anus 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS IN OUT 2": {
+          "category": "CAT_GENITALS",
+          "name": "anus in out 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS IN OUT ROTATED": {
+          "category": "CAT_GENITALS",
+          "name": "anus in out rotate",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "anus in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS SHAPE": {
+          "category": "CAT_GENITALS",
+          "name": "anus shape",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS SIZE 2": {
+          "category": "CAT_GENITALS",
+          "name": "anus size 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS SIZE": {
+          "category": "CAT_GENITALS",
+          "name": "anus size",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS SIZE3": {
+          "category": "CAT_GENITALS",
+          "name": "anus size",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS STRETCH 2": {
+          "category": "CAT_GENITALS",
+          "name": "anus stretch 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "ANUS STRETCH": {
+          "category": "CAT_GENITALS",
+          "name": "anus stretch",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN 01": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora open 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN 02": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora open 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN LEFT 2": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora open left 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN LEFT": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora open left",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN RIGHT 2": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora open right 2",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN RIGHT": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora open right",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA OPEN": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora ope",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA FRONT CLOSED": {
+          "category": "CAT_SPECIAL",
+          "name": "labia minora front close",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA FRONT SMALL": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora front small",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA LEFT LONG": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora left long",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA RIGHT LONG": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora right long",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA SHAPE 01": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora shape 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "LABIA MINORA SHAPE 02": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora shape 02",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "LABIA MINORA SHAPE 03": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora shape 03",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "LABIA MINORA BACK  L SMALL": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora back l small",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA SHAPE 04": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora shape 04",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "LABIA MINORA BACK 01": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora back 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA SHAPE 05": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora shape 05",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "LABIA MINORA BACK IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora back in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA SHAPE 06": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora shape 06",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "LABIA MINORA BACK R SMALL": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora back r small",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA SMALL": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora small",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA FRONT  L BIG": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora front l big",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA THICKNES 01": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora thicknes 01",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA FRONT  R BIG": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora front r big",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA THIKNESS": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora thiknes",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "LABIA MINORA FRONT BIG": {
+          "category": "CAT_GENITALS",
+          "name": "labia minora front big",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLITORIS FRONT BACK": {
+          "category": "CAT_GENITALS",
+          "name": "clitoris front back",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MID"
+        },
+        "CLITORIS IN OUT": {
+          "category": "CAT_GENITALS",
+          "name": "clitoris in out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MID"
+        },
+        "CLITORIS MOVE": {
+          "category": "CAT_GENITALS",
+          "name": "clitoris move",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MID"
+        },
+        "CLITORIS SIZE - BACK": {
+          "category": "CAT_GENITALS",
+          "name": "clitoris size - back",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLITORIS SIZE": {
+          "category": "CAT_GENITALS",
+          "name": "clitoris size",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "CLITORIS SMALL": {
+          "category": "CAT_GENITALS",
+          "name": "clitoris size",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        }
+      }
+    }
+  },
+  "/data/vyusur/body geo/body geo": {
+    "shapes": {
+      "female": {
+        "Navel": {
+          "category": "CAT_BREAST",
+          "name": "Navel",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "Nipples": {
+          "category": "CAT_BREAST",
+          "name": "Nipples",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "Nipples2": {
+          "category": "CAT_BREAST",
+          "name": "Nipples 2",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "Nipples3": {
+          "category": "CAT_BREAST",
+          "name": "Nipples 3",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        }
+      }
+    }
+  },
+  "/data/daz 3d/genesis 9/base": {
+    "shapes": {
+      "female": {
+        "body_bs_AnimeBodyHeavyFeminine": {
+          "category": "CAT_BODY",
+          "name": "Heavy",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_AnimeBodyMuscularFeminine": {
+          "category": "CAT_BODY",
+          "name": "Muscular",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsLargeExtra": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Large Extra",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsPoint": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Point",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsTipDown": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Tip Down",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsTipIn": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Tip In",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsTipOut": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Tip Out",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsTipUp": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Tip Up",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsWidth": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Width",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BodyPearFigure": {
+          "category": "CAT_BODY",
+          "name": "Pear Figure",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyVoluptuous": {
+          "category": "CAT_BODY",
+          "name": "Voluptuous",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsCleavage": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Cleavage",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsDiameter": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Diameter",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsDownwardSlope": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Downward Slope",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsFullnessLower": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Fullness Lower",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsFullnessUpper": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Fullness Upper",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsGone": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Gone",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsHeavy": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Heavy",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsLarge": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Large",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsLargeHigh": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Large High",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsNatural": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Natural",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsPerkSide": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Perk Side",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsShape01": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Shape 01",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsShape02": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Shape 02",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsShape03": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Shape 03",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsShape04": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Shape 04",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsShape05": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Shape 05",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BreastsShape06": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Shape 06",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsSidesDepth": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Sides Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BreastsSmall": {
+          "category": "CAT_BREAST",
+          "name": "Breasts Small",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NipplesAreolaeDepthFeminine": {
+          "category": "CAT_BREAST",
+          "name": "Nipples Areolae Depth Feminine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_NipplesAreolaeDiameterFeminine": {
+          "category": "CAT_BREAST",
+          "name": "Nipples Areolae Diameter Feminine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_NipplesDepthFeminine_HD3": {
+          "category": "CAT_BREAST",
+          "name": "Nipples Depth Feminine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NipplesDiameterFeminine": {
+          "category": "CAT_BREAST",
+          "name": "Nipples Diameter Feminine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_Pregnant": {
+          "category": "CAT_SPECIAL",
+          "name": "Pregnant",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "Hip_Back_Dimples": {
+          "category": "CAT_BODY",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Breast_Size_Reduction": {
+          "category": "CAT_BREAST",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "Eye_Style_01": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Heart_Pupil": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Iris_Smoothing": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Left_Eye_Effect_Zoom_and_Out": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Navel_Sag_HD": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "O_Shaped_Cat_Mouth": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Oblique_Eyebrow": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Pseudo_Anime_Canine_Teeth_Left": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Pseudo_Anime_Canine_Teeth_Right": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Pupi_Constricting_Left": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Pupi_Constrictingl_Right": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Pupils_Shrink_and_Dilate": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Right_Eye_Effect_Zoom_and_Out": {
+          "category": "CAT_SPECIAL",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "Slanted_Eyebrow": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        }
+      },
+      "male": {
+        "body_bs_AnimeBodyHeavyMasculine": {
+          "category": "CAT_BODY",
+          "name": "Heavy",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_AnimeBodyMuscularMasculine": {
+          "category": "CAT_BODY",
+          "name": "Muscular",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyPortly": {
+          "category": "CAT_BODY",
+          "name": "Body Portly",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyStocky": {
+          "category": "CAT_BODY",
+          "name": "Body Stocky",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_NipplesAreolaeDepthMasculine": {
+          "category": "CAT_BODY",
+          "name": "Nipples Areolae Depth Masculine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NipplesAreolaeDiameterMasculine": {
+          "category": "CAT_BODY",
+          "name": "Nipples Areolae Diameter Masculine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NipplesDepthMasculine_HD3": {
+          "category": "CAT_BODY",
+          "name": "Nipples Depth Masculine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NipplesDiameterMasculine": {
+          "category": "CAT_BODY",
+          "name": "Nipples Diameter Masculine",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_PectoralsCleavage": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Cleavage",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_PectoralsDiameter": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Diameter",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_PectoralsHeight": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Height",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_PectoralsHeightOuter": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Height Outer",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_PectoralsSag": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Sag",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_PectoralsSize": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_PectoralsUnderCurve": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Under Curve",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_PectoralsWidth": {
+          "category": "CAT_BODY",
+          "name": "Pectorals Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        }
+      },
+      "unisex": {
+        "facs_cbs_JawOpen": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_JawOpenWide": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EyeBlinkCrescentLeftFix": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EyeBlinkCrescentRightFix": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EyeBlinkLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EyeBlinkRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthUp": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeLidCloseUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveSide_SideRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsCat": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveSide_SideLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveBackLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveBackRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeBlinkCrescentRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeBlinkCrescentLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsSide": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "pupils_Dilate_Right": {
+          "category": "CAT_HEAD",
+          "name": "Pupils dilate right",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "pupils_Dilate_Left": {
+          "category": "CAT_HEAD",
+          "name": "Pupils dilate left",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_BrowDownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_BrowDownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_BrowInnerUpLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_BrowInnerUpRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_BrowOuterUpLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_BrowOuterUpRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_BrowSqueezeLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_BrowSqueezeRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekHollowLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekHollowRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekInflateCounterLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekInflateCounterRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekInflateLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekInflateRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_CheekPuffLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_CheekPuffRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_CheekSquintLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_CheekSquintRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EarPullBackLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EarPullBackRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeBlinkLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeBlinkRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeCornerTightnessInnerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeCornerTightnessInnerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeCornerTightnessOuterLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeCornerTightnessOuterRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeLidCloseUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeLookDownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeLookDownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeLookInLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeLookInRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeLookOutLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeLookOutRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeLookUpLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeLookUpRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyePupilsDilate": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyeSquintLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyeSquintRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_EyelidCloseLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyelidCloseLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyelidCloseUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyelidOpenLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyelidOpenLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyelidOpenUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_EyelidOpenUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawChinCompression": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawClenchLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawClenchRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawForward": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_JawLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawOpen": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_JawOpenWide": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawRecess": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_JawRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthBackLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthBackLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthBackUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthBackUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCloseLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthCloseLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthCloseUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthCloseUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthCompressLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCompressLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCompressUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCompressUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveFwd-BackLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveFwd-BackRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveSide-SideLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveSide-SideRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveUp-DownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerMoveUp-DownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerTightnessLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerTightnessLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerTightnessUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthCornerTightnessUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthDimpleLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthDimpleRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthForward-BackMiddleLower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthForward-BackMiddleUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthForwardLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthForwardLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthForwardUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthForwardUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthFrownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthFrownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthFunnelLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthFunnelLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthFunnelUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthFunnelUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthLipsSide-SideLower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsSide-SideUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsVolumeLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsVolumeLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsVolumeUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLipsVolumeUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthLowerDownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthLowerDownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPressLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPressLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPressUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPressUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPurseLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPurseLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPurseUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthPurseUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthRollLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthRollLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthRollUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthRollUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthShrugLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthShrugLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthShrugUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthShrugUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthSmileLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthSmileRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthSmileWidenLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthSmileWidenRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyLowerCenter": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyLowerInnerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyLowerInnerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyLowerOuterLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyLowerOuterRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyUpperCenter": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyUpperInnerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyUpperInnerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyUpperOuterLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStickyUpperOuterRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthStretchLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthStretchRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthUp-Down": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthUp-DownMiddleLower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthUp-DownMiddleUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_MouthUpperUpLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_MouthUpperUpRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_NasalCompressLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalCompressRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalCreaseFlexLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalCreaseFlexRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalFlareLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalFlareRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalStretchLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NasalStretchRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NeckFlexLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NeckFlexRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NeckLarynxUp": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NeckMastoidFlexLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NeckMastoidFlexRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NeckUnderChinFlex": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NoseSneerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_NoseSneerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_NoseSneerUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_NoseSneerUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_TongueIn": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_TongueNarrow": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_TongueOut": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_bs_TongueRoll": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_TongueTipNarrow": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_bs_TongueTipWide": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_BIUL_BDL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_BIUR_BDR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBL_BIUL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBL_BOUL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EBL_CSL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBL_ELIL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBL_ELOL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EBL_ESL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBL_NSL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBR_BIUR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBR_BOUR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EBR_CSR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBR_ELIR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBR_ELOR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EBR_ESR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EBR_NSR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_EyeFullCompressionLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_EyeFullCompressionRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_JO_MF": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_JO_ML": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_JO_MR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_cbs_MP_CPL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_MP_CPR": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_MP_MC": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_cbs_MP_MF": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_BrowDown": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_BrowInnerUp": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_BrowSqueeze": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_BrowUp": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_CheekHollow": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_CheekPuff": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_CheekSquint": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EarPullBack": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeBlink": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeCrossed": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeFullCompressionLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeFullCompressionRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeLookAuto": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookDownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookDownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookInLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookInRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookOutLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeLookOutRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeLookSide-Side": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeLookSide-SideLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookSide-SideRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookUp-Down": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeLookUp-DownLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookUp-DownRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeLookUpLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeLookUpRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeRestingFocalPoint": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeSquint": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyeWide": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeWideLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyeWideRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_EyelidOpen-CloseLower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyelidOpen-CloseLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyelidOpen-CloseUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyelidOpen-CloseUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyelidOpen-CloseUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_EyelidOpenCloseLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_JawClench": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_JawForward-Recess": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_JawLeft-Right": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthClose": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthCompress": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthDimple": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthForward-Back": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthForward-BackLowerLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthForward-BackLowerRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthForward-BackUpperLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthForward-BackUpperRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthFrown": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthFunnel": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthLeft-Right": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthLowerDown": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthPress": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthPressLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthPressRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthPucker": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthPurse": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthRollLower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthRollUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthShrugLower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthShrugUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthSmile": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthSmileWiden": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthStickyControlLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthStickyControlRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthStickyPower": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "facs_ctrl_MouthStretch": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_MouthUpperUp": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NasalCompress": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NasalCreaseFlex": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NasalFlare": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NasalStretch": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NeckFlex": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NeckSwallow": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NoseSneer": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_NoseSneerUpper": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_TongueLeft": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_TongueRight": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_TongueTipBend": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_TongueTwist": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_TongueUp": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vAA": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vEE": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vEH": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vER": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vF": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vIH": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vIY": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vK": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vL": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vM": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vOW": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vS": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vSH": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vT": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vTH": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vUW": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "facs_ctrl_vW": {
+          "category": "CAT_FACS",
+          "name": "",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "head_ctrl_ToonIrisOval": {
+          "category": "CAT_HEAD",
+          "name": "Iris Oval",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_FingersTaper": {
+          "category": "CAT_ARMS",
+          "name": "Fingers Taper",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "head_bs_EarElfLongOutward": {
+          "category": "CAT_HEAD",
+          "name": "Ear Elf Long Outward",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_MIN"
+        },
+        "head_bs_EyeInnerHeightSize": {
+          "category": "CAT_HEAD",
+          "name": "Eye Inner Height",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "head_bs_EyeLowerCurveBalance": {
+          "category": "CAT_HEAD",
+          "name": "Eye Lower Curve Balance",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "head_bs_EyeOuterArcDown": {
+          "category": "CAT_HEAD",
+          "name": "Eye Outer Arc Down",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "head_bs_EyeSwoopUp": {
+          "category": "CAT_HEAD",
+          "name": "Eye Swoop Up",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "head_bs_EyeUpperCurveBalance": {
+          "category": "CAT_HEAD",
+          "name": "Eye Upper Curve Balance",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "head_bs_EyeUpperPeak": {
+          "category": "CAT_HEAD",
+          "name": "Eye Upper Peak",
+          "figure": "FIGURE_TOON",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_AbdominalsCenterDefine": {
+          "category": "CAT_BODY",
+          "name": "Abdominals Center Define",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_AbdominalsOuterDefine": {
+          "category": "CAT_BODY",
+          "name": "Abdominals Outer Define",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_AbdominalsWidth": {
+          "category": "CAT_BODY",
+          "name": "Abdominals Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_BodyEmaciated": {
+          "category": "CAT_BODY",
+          "name": "Body Emaciated",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyFitnessDetails": {
+          "category": "CAT_BODY",
+          "name": "Body Fitness Details",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyFitnessMass": {
+          "category": "CAT_BODY",
+          "name": "Body Fitness Mass",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyHeavy": {
+          "category": "CAT_BODY",
+          "name": "Body Heavy",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyLithe": {
+          "category": "CAT_BODY",
+          "name": "Body Lithe",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyMuscularDetails": {
+          "category": "CAT_BODY",
+          "name": "Body Muscular Details",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyMuscularMass": {
+          "category": "CAT_BODY",
+          "name": "Body Muscular Mass",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyOlder": {
+          "category": "CAT_BODY",
+          "name": "Body Older",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyThin": {
+          "category": "CAT_BODY",
+          "name": "Body Thin",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_BodyTone": {
+          "category": "CAT_BODY",
+          "name": "Body Tone",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_CalvesSize": {
+          "category": "CAT_LEGS",
+          "name": "Calves Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_CollarboneDetail": {
+          "category": "CAT_BODY",
+          "name": "Collarbone Detail",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_FingersWidth": {
+          "category": "CAT_ARMS",
+          "name": "Fingers Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_FootArchDepth": {
+          "category": "CAT_LEGS",
+          "name": "Foot Arch Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_GluteCrease": {
+          "category": "CAT_ASS",
+          "name": "Glute Crease",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_GluteDepthLower": {
+          "category": "CAT_ASS",
+          "name": "Glute Depth Lower",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_GluteDepthUpper": {
+          "category": "CAT_ASS",
+          "name": "Glute Depth Upper",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_GluteSize": {
+          "category": "CAT_ASS",
+          "name": "Glute Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_GluteWidth": {
+          "category": "CAT_ASS",
+          "name": "Glute Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_HipBackDimples": {
+          "category": "CAT_ASS",
+          "name": "Hip Back Dimples",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_HipBoneCrest": {
+          "category": "CAT_ASS",
+          "name": "Hip Bone Crest",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_HipBoneSize": {
+          "category": "CAT_ASS",
+          "name": "Hip Bone Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_HipGenitalBulge": {
+          "category": "CAT_ASS",
+          "name": "Hip Genital Bulge",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_HipPelvicTilt": {
+          "category": "CAT_ASS",
+          "name": "Hip Pelvic Tilt",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_HipSize": {
+          "category": "CAT_ASS",
+          "name": "Hip Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_HipVDefine": {
+          "category": "CAT_ASS",
+          "name": "Hip V Define",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_KneeBonesSize": {
+          "category": "CAT_LEGS",
+          "name": "Knee Bones Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_LatsSize": {
+          "category": "CAT_BODY",
+          "name": "Lats Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_LoveHandles": {
+          "category": "CAT_BODY",
+          "name": "Love Handles",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassAnkles": {
+          "category": "CAT_LEGS",
+          "name": "Mass Ankles",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassBody": {
+          "category": "CAT_BODY",
+          "name": "Mass Body",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassFeet": {
+          "category": "CAT_LEGS",
+          "name": "Mass Feet",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassForearms": {
+          "category": "CAT_ARMS",
+          "name": "Mass Forearms",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassHands": {
+          "category": "CAT_ARMS",
+          "name": "Mass Hands",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassKnees": {
+          "category": "CAT_LEGS",
+          "name": "Mass Knees",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_MassLowerTorso": {
+          "category": "CAT_BODY",
+          "name": "Mass Lower Torso",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassNeck": {
+          "category": "CAT_HEAD",
+          "name": "Mass Neck",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassShins": {
+          "category": "CAT_LEGS",
+          "name": "Mass Shins",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassShoulders": {
+          "category": "CAT_ARMS",
+          "name": "Mass Shoulders",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassThighs": {
+          "category": "CAT_LEGS",
+          "name": "Mass Thighs",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_bs_MassUpperarms": {
+          "category": "CAT_ARMS",
+          "name": "Mass Upperarms",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassUpperTorso": {
+          "category": "CAT_BODY",
+          "name": "Mass Upper Torso",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_MassWrist": {
+          "category": "CAT_ARMS",
+          "name": "Mass Wrist",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NailsLengthRound": {
+          "category": "CAT_ARMS",
+          "name": "Nails Length Round",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_NailsLengthSharp": {
+          "category": "CAT_ARMS",
+          "name": "Nails Length Sharp",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_NailsLengthSquare": {
+          "category": "CAT_ARMS",
+          "name": "Nails Length Square",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NavelDepth_HD3": {
+          "category": "CAT_BODY",
+          "name": "Navel Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NavelHollow_HD3": {
+          "category": "CAT_BODY",
+          "name": "Navel Hollow",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NavelHorizontal_HD3": {
+          "category": "CAT_BODY",
+          "name": "Navel Horizontal",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NavelOut_HD3": {
+          "category": "CAT_BODY",
+          "name": "Navel Out",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NavelSize_HD3": {
+          "category": "CAT_BODY",
+          "name": "Navel Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_NavelVertical_HD3": {
+          "category": "CAT_BODY",
+          "name": "Navel Vertical",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_RibcageArched": {
+          "category": "CAT_BODY",
+          "name": "Ribcage Arched",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_RibcagePointed": {
+          "category": "CAT_BODY",
+          "name": "Ribcage Pointed",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_RibcageSize": {
+          "category": "CAT_BODY",
+          "name": "Ribcage Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_ScapulaDepth": {
+          "category": "CAT_BODY",
+          "name": "Scapula Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_ScapulaSize": {
+          "category": "CAT_BODY",
+          "name": "Scapula Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_SternumDepth": {
+          "category": "CAT_BODY",
+          "name": "Sternum Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_SternumHeight": {
+          "category": "CAT_BODY",
+          "name": "Sternum Height",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_SternumWidth": {
+          "category": "CAT_BODY",
+          "name": "Sternum Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_StomachDepth": {
+          "category": "CAT_BODY",
+          "name": "Stomach Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_StomachDepthLower": {
+          "category": "CAT_BODY",
+          "name": "Stomach Depth Lower",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_StomachSoften": {
+          "category": "CAT_BODY",
+          "name": "Stomach Soften",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperForearmA": {
+          "category": "CAT_ARMS",
+          "name": "Taper Forearm A",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperForearmB": {
+          "category": "CAT_ARMS",
+          "name": "Taper Forearm B",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperNeckA": {
+          "category": "CAT_BODY",
+          "name": "Taper Neck A",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperNeckB": {
+          "category": "CAT_BODY",
+          "name": "Taper Neck B",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperShinA": {
+          "category": "CAT_LEGS",
+          "name": "Taper Shin A",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperShinB": {
+          "category": "CAT_LEGS",
+          "name": "Taper Shin B",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TaperThighA": {
+          "category": "CAT_LEGS",
+          "name": "Taper Thigh A",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_TaperThighB": {
+          "category": "CAT_LEGS",
+          "name": "Taper Thigh B",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_TaperUpperArmA": {
+          "category": "CAT_ARMS",
+          "name": "Taper Upper Arm A",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_TaperUpperArmB": {
+          "category": "CAT_ARMS",
+          "name": "Taper Upper Arm B",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_ThighDepth": {
+          "category": "CAT_LEGS",
+          "name": "Thigh Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_ThighTone": {
+          "category": "CAT_LEGS",
+          "name": "Thigh Tone",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_TrapsSize": {
+          "category": "CAT_BODY",
+          "name": "Traps Size",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_UpperArmTaperWidth": {
+          "category": "CAT_ARMS",
+          "name": "Upper Arm Taper Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_bs_WaistDepth": {
+          "category": "CAT_BODY",
+          "name": "Waist Depth",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_WaistWidth": {
+          "category": "CAT_BODY",
+          "name": "Waist Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MID"
+        },
+        "body_bs_WaistWidthUpper": {
+          "category": "CAT_BODY",
+          "name": "Waist Width Upper",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "body_ctrl_BodyFitness": {
+          "category": "CAT_BODY",
+          "name": "Body Fitness",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_ctrl_BodyMuscular": {
+          "category": "CAT_BODY",
+          "name": "Body Muscular",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        }
+      }
+    }
+  },
+  "/data/daz 3d/genesis 9/anatomical elements male": {
+    "shapes": {
+      "male": {
+        "body_ctrl_PenileLength": {
+          "category": "CAT_GENITALS",
+          "name": "Penile Length",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "body_ctrl_PenileWidth": {
+          "category": "CAT_GENITALS",
+          "name": "Penile Width",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        }
+      }
+    }
+  },
+  "/data/meipex/goldenpalace_genitalia_g9/g9goldenpalace_graft": {
+    "shapes": {
+      "female": {
+        "GP_MonsVeneris_Front-Back1": {
+          "category": "CAT_GENITALS",
+          "name": "Mons Veneris Front-Back 1",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_MonsVeneris_Front-Back2": {
+          "category": "CAT_GENITALS",
+          "name": "Mons Veneris Front-Back 2",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_MonsVeneris_Up-Down": {
+          "category": "CAT_GENITALS",
+          "name": "Mons Veneris Up-Down",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Aicie": {
+          "category": "CAT_GENITALS",
+          "name": "Aicie",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Angelica": {
+          "category": "CAT_GENITALS",
+          "name": "Angelica",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Astra": {
+          "category": "CAT_GENITALS",
+          "name": "Astra",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Augusta": {
+          "category": "CAT_GENITALS",
+          "name": "Augusta",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Bammi": {
+          "category": "CAT_GENITALS",
+          "name": "Bammi",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Carmen": {
+          "category": "CAT_GENITALS",
+          "name": "Carmen",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Chiktad": {
+          "category": "CAT_GENITALS",
+          "name": "Chiktad",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Crystal": {
+          "category": "CAT_GENITALS",
+          "name": "Crystal",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Felicitas": {
+          "category": "CAT_GENITALS",
+          "name": "Felicitas",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Gaia": {
+          "category": "CAT_GENITALS",
+          "name": "Gaia",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Ilzolla": {
+          "category": "CAT_GENITALS",
+          "name": "Ilzolla",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Krognea": {
+          "category": "CAT_GENITALS",
+          "name": "Krognea",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Laetitia": {
+          "category": "CAT_GENITALS",
+          "name": "Laetitia",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Livia": {
+          "category": "CAT_GENITALS",
+          "name": "Livia",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Raad": {
+          "category": "CAT_GENITALS",
+          "name": "Raad",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Remphea": {
+          "category": "CAT_GENITALS",
+          "name": "Remphea",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Tophae": {
+          "category": "CAT_GENITALS",
+          "name": "Tophae",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Valentina": {
+          "category": "CAT_GENITALS",
+          "name": "Valentina",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR-Yelqi": {
+          "category": "CAT_GENITALS",
+          "name": "Yelqi",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR-Zetill": {
+          "category": "CAT_GENITALS",
+          "name": "Zetill",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Albina": {
+          "category": "CAT_GENITALS",
+          "name": "Albina",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR_Amazon": {
+          "category": "CAT_GENITALS",
+          "name": "Amazon",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Aurelia": {
+          "category": "CAT_GENITALS",
+          "name": "Aurelia",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_PR_Majora01": {
+          "category": "CAT_GENITALS",
+          "name": "Majora 01",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Majora02": {
+          "category": "CAT_GENITALS",
+          "name": "Majora 02",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Majora03": {
+          "category": "CAT_GENITALS",
+          "name": "Majora 03",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora01": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 01",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora02": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 02",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora03": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 03",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora04": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 04",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora05": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 05",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora06": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 06",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora07": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 07",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora08": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 08",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora09": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 09",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Minora10": {
+          "category": "CAT_GENITALS",
+          "name": "Minora 10",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Bump1": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Bump 1",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Bump2": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Bump 2",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Bump3": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Bump 3",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Bump4": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Bump 4",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Bump5": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Bump 5",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Contraction": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_ContractionMore": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction More",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Contraction_Shape1": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Contraction_Shape2": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Contraction_Wrinkles1": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Contraction_Wrinkles2": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Contraction_Wrinkles3": {
+          "category": "CAT_GENITALS",
+          "name": "Anus Contraction",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Open1": {
+          "category": "CAT_SPECIAL",
+          "name": "Anus Open 1",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Anus_Open2": {
+          "category": "CAT_SPECIAL",
+          "name": "Anus Open 2",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_Anus_Open3": {
+          "category": "CAT_SPECIAL",
+          "name": "Anus Open 3",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_PR_Vagina_Open": {
+          "category": "CAT_SPECIAL",
+          "name": "Vagina Open",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Vagina_Open1": {
+          "category": "CAT_SPECIAL",
+          "name": "Vagina Open 1",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        },
+        "GP_Vagina_Open2": {
+          "category": "CAT_SPECIAL",
+          "name": "Vagina Open 2",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_MIN"
+        },
+        "GP_Vagina_Open3": {
+          "category": "CAT_SPECIAL",
+          "name": "Vagina Open 3",
+          "figure": "FIGURE_ANY",
+          "profile": "PROFILE_FULL"
+        }
+      }
+    }
+  }
+}

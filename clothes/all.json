@@ -1,0 +1,648 @@
+{
+    "Romance Bra": {
+        "fingerprint": "13332-26195-12864",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Romance Choker": {
+        "fingerprint": "823-1590-768",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Romance Panties": {
+        "fingerprint": "4110-7999-3890",
+        "skin_tight": "PANTIE_SCALING",
+        "panties": true
+    },
+    "Romance Thigh Straps": {
+        "fingerprint": "7852-15680-7840",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "SU Bunny Suit Clothes G9": {
+        "fingerprint": "7097-14070-6972",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "SU Bunny Suit Pantyhose G9": {
+        "fingerprint": "8926-17819-8894",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "SU Bunny Suit Top G9": {
+        "fingerprint": "6677-13295-6618",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DAO ArmBands": {
+        "fingerprint": "6696-12834-6138",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DAO BodySuit": {
+        "fingerprint": "9047-18026-8976",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DAO Covers": {
+        "fingerprint": "390-724-336",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DAO Harness Bodysuit": {
+        "fingerprint": "39533-76438-36896",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DAO Legbands": {
+        "fingerprint": "11054-21144-10090",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DAO Upper ArmBands": {
+        "fingerprint": "1144-2184-1040",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "M3DEORing": {
+        "fingerprint": "801-1606-805",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Midnight Lingerie Corset": {
+        "fingerprint": "18102-35732-17622",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Midnight Lingerie Panties": {
+        "fingerprint": "3601-6736-3136",
+        "skin_tight": "PANTIE_SCALING",
+        "panties": true
+    },
+    "Midnight Lingerie Stockings": {
+        "fingerprint": "4358-8688-4332",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Refined Lingerie Corset for Genesis 9": {
+        "fingerprint": "29842-58911-29056",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Refined Lingerie Gloves for Genesis 9": {
+        "fingerprint": "24066-48052-23988",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Refined Lingerie Panties for Genesis 9": {
+        "fingerprint": "6236-12222-5987",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": true
+    },
+    "Refined Lingerie Stockings for Genesis 9": {
+        "fingerprint": "14072-28090-14020",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Scarlett Lingerie": {
+        "fingerprint": "11517-22868-11385",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "SU Sexy Line Bikini G9": {
+        "fingerprint": "7880-14804-6913",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "XF Court Stylish Bottom": {
+        "fingerprint": "949-1838-888",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "XF Court Stylish Corset": {
+        "fingerprint": "32855-64044-31240",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "XF Court Stylish Stockings": {
+        "fingerprint": "4904-9740-4836",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "LVA Arm Guard": {
+        "fingerprint": "28366-56444-28222",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LVA Belt": {
+        "fingerprint": "1948-3872-1928",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LVA Boots": {
+        "fingerprint": "6420-12662-6244",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LVA Pant": {
+        "fingerprint": "4526-8995-4468",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LVA Shirt": {
+        "fingerprint": "10438-20704-10264",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LVA Vest": {
+        "fingerprint": "3751-7337-3585",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LVA Vest Straps": {
+        "fingerprint": "5580-11130-5568",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "BattleMage Medallion G9": {
+        "fingerprint": "16291-32492-16202",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "BattleMage Shirt G9": {
+        "fingerprint": "59984-117646-57745",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "BattleMage Skirt G9": {
+        "fingerprint": "62529-124028-61617",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Dark Side Corset": {
+        "fingerprint": "2416-4708-2292",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Dark Side Jacket": {
+        "fingerprint": "11447-22693-11243",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Dark Side Pants": {
+        "fingerprint": "5387-10716-5328",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "Dark Side Top": {
+        "fingerprint": "1117-2163-1044",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "RMO Dress": {
+        "fingerprint": "12119-23967-11846",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "VALBattleMage Bracers G9": {
+        "fingerprint": "16106-30990-14938",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "VALBattleMage Pantie G9": {
+        "fingerprint": "582-1067-484",
+        "skin_tight": 0.01,
+        "panties": true
+    },
+    "White Witch Dress": {
+        "fingerprint": "22767-45315-22576",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "White Witch Hat": {
+        "fingerprint": "6987-13875-6903",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "White Witch Sleeves": {
+        "fingerprint": "19852-39574-19726",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "DCKA Guard Vest": {
+        "fingerprint": "31098-60151-29196",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Urban Kunoichi Glove": {
+        "fingerprint": "7894-15692-7800",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Urban Kunoichi Heels": {
+        "fingerprint": "6524-12840-6320",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Urban Kunoichi Jacket": {
+        "fingerprint": "4682-9316-4632",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Urban Kunoichi Mask": {
+        "fingerprint": "1207-2328-1120",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Urban Kunoichi Pants": {
+        "fingerprint": "3763-7429-3675",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Urban Kunoichi Top": {
+        "fingerprint": "840-1626-784",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "PPSS Boots": {
+        "fingerprint": "17589-35086-17501",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "PPSS Jacket": {
+        "fingerprint": "49380-98350-48997",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "PPSS Skirt": {
+        "fingerprint": "11467-22703-11232",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "PPSS Stockings": {
+        "fingerprint": "10912-21736-10824",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "PPSS Tshirt": {
+        "fingerprint": "12234-24008-11773",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Nirv Zero's Bra": {
+        "fingerprint": "1954-3838-1884",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Nirv Zero's Cat Slippers": {
+        "fingerprint": "1940-3848-1932",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Nirv Zero's Underwear": {
+        "fingerprint": "3003-5896-2892",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "dForce Nirv Zero's Dresses": {
+        "fingerprint": "10859-21641-10780",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SS14 TOON": {
+        "fingerprint": "11797-23057-11281",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SS35 BRA TOON": {
+        "fingerprint": "23787-47090-23306",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SS35 THONG TOON": {
+        "fingerprint": "16038-31713-15680",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": true
+    },
+    "SXS25 PANTS TOON": {
+        "fingerprint": "1702-3278-1574",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": true
+    },
+    "SXS25 TOP TOON": {
+        "fingerprint": "2639-5079-2436",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "SXS29G9TOON": {
+        "fingerprint": "7299-13864-6532",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "the Demon Servant Crown": {
+        "fingerprint": "2894-5628-2754",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Gauntlet": {
+        "fingerprint": "5112-9594-4498",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Greaves": {
+        "fingerprint": "10436-20112-9702",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Hands": {
+        "fingerprint": "4326-8256-3952",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Pants": {
+        "fingerprint": "2516-4977-2460",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Shawl": {
+        "fingerprint": "2688-5312-2624",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Shirt": {
+        "fingerprint": "4912-9788-4876",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Skirt": {
+        "fingerprint": "2106-4088-1984",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Top Armor": {
+        "fingerprint": "3765-7357-3590",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "the Demon Servant Waist Armors": {
+        "fingerprint": "1554-2914-1366",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Viking Warrior Pants": {
+        "fingerprint": "2687-5323-2635",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Viking Warrior Tunic": {
+        "fingerprint": "6975-13839-6856",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Warrior Gloves": {
+        "fingerprint": "3964-7828-3856",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Warrior Gloves Shield": {
+        "fingerprint": "2052-3768-1728",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Warrior Pants": {
+        "fingerprint": "2343-4640-2296",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Warrior Skirt": {
+        "fingerprint": "2216-4296-2080",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Warrior Tops": {
+        "fingerprint": "3913-7680-3766",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Dress": {
+        "fingerprint": "37250-74468-37212",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Gloves": {
+        "fingerprint": "11836-23030-11220",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Shin Guard": {
+        "fingerprint": "7526-15022-7532",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Shoes": {
+        "fingerprint": "6860-13628-6798",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Socks": {
+        "fingerprint": "5168-10268-5100",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "SAO Thigh Guard": {
+        "fingerprint": "1988-3968-1984",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Arm Guard": {
+        "fingerprint": "7486-14958-7484",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Belt": {
+        "fingerprint": "8172-16188-8104",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Breast Guard": {
+        "fingerprint": "1242-2493-1253",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Shoulder Guard": {
+        "fingerprint": "2737-5459-2734",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SAO Necklace": {
+        "fingerprint": "690-1380-690",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "G9 Base Bra": {
+        "fingerprint": "9748-19504-9754",
+        "skin_tight": "CLOTHES_MIN_DIST_TO_SKIN",
+        "panties": false
+    },
+    "G9 Base Panty": {
+        "fingerprint": "8624-17254-8630",
+        "skin_tight": -1,
+        "panties": true
+    },
+    "G9 Base Shirt": {
+        "fingerprint": "8038-16050-8010",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "G9 Base Shorts": {
+        "fingerprint": "8256-16387-8130",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "VALBattleMage_Bracers": {
+        "fingerprint": "16106-30990-14938",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "VALBattleMage_Pantie": {
+        "fingerprint": "582-1067-484",
+        "skin_tight": "PANTIE_SCALING",
+        "panties": true
+    },
+    "BattleMage_Medallion": {
+        "fingerprint": "16291-32492-16202",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "BattleMage_Shirt": {
+        "fingerprint": "59984-117646-57745",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "BattleMage_Skirt": {
+        "fingerprint": "62529-124028-61617",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "KuJ Bracelet 02 L": {
+        "fingerprint": "3252-6456-3208",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "KuJ Bracelet 02 R": {
+        "fingerprint": "3252-6456-3208",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "KuJ Cloth Shoes": {
+        "fingerprint": "4622-9194-4574",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Soaring Dragon Kung Fu Dress": {
+        "fingerprint": "15905-31513-15606",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LLA Choker L01": {
+        "fingerprint": "1595-3150-1555",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LLA Choker L02": {
+        "fingerprint": "7194-14321-7127",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "LLA Choker L03": {
+        "fingerprint": "1228-2409-1181",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "BW KK Panty G9": {
+        "fingerprint": "5031-9894-4862",
+        "skin_tight": "PANTIE_SCALING",
+        "panties": true
+    },
+    "DGA Collar 01": {
+        "fingerprint": "4619-10165-5564",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "DGA Collar 02": {
+        "fingerprint": "4298-9067-4858",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "DGA Collar 03": {
+        "fingerprint": "5312-11216-5904",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "DGA Handcuffs": {
+        "fingerprint": "8620-18253-9587",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "G9 Base Bikini": {
+        "fingerprint": "4046-7915-3870",
+        "skin_tight": "PANTIE_SCALING",
+        "panties": true
+    },
+    "AWl Bra": {
+        "fingerprint": "4604-8988-4376",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "SU Latex Outfit G9": {
+        "fingerprint": "46879-93730-46852",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "POU Belt": {
+        "fingerprint": "27423-54450-27111",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "POU Cap": {
+        "fingerprint": "13515-27015-13492",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "POU Pant": {
+        "fingerprint": "18229-36133-17924",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "POU Shirt Long": {
+        "fingerprint": "22328-44172-21861",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "POU Shoes": {
+        "fingerprint": "15784-31230-15446",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "POU Vest": {
+        "fingerprint": "12914-25398-12508",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Futuristic Suit Hand Armor": {
+        "fingerprint": "2880-5696-2816",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Futuristic Suit Jumpsuit": {
+        "fingerprint": "19067-37920-18854",
+        "skin_tight": -1,
+        "panties": false
+    },
+    "Futuristic Suit Nails": {
+        "fingerprint": "6510-12680-6200",
+        "skin_tight": -1,
+        "panties": false,
+        "dont_resize":true
+    }
+}
