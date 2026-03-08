@@ -92,20 +92,31 @@ def serialize_object(obj, vertices=False, vertex_normals=False, loops=False, pol
 
 
 class BakedImg:
-    def __init__(self, nump, path, img: bpy.types.Image=None):
+    def __init__(self, nump, path, color_space, img: bpy.types.Image=None):
         self.np = nump
         self.image = img
         self.path = path
+        self.uv_map = None
+        self.color_space = color_space
+
+    def __repr__(self):
+        return (self.path if self.image is None else self.image.filepath) + ':' + self.color_space
 
     def to_numpy(self):
         return self.np
 
     def to_image(self, path):
         if self.image is None:
-            img = np_to_pil(self.np)
+            if self.color_space == "sRGB":
+                raw = linearrgb_to_srgb(self.np)
+            else:
+                raw = self.np
+            img = np_to_pil(raw)
             img.save(path)
             self.image = bpy.data.images.load(path)
+            self.image.colorspace_settings.name = self.color_space
         return self.image
+
 
 def np_to_pil(x: np.ndarray):
     from PIL import Image
@@ -126,35 +137,32 @@ def open_img_to_np(filepath):
     img_np = pil_to_np(img_np)
     return img_np
 
-def linearrgb_to_srgb_channel(c):
-    if c < 0:
-        return 0
-    elif c < 0.0031308:
-        return 12.92 * c
-    else:
-        return 1.055 * (c ** (1 / 2.4)) - 0.055
 
 def linearrgb_to_srgb(c):
-    r, g, b = c[:3]
-    r = linearrgb_to_srgb_channel(r)
-    g = linearrgb_to_srgb_channel(g)
-    b = linearrgb_to_srgb_channel(b)
-    if len(c)==3:
-        return np.array((r, g, b))
-    else:
-        return np.array((r, g, b, c[-1]))
+    assert c.ndim == 2 or 3 <= c.shape[2] <= 4, c.shape
+    rgb = c[:,:,:3] if c.ndim > 2 else c
+    mask = rgb < 0.0031308
+    neg_mask = rgb < 0
+    rgb[mask] = 12.92 * rgb[mask]
+    not_mask = ~mask
+    rgb[not_mask] = 1.055 * (rgb[not_mask] ** (1 / 2.4)) - 0.055
+    rgb[neg_mask] = 0
+    return c
+
 
 def srgb_to_linearrgb(c):
-    mask = c >= 0.04045
-    c[mask] = ((c[mask] + 0.055) / 1.055) ** 2.4
-    c[~mask] = c[~mask] / 12.92
-    return c
+    assert c.ndim == 2 or 3 <= c.shape[2] <= 4, c.shape
+    rgb = c[:,:,:3] if c.ndim > 2 else c
+    mask = rgb >= 0.04045
+    rgb[mask] = ((rgb[mask] + 0.055) / 1.055) ** 2.4
+    rgb[~mask] = rgb[~mask] / 12.92
+    return rgb
 
 def gamma(color, gamma_value):
     return np.power(color, gamma_value)
 
 def lerp(a,b,alpha):
-    return a + (b - a) * alpha
+    return a * (1-alpha) + b * alpha
 
 def screen(a,b,alpha):
     facm = 1.0 - alpha
@@ -192,12 +200,34 @@ class BakedNode:
 
 
 class MaterialBaker:
+    def __init__(self, node_tree, debug=0):
+        if isinstance(node_tree, str):
+            node_tree = bpy.data.materials[node_tree]
+        if isinstance(node_tree, bpy.types.Material):
+            self.material = node_tree
+            node_tree = node_tree.node_tree
+        else:
+            self.material = None
+        assert isinstance(node_tree, bpy.types.ShaderNodeTree)
+        self.debug = debug
+        self.node_tree = node_tree
+        self.evaluated = {}
+        self.inputs = None
+        self.outputs = None
+
+    def __repr__(self):
+        return repr(self.node_tree) if self.material is None else self.material.name
+
     @staticmethod
     def tonp(x):
-        return x if isinstance(x, np.ndarray) or np.isscalar(x) else x.to_numpy()
+        assert x is not None
+        if isinstance(x, BakedImg):
+            return x.to_numpy()
+        return np.array(x)
 
     @staticmethod
     def topa(x):
+        assert x is not None
         return [x.path] if isinstance(x, BakedImg) else []
 
     @staticmethod
@@ -265,6 +295,13 @@ class MaterialBaker:
             return o
 
     @staticmethod
+    def common_cs(*args):
+        for e in args:
+            if isinstance(e, BakedImg) and e.color_space != 'Non-Color':
+                return e.color_space
+        return 'Non-Color'
+
+    @staticmethod
     def common(*args):
         a = []
         for arg in args:
@@ -297,40 +334,97 @@ class MaterialBaker:
         def sort_topologically_recursion(node):
             for i in node.inputs:
                 for l in i.links:
-                    node = l.from_node
-                    if node not in visited:
-                        visited.add(node)
-                        sort_topologically_recursion(node)
+                    if l.from_node not in visited:
+                        visited.add(l.from_node)
+                        sort_topologically_recursion(l.from_node)
             sorted_nodes.append(node)
-
 
         for end in MaterialBaker.get_all_final(node_tree):
             sort_topologically_recursion(end)
 
         return sorted_nodes
 
-    def __int__(self, node_tree):
-        self.node_tree = node_tree
-        self.evaluated = {}
-        self.inputs = None
-        self.outputs = None
-
-    def bake(self):
+    def bake(self, debug=True):
+        if debug:
+            print('    '*self.debug + 'Baking ', self)
         nodes = MaterialBaker.sort_topologically(self.node_tree)
         for node in nodes:
-            self.evaluate(node)
+            if debug:
+                print('    '*(self.debug+1)+repr(node))
+                for i in node.inputs:
+                    if not i.is_unavailable:
+                        print('    '*(self.debug+2) +i.name+"="+repr(self.get(node, i)))
+            baked = self.evaluate(node, debug)
+            if debug:
+                print('    '*(self.debug+2)+'baked:'+str(baked))
+
+    def apply(self):
+        to_remove = set()
+        print("evaluated=", {e.node.name+'->'+e.name for e in self.evaluated.keys()})
+        for node in self.node_tree.nodes:
+            if len(node.outputs)>0: # this if guards against removing Material Output node
+                all_outs_baked = True
+                for o in node.outputs:
+                    if not o.is_unavailable and o not in self.evaluated:
+                        all_outs_baked = False
+                        print("Keeping "+node.name+" because of "+o.name+" ("+repr(o)+")")
+                        break
+                if all_outs_baked:
+                    to_remove.add(node)
+        print("to_remove=", {e.name for e in to_remove})
+        to_insert_baked = set()
+        for node in self.node_tree.nodes:
+            for o in node.outputs:
+                if o in self.evaluated:
+                    any_link_needed = False
+                    for l in o.links:
+                        if l.to_node not in to_remove:
+                            any_link_needed = True
+                            break
+                    if any_link_needed:
+                        to_insert_baked.add(o)
+        print("to_insert_baked=", {e.node.name+"->"+e.name for e in to_insert_baked})
+        for o in to_insert_baked:
+            baked_o = self.evaluated.get(o)
+            i_socs = [l.to_socket for l in o.links]
+            if isinstance(baked_o, BakedImg):
+                tex_node = self.node_tree.nodes.new('ShaderNodeTexImage')
+                tex_node.name = 'baked '+o.node.name+' '+o.name
+                tex_node.location = o.node.location
+                mat_name = self.node_tree.name if self.material is None else self.material.name
+                path = bpy.path.abspath('//' + mat_name+"_"+o.node.name+' '+o.name + '.png')
+                tex_node.image = baked_o.to_image(path)
+                for i_soc in i_socs:
+                    self.node_tree.links.new(i_soc, tex_node.outputs['Color'])
+            else:
+                for i_soc in i_socs:
+                    i_soc.default_value = baked_o
+        for node in to_remove:
+            self.node_tree.nodes.remove(node)
 
     def get(self, node, socket, default_value=None):
         if isinstance(socket, (str,int)):
-            socket = node.inputs.get(socket)
-        if socket is None or socket.is_inactive:
+            try:
+                socket = node.inputs[socket]
+            except KeyError:
+                return None
+            except IndexError:
+                return None
+        if socket.is_unavailable:
             return default_value
         if socket.is_linked:
-            return self.evaluated.get(socket)
+            if len(socket.links)==1:
+                return self.evaluated.get(socket.links[0].from_socket)
+            else:
+                return None
         else:
-            return socket.default_value
+            try:
+                return np.array(socket.default_value)
+            except AttributeError:
+                return None
 
-    def evaluate(self, node):
+    def evaluate(self, node, debug=True):
+
         if isinstance(node, bpy.types.ShaderNodeRGB):
             o = node.outputs[0]
             rgb = linearrgb_to_srgb(o.default_value)
@@ -339,27 +433,40 @@ class MaterialBaker:
         elif isinstance(node, bpy.types.ShaderNodeMath):
             a_i = self.get(node, 0)
             b_i = self.get(node, 1)
+            c_i = self.get(node, 2)
             if a_i is None or b_i is None:
                 return False
             p = MaterialBaker.common(a_i, b_i)
+            cs = MaterialBaker.common_cs(a_i, b_i, c_i)
             a = MaterialBaker.tonp(a_i)
             b = MaterialBaker.tonp(b_i)
             if node.operation == "MULTIPLY":
-                c = a * b
+                res = a * b
+            elif node.operation == "MULTIPLY_ADD":
+                if c_i is None:
+                    return False
+                c = MaterialBaker.tonp(c_i)
+                res = a * b + c
             elif node.operation == "ADD":
-                c = a + b
+                res = a + b
             elif node.operation == "SUBTRACT":
-                c = a - b
+                res = a - b
             elif node.operation == "DIVIDE":
-                c = a / b
+                res = a / b
             elif node.operation == "MODULO":
-                c = a % b
-            self.evaluated[node.outputs[0]] = BakedImg(c, p)
+                res = a % b
+            elif node.operation == "POWER":
+                res = a ** b
+            elif node.operation == "LOGARITHM":
+                res = np.log(a, b)
+            else:
+                raise Exception('unimplemented bpy.types.ShaderNodeMath with operation '+node.operation)
+            self.evaluated[node.outputs['Value']] = BakedImg(res, p, cs)
             return True
         elif isinstance(node, bpy.types.NodeGroupInput):
             if self.inputs is not None:
                 for out in node.outputs:
-                    self.evaluated[out] = self.inputs[out.name]
+                    self.evaluated[out] = self.inputs.get(out.name)
             return False # the input node is never removed after optimisation
         elif isinstance(node, bpy.types.NodeGroupOutput):
             if self.outputs is not None:
@@ -369,12 +476,12 @@ class MaterialBaker:
                         self.outputs[i.name] = optimised_i
             return False # the input node is never removed after optimisation
         elif isinstance(node, bpy.types.ShaderNodeGroup):
-            mb = MaterialBaker(node.node_tree)
+            mb = MaterialBaker(node.node_tree, debug=self.debug+2)
             mb.inputs = {}
             for i in node.inputs:
                 mb.inputs[i.name] = self.get(node, i)
             mb.outputs = {}
-            mb.bake()
+            mb.bake(debug=debug)
             all_optimised = True
             for o in node.outputs:
                 optimised_o = mb.outputs.get(o.name)
@@ -387,19 +494,22 @@ class MaterialBaker:
             l_i = self.get(node, 'Location', 0)
             s_i = self.get(node, 'Scale', 1)
             r_i = self.get(node, 'Rotation', 0)
-            if l_i is None or s_i is None or r_i is None:
+            v_i = self.get(node, 'Vector', 0)
+            if l_i is None or s_i is None or r_i is None or v_i is None:
                 return False
             l = MaterialBaker.tonp(l_i)
             s = MaterialBaker.tonp(s_i)
             r = MaterialBaker.tonp(r_i)
             if not np.all(r == 0):
                 raise Exception("Encountered "+ repr(node)+ ' with  rotation! Not implemented yet!!!!')
-            v_i = self.get(node, 'Vector', 0)
             v = MaterialBaker.tonp(v_i)
             out = v * s + l
             p = MaterialBaker.common(r_i, s_i, l_i, v_i)
-            self.evaluated[node.outputs[0]] = BakedImg(out, p)
+            cs = MaterialBaker.common_cs(r_i, s_i, l_i, v_i)
+            self.evaluated[node.outputs['Vector']] = BakedImg(out, p, cs)
             return True
+        elif isinstance(node, bpy.types.ShaderNodeValue):
+            self.evaluated[node.outputs['Value']] = np.array(node.outputs[0].default_value)
         elif isinstance(node, bpy.types.ShaderNodeGamma):
             c_i = self.get(node, 'Color')
             g_i = self.get(node, 'Gamma')
@@ -409,25 +519,40 @@ class MaterialBaker:
             g = MaterialBaker.tonp(g_i)
             img_c = gamma(c, g)
             p = MaterialBaker.common(c_i, g_i)
-            self.evaluated[node.outputs[0]] = BakedImg(img_c, p)
+            cs = MaterialBaker.common_cs(c_i, g_i)
+            self.evaluated[node.outputs['Color']] = BakedImg(img_c, p, cs)
             return True
         elif isinstance(node, bpy.types.ShaderNodeTexImage):
-            normal = node.inputs['Vector']
-            if normal.is_linked:
-                return False
+            if node.image is None:
+                raise Exception(repr(node)+" has no image")
+            normal = self.get(node, 'Vector')
+            if normal is not None:
+                if not np.all(normal==0):
+                    return False
             a_soc = node.outputs["Alpha"]
             c_soc = node.outputs['Color']
             from PIL import Image
             path = bpy.path.abspath(node.image.filepath)
             i = np.array(Image.open(path)) / np.float32(255)
-            col = i[:, :, :3]
-            if i.shape[2] > 3:
-                alpha = i[:, :, 3]
+            if i.ndim > 2:
+                col = i[:, :, :3]
+                if i.shape[2] > 3:
+                    alpha = i[:, :, 3]
+                else:
+                    alpha = 1
             else:
+                col = i
                 alpha = 1
             path = os.path.basename(node.image.filepath)
-            self.evaluated[c_soc] = BakedImg(col, path, node.image)
-            self.evaluated[a_soc] = BakedImg(alpha, path, node.image)
+            c_space = node.image.colorspace_settings.name
+            if c_space == 'sRGB':
+                col = srgb_to_linearrgb(col)
+            elif c_space == 'Non-Color':
+                pass
+            else:
+                raise Exception('unsupported color space ' + c_space + ' in ' + repr(node))
+            self.evaluated[c_soc] = BakedImg(col, path, c_space, node.image)
+            self.evaluated[a_soc] = BakedImg(alpha, path, c_space, node.image)
             return True
         elif isinstance(node, bpy.types.ShaderNodeMix):
             a_i = self.get(node, 'A')
@@ -436,11 +561,10 @@ class MaterialBaker:
             if a_i is None or b_i is None or alpha_i is None:
                 return False
             p = MaterialBaker.common(a_i,b_i,alpha_i)
+            cs = MaterialBaker.common_cs(a_i, b_i, alpha_i)
             a = MaterialBaker.tonp(a_i)
             b = MaterialBaker.tonp(b_i)
             alpha = MaterialBaker.tonp(alpha_i)
-            t0, t1 = 3000, 1000
-            # print(node, "[0] a=",a[t0, t1] if a.ndim>=2 else a, "b=",b[t0, t1] if b.ndim>=2 else b, "alpha=",alpha[t0, t1] if alpha.ndim>=2 else alpha)
             max_channels = max(MaterialBaker.channels(a), MaterialBaker.channels(b), MaterialBaker.channels(alpha))
             a = MaterialBaker.to_channels(a, max_channels)
             b = MaterialBaker.to_channels(b, max_channels)
@@ -450,50 +574,52 @@ class MaterialBaker:
             a = MaterialBaker.to_size(a, max_height, max_width)
             b = MaterialBaker.to_size(b, max_height, max_width)
             alpha = MaterialBaker.to_size(alpha, max_height, max_width)
+            o = node.outputs['Result']
             # original implementation
             # https://projects.blender.org/blender/blender/src/branch/main/source/blender/gpu/shaders/material/gpu_shader_material_mix_color.glsl
             if node.blend_type == 'MIX':
+                import ipdb; ipdb.set_trace()
                 img_c = lerp(a, b, alpha)
-                self.evaluated[node.outputs[0]] = BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'DARKEN':
                 img_c = lerp(a, np.minimum(a, b), alpha)
                 reset_alpha_channel(img_c, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'LIGHTEN':
                 img_c = lerp(a, np.maximum(a, b), alpha)
                 reset_alpha_channel(img_c, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'DODGE':
                 img_c = dodge(a, b)
                 reset_alpha_channel(img_c, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'BURN':
-                img_c = burn(a,b,alpha)
+                img_c = burn(a, b, alpha)
                 reset_alpha_channel(img_c, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'SCREEN':
-                outcol = screen(a,b,alpha)
+                outcol = screen(a, b, alpha)
                 reset_alpha_channel(outcol, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(outcol, p)
+                self.evaluated[o] = BakedImg(outcol, p, cs)
                 return True
             elif node.blend_type == 'OVERLAY':
-                img_c = overlay(a,b,alpha)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                img_c = overlay(a, b, alpha)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'ADD':
                 img_c = a + b * alpha
                 reset_alpha_channel(img_c, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
             elif node.blend_type == 'MULTIPLY':
-                img_c = alpha_multiply(a,b,alpha)
+                img_c = alpha_multiply(a, b, alpha)
                 reset_alpha_channel(img_c, a)
-                self.evaluated[node.outputs[0]] =  BakedImg(img_c, p)
+                self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
         return False
 
@@ -3093,8 +3219,7 @@ class DazOptimizer:
             mat.node_tree.nodes.clear()
             NodesUtils.gen_simple_material(mat.node_tree, body_part_filepaths)
 
-    def simplify_materials(self):
-        from PIL import Image
+    def collect_bakeable_mats(self):
         BODY_M = self.get_body_mesh()
         MOUTH_M = self.get_mouth_mesh()
         gp = self.get_gp_mesh()
@@ -3106,6 +3231,24 @@ class DazOptimizer:
         for g in DICK_GEOGRAFTS:
             if g + ' Mesh' in bpy.data.objects:
                 mats.extend(bpy.data.objects[g + ' Mesh'].data.materials)
+        return mats
+
+    def bake_materials(self, active_only=True):
+        if active_only:
+            mats = [bpy.context.object.active_material]
+        else:
+            mats = self.collect_bakeable_mats()
+        for mat in mats:
+            b = MaterialBaker(mat.node_tree)
+            b.bake()
+            b.apply()
+
+    def simplify_materials(self):
+        from PIL import Image
+        BODY_M = self.get_body_mesh()
+        MOUTH_M = self.get_mouth_mesh()
+        gp = self.get_gp_mesh()
+        mats = self.collect_bakeable_mats()
         all_filepaths = DazOptimizer.find_body_part_textures(mats)
 
 
@@ -3167,8 +3310,6 @@ class DazOptimizer:
                     teeth_color = linearrgb_to_srgb(bc)
                 elif len(bc) > 0:
                     teeth_img = bc[0]
-
-
 
         def to_channels(x, c):
             if len(x) < c:
@@ -6243,6 +6384,22 @@ class DazSimplifyGoldenPalaceMaterials_operator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class DazBakeMaterials_operator(bpy.types.Operator):
+    """ Simplify materials """
+    bl_idname = "dazoptim.bake_mats"
+    bl_label = "Simplify materials"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = 'Q'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazBakeMaterials_operator, DazMergeGrografts_operator])
+
+    def execute(self, context):
+        DazOptimizer().bake_materials()
+        pass_stage(self)
+        return {'FINISHED'}
+
 class DazSimplifyMaterials_operator(bpy.types.Operator):
     """ Simplify materials """
     bl_idname = "dazoptim.simpl_mats"
@@ -6252,7 +6409,7 @@ class DazSimplifyMaterials_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazSimplifyMaterials_operator, DazMergeGrografts_operator])
+        return UNLOCK or check_stage(context, [DazBakeMaterials_operator], [DazSimplifyMaterials_operator, DazMergeGrografts_operator])
 
     def execute(self, context):
         DazOptimizer().simplify_materials()
@@ -7796,6 +7953,7 @@ operators = [
     EntryOp(DazAddThighUpperBones_operator, "Add thigh bones (upper)"),
     EntryOp(DazAddThighLowerBones_operator, "Add thigh bones (lower)"),
     EntryOp(DazAddThighSideBones_operator, "Add thigh bones (sides)"),
+    EntryOp(DazBakeMaterials_operator, "Bake materials"),
     EntryOp(DazSimplifyMaterials_operator, "Simplify materials"),
     EntryOp(DazOptimizeEyes_operator, "Optimize eyes mesh"),
     EntryOp(DazOptimizeEyesForToon_operator, "Optimize eyes for toon"),
