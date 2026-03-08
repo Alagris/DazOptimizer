@@ -214,6 +214,7 @@ class MaterialBaker:
         self.evaluated = {}
         self.inputs = None
         self.outputs = None
+        self.whitelist = None
 
     def __repr__(self):
         return repr(self.node_tree) if self.material is None else self.material.name
@@ -344,11 +345,13 @@ class MaterialBaker:
 
         return sorted_nodes
 
-    def bake(self, debug=True):
+    def bake(self, debug=False):
         if debug:
             print('    '*self.debug + 'Baking ', self)
         nodes = MaterialBaker.sort_topologically(self.node_tree)
         for node in nodes:
+            if self.whitelist is not None and node not in self.whitelist:
+                continue
             if debug:
                 print('    '*(self.debug+1)+repr(node))
                 for i in node.inputs:
@@ -362,6 +365,8 @@ class MaterialBaker:
         to_remove = set()
         print("evaluated=", {e.node.name+'->'+e.name for e in self.evaluated.keys()})
         for node in self.node_tree.nodes:
+            if self.whitelist is not None and node not in self.whitelist:
+                continue
             if len(node.outputs)>0: # this if guards against removing Material Output node
                 all_outs_baked = True
                 for o in node.outputs:
@@ -392,7 +397,11 @@ class MaterialBaker:
                 tex_node.name = 'baked '+o.node.name+' '+o.name
                 tex_node.location = o.node.location
                 mat_name = self.node_tree.name if self.material is None else self.material.name
-                path = bpy.path.abspath('//' + mat_name+"_"+o.node.name+' '+o.name + '.png')
+                path = bpy.path.abspath('//baked/' + mat_name+"_"+o.node.name+' '+o.name + '.png')
+                try:
+                    os.makedirs(os.path.dirname(path))
+                except OSError as e:
+                    pass
                 tex_node.image = baked_o.to_image(path)
                 for i_soc in i_socs:
                     self.node_tree.links.new(i_soc, tex_node.outputs['Color'])
@@ -578,7 +587,7 @@ class MaterialBaker:
             # original implementation
             # https://projects.blender.org/blender/blender/src/branch/main/source/blender/gpu/shaders/material/gpu_shader_material_mix_color.glsl
             if node.blend_type == 'MIX':
-                import ipdb; ipdb.set_trace()
+                #import ipdb; ipdb.set_trace()
                 img_c = lerp(a, b, alpha)
                 self.evaluated[o] = BakedImg(img_c, p, cs)
                 return True
@@ -644,6 +653,16 @@ class NodesUtils:
                         NodesUtils.walk_backwards(i, visited, lambda_func, used_inp_socks)
 
     @staticmethod
+    def find_textures(inp_socket):
+        visited = set()
+        outputs = []
+        def callback(node, input_soc):
+            if isinstance(node, bpy.types.ShaderNodeTexImage):
+                outputs.append(node.image)
+        NodesUtils.walk_backwards(inp_socket, visited, callback)
+        return outputs
+
+    @staticmethod
     def add_explicit_uvs(mat, uv_layer):
         node_tree = mat.node_tree
         ns = node_tree.nodes
@@ -677,6 +696,11 @@ class NodesUtils:
                 for link in input_socket.links:
                     NodesUtils.collect_all_before(link.from_node, outputs)
         return outputs
+
+    @staticmethod
+    def collect_all_before_socket(input_socket, outputs):
+        for link in input_socket.links:
+            NodesUtils.collect_all_before(link.from_node, outputs)
 
     @staticmethod
     def delete_all_before(node_tree, node):
@@ -3138,74 +3162,81 @@ class DazOptimizer:
         return DazOptimizer.find_body_part_textures(mats)
 
     @staticmethod
-    def find_body_part_textures(mats):
+    def find_sockets_of_each_map_type(mat):
+        output_node = NodesUtils.find_by_type(mat.node_tree, bpy.types.ShaderNodeOutputMaterial)
+        sockets = {'Base Color': set(), 'Roughness': set(), 'Normal': set()}
+        if output_node is not None:
+            for bsdf in NodesUtils.from_socket_backwards_search_for(output_node.inputs['Surface'], (bpy.types.ShaderNodeBsdfPrincipled, bpy.types.ShaderNodeGroup), set()):
+                if isinstance(bsdf, bpy.types.ShaderNodeBsdfPrincipled):
+                    for channel in ['Base Color', 'Roughness', 'Normal']:
+                        sockets[channel].add(bsdf.inputs[channel])
+                elif bsdf.node_tree.name == 'DAZ Dual Lobe PBR':
+                    sockets['Roughness'].add(bsdf.inputs['Roughness 1'])
+                    sockets['Roughness'].add(bsdf.inputs['Roughness 2'])
+                    sockets['Normal'].add(bsdf.inputs['Normal'])
+                elif bsdf.node_tree.name == 'DAZ Toon Diffuse':
+                    sockets['Base Color'].add(bsdf.inputs['Color'])
+                    sockets['Normal'].add(bsdf.inputs['Normal'])
+        return sockets
 
-        def find_textures(i):
-            visited = set()
-            outputs = []
-            def callback(node):
-                if isinstance(node, bpy.types.ShaderNodeTexImage):
-                    outputs.add(node.image)
-            NodesUtils.walk_backwards(i, visited, callback)
-            return outputs
-        all_filepaths: {str: {str: [bpy.types.Image]}} = {}
-        const_color_values = {}
+    class FindImagesResult:
+        def __init__(self):
+            self.images: {bpy.types.Image} = set()
+            self.const = None
+
+    @staticmethod
+    def find_images_of_each_map_type(mat):
+        images = {}
+        for channel, sockets in DazOptimizer.find_sockets_of_each_map_type(mat).items():
+            r = images[channel] = DazOptimizer.FindImagesResult()
+            for soc in sockets:
+                if len(soc.links) == 0:
+                    r.const_value = np.array(soc.default_value)
+                r.images.update(NodesUtils.find_textures(soc))
+        return images
+
+    @staticmethod
+    def find_body_part_textures(mats):
+        all_filepaths: {str: {str: DazOptimizer.FindImagesResult}} = {}
         for mat in mats:
-            output_node = NodesUtils.find_by_type(mat.node_tree, bpy.types.ShaderNodeOutputMaterial)
             body_part = mat.name.rstrip('0123456789-_.')
-            body_part_filepaths = all_filepaths[body_part] = {'Base Color': set(), 'Roughness': set(), 'Normal': set()}
-            const_color_value = None
-            if output_node is not None:
-                for bsdf in NodesUtils.from_socket_backwards_search_for(output_node.inputs['Surface'], (bpy.types.ShaderNodeBsdfPrincipled, bpy.types.ShaderNodeGroup), set()):
-                    if isinstance(bsdf, bpy.types.ShaderNodeBsdfPrincipled):
-                        for channel in ['Base Color', 'Roughness', 'Normal']:
-                            for image in find_textures(bsdf.inputs[channel]):
-                                body_part_filepaths[channel].add(image)
-                                print(body_part, channel, image)
-                    elif bsdf.node_tree.name == 'DAZ Dual Lobe PBR':
-                        for image in find_textures(bsdf.inputs['Roughness 1']):
-                            body_part_filepaths['Roughness'].add(image)
-                            print(body_part, "Roughness", image)
-                        for image in find_textures(bsdf.inputs['Roughness 2']):
-                            body_part_filepaths['Roughness'].add(image)
-                            print(body_part, "Roughness", image)
-                        for image in find_textures(bsdf.inputs['Normal']):
-                            body_part_filepaths['Normal'].add(image)
-                            print(body_part, "Normal", image)
-                    elif bsdf.node_tree.name == 'DAZ Toon Diffuse':
-                        clr_soc = bsdf.inputs['Color']
-                        if len(clr_soc.links) == 0:
-                            const_color_value = np.array(clr_soc.default_value)
-                        else:
-                            for image in find_textures(bsdf.inputs['Color']):
-                                body_part_filepaths['Base Color'].add(image)
-                                print(body_part,"Base Color",image)
-                        for image in find_textures(bsdf.inputs['Normal']):
-                            body_part_filepaths['Normal'].add(image)
-                            print(body_part, "Normal", image)
-                if len(body_part_filepaths['Base Color']) == 0 and const_color_value is not None:
-                    const_color_values[body_part] = const_color_value
-                    print(body_part, "Base Color", const_color_value)
+            assert body_part not in all_filepaths
+            all_filepaths[body_part] = DazOptimizer.find_images_of_each_map_type(mat)
+
         for body_part_name, body_part_filepaths in all_filepaths.items():
             occurrences = {}
             filenames = []
-            for channel in body_part_filepaths.values():
-                if len(channel)==1:
-                    first = next(iter(channel))
+            for channel_images in body_part_filepaths.values():
+                assert isinstance(channel_images, DazOptimizer.FindImagesResult)
+                if len(channel_images.images) == 1:
+                    first = next(iter(channel_images.images))
                     filepath = first.filepath
                     filenames.append(filepath)
             lcp = os.path.commonprefix(filenames)
-            for channel in body_part_filepaths.values():
-                for image in channel:
+            for channel_name, channel_images in body_part_filepaths.items():
+                for image in channel_images.images:
                     if image not in occurrences:
-                        occurrences[image] = 0
-                    occurrences[image] += 1 + len(os.path.commonprefix([image.filepath, lcp]))
+                        fp: str = image.filepath
+                        score = len(os.path.commonprefix([fp, lcp]))
+                        no_ext = fp.rsplit('.', maxsplit=1)[0]
+                        has_magic_word = False
+                        if channel_name == 'Base Color':
+                            has_magic_word = 'Diffuse' in no_ext or no_ext.endswith(' D')
+                        elif channel_name == 'Normal':
+                            has_magic_word = 'Normal' in no_ext or no_ext.endswith(' N')
+                        elif channel_name == 'Roughness':
+                            has_magic_word = 'Rough' in no_ext or no_ext.endswith(' R') or no_ext.endswith(' S')
+                        if has_magic_word:
+                            score += 10
+                        occurrences[image] = score
+                    occurrences[image] += 1
 
-            for channel in body_part_filepaths:
-                s = list(sorted(body_part_filepaths[channel], key=lambda x: -occurrences[x]))
-                if channel == "Base Color" and len(s)==0 and body_part_name in const_color_values:
-                    s = const_color_values[body_part_name]
-                body_part_filepaths[channel] = s
+            for channel_name, channel_images in body_part_filepaths.items():
+                assert isinstance(channel_images, DazOptimizer.FindImagesResult)
+                s = list(sorted(channel_images.images, key=lambda x: -occurrences[x]))
+                if len(s)==0 and channel_images.const is not None:
+                    s = channel_images.images
+                body_part_filepaths[channel_name] = s
         print(json.dumps({k: {k2: v2.tolist() if isinstance(v2, np.ndarray) else [v3.filepath+" "+str(tuple(v3.size)+(v3.channels,)) for v3 in v2] for k2, v2 in v.items()} for k, v in all_filepaths.items()}, indent=2))
         return all_filepaths
 
@@ -3231,15 +3262,31 @@ class DazOptimizer:
         for g in DICK_GEOGRAFTS:
             if g + ' Mesh' in bpy.data.objects:
                 mats.extend(bpy.data.objects[g + ' Mesh'].data.materials)
-        return mats
+        return set(mats)
 
-    def bake_materials(self, active_only=True):
+    def bake_materials(self, active_only=False):
         if active_only:
             mats = [bpy.context.object.active_material]
         else:
             mats = self.collect_bakeable_mats()
+        diffuse = bpy.context.scene.bake_diffuse
+        norm = bpy.context.scene.bake_normal_maps
+        rough = bpy.context.scene.bake_roughness_maps
+        all_maps = diffuse and norm and rough
         for mat in mats:
-            b = MaterialBaker(mat.node_tree)
+            b = MaterialBaker(mat)
+            if not all_maps:
+                sockets = DazOptimizer.find_sockets_of_each_map_type(mat)
+                b.whitelist = set()
+                if diffuse:
+                    for s in sockets['Base Color']:
+                        NodesUtils.collect_all_before_socket(s, b.whitelist)
+                if norm:
+                    for s in sockets['Normal']:
+                        NodesUtils.collect_all_before_socket(s, b.whitelist)
+                if norm:
+                    for s in sockets['Roughness']:
+                        NodesUtils.collect_all_before_socket(s, b.whitelist)
             b.bake()
             b.apply()
 
@@ -3250,8 +3297,6 @@ class DazOptimizer:
         gp = self.get_gp_mesh()
         mats = self.collect_bakeable_mats()
         all_filepaths = DazOptimizer.find_body_part_textures(mats)
-
-
         nails_img = None
         head_img = None
         head_body_part = None
@@ -6393,7 +6438,7 @@ class DazBakeMaterials_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazBakeMaterials_operator, DazMergeGrografts_operator])
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazSimplifyMaterials_operator, DazMergeGrografts_operator])
 
     def execute(self, context):
         DazOptimizer().bake_materials()
@@ -6409,7 +6454,7 @@ class DazSimplifyMaterials_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazBakeMaterials_operator], [DazSimplifyMaterials_operator, DazMergeGrografts_operator])
+        return UNLOCK or check_stage(context, [DazSaveTextures_operator], [DazSimplifyMaterials_operator, DazMergeGrografts_operator])
 
     def execute(self, context):
         DazOptimizer().simplify_materials()
@@ -7869,6 +7914,8 @@ class EntryProp:
             cons = bpy.props.FloatProperty
         elif self.prop_type is str:
             cons = bpy.props.StringProperty
+        elif self.prop_type is bool:
+            cons = bpy.props.BoolProperty
         elif self.prop_type is list:
             setattr(bpy.types.Scene, self.name, bpy.props.EnumProperty(
                 name=self.name,
@@ -7953,7 +8000,20 @@ operators = [
     EntryOp(DazAddThighUpperBones_operator, "Add thigh bones (upper)"),
     EntryOp(DazAddThighLowerBones_operator, "Add thigh bones (lower)"),
     EntryOp(DazAddThighSideBones_operator, "Add thigh bones (sides)"),
+    EntryProp('bake_diffuse', bool, True),
+    EntryProp('bake_normal_maps', bool, False),
+    EntryProp('bake_roughness_maps', bool, False),
     EntryOp(DazBakeMaterials_operator, "Bake materials"),
+    # EntryProp('head_texture', str, ''),
+    # EntryProp('arms_texture', str, ''),
+    # EntryProp('legs_texture', str, ''),
+    # EntryProp('body_texture', str, ''),
+    # EntryProp('teeth_texture', str, ''),
+    # EntryProp('eyes_texture', str, ''),
+    # EntryProp('nails_texture', str, ''),
+    # EntryProp('mouth_texture', str, ''),
+    # EntryProp('gp_texture', str, ''),
+    # EntryProp('penis_texture', str, ''),
     EntryOp(DazSimplifyMaterials_operator, "Simplify materials"),
     EntryOp(DazOptimizeEyes_operator, "Optimize eyes mesh"),
     EntryOp(DazOptimizeEyesForToon_operator, "Optimize eyes for toon"),
