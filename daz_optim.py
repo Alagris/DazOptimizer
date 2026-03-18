@@ -2251,20 +2251,9 @@ class DazOptimizer:
                         l_thigh_jiggle.add(index=(idx,), weight=w - diff, type='REPLACE')
 
     @staticmethod
-    def apply_additional_bone(bone_names):
+    def apply_additional_bone(bone_names=None):
         AdditionalBones(bone_names).apply()
 
-    def add_double_small_glute_bones(self):
-        self.apply_additional_bone(['r_glute', 'r_glute2', 'l_glute', 'l_glute2'])
-
-    def add_high_thigh_jiggle(self):
-        self.apply_additional_bone(['l_thigh_jiggle', 'r_thigh_jiggle'])
-
-    def add_low_thigh_jiggle(self):
-        self.apply_additional_bone(['l_thigh_jiggle2', 'r_thigh_jiggle2'])
-
-    def add_side_thigh_jiggle(self):
-        self.apply_additional_bone(['l_thigh_jiggle_side', 'r_thigh_jiggle_side'])
 
     def add_single_big_glute_bones(self):
         body_mesh = self.get_body_mesh()

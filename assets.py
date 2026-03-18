@@ -63,6 +63,7 @@ class AdditionalBone:
         self.connect = j["connect"]
         self.local = j["local"]
         weights = j["weights"]
+        weights = weights.encode('utf-8')
         weights = base64.decodebytes(weights)
         weights = np.frombuffer(weights, dtype=np.float64)
         self.weights = weights

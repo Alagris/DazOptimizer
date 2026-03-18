@@ -956,84 +956,30 @@ class DazAddBreastBones_operator(bpy.types.Operator):
         pass_stage(self)
         return {'FINISHED'}
 
-class DazAddGluteOneBigBones_operator(bpy.types.Operator):
-    """ Add glute bones """
-    bl_idname = "dazoptim.add_glute_single_big_bone"
-    bl_label = "Optimize UVs"
-    bl_options = {"REGISTER", "UNDO"}
-    stage_id = '7'
 
-    @classmethod
-    def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddGluteOneBigBones_operator])
-
-    def execute(self, context):
-        DazOptimizer().add_single_big_glute_bones()
-        pass_stage(self)
-        return {'FINISHED'}
-
-class DazAddGluteTwoSmallerBones_operator(bpy.types.Operator):
-    """ Add glute bones """
-    bl_idname = "dazoptim.add_glute_two_small_bones"
-    bl_label = "Optimize UVs"
-    bl_options = {"REGISTER", "UNDO"}
-    stage_id = '7'
-
-    @classmethod
-    def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddGluteTwoSmallerBones_operator])
-
-    def execute(self, context):
-        DazOptimizer().add_double_small_glute_bones()
-        pass_stage(self)
-        return {'FINISHED'}
-
-class DazAddThighUpperBones_operator(bpy.types.Operator):
-    """ Add glute bones """
-    bl_idname = "dazoptim.add_thigh_upper_bones"
-    bl_label = "Optimize UVs"
-    bl_options = {"REGISTER", "UNDO"}
-    stage_id = '#'
-
-    @classmethod
-    def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighUpperBones_operator])
-
-    def execute(self, context):
-        DazOptimizer().add_high_thigh_jiggle()
-        pass_stage(self)
-        return {'FINISHED'}
-
-class DazAddThighLowerBones_operator(bpy.types.Operator):
-    """ Add glute bones """
-    bl_idname = "dazoptim.add_thigh_lower_bones"
-    bl_label = "Optimize UVs"
-    bl_options = {"REGISTER", "UNDO"}
-    stage_id = '%'
-
-    @classmethod
-    def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighLowerBones_operator])
-
-    def execute(self, context):
-        DazOptimizer().add_low_thigh_jiggle()
-        pass_stage(self)
-        return {'FINISHED'}
-
-class DazAddThighSideBones_operator(bpy.types.Operator):
-    """ Add glute bones """
-    bl_idname = "dazoptim.add_thigh_side_bones"
-    bl_label = "Add thigh side bones"
+class DazAddAdditionalBones_operator(bpy.types.Operator):
+    """ Add additional bones """
+    bl_idname = "dazoptim.add_additional_bones"
+    bl_label = "Add additional bones"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = '^'
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMergeAllRigs_operator], [DazAddThighSideBones_operator])
+        if UNLOCK:
+            return True
+        if bpy.context.scene.additional_bones_file == '':
+            return False
+        return  check_stage(context, [DazMergeAllRigs_operator], [DazScaleToUnreal, DazScaleToQuinn, DuplicateSkeleton, DazDetachHairFromSkeleton_operator])
 
     def execute(self, context):
-        DazOptimizer().add_side_thigh_jiggle()
+        bone_names = bpy.context.scene.additional_bones_file
+        DazOptimizer().apply_additional_bone(bone_names)
         pass_stage(self)
+        already_applied = bpy.context.scene.get('applied_additional_bones', '')
+        if len(already_applied)>0:
+            already_applied = already_applied+':'
+        bpy.context.scene['applied_additional_bones'] = already_applied + bone_names
         return {'FINISHED'}
 
 
@@ -1132,8 +1078,7 @@ class DazFitPanties_operator(bpy.types.Operator):
         return {'FINISHED'}
 
 BONE_ADDING_OPS = [
-            DazAddGluteOneBigBones_operator, DazAddBreastBones_operator, DazAddGluteTwoSmallerBones_operator,
-            DazAddThighLowerBones_operator, DazAddThighUpperBones_operator, DazAddThighSideBones_operator
+            DazAddAdditionalBones_operator, DazAddBreastBones_operator
 ]
 class DazTransferMissingBonesToClothes_operator(bpy.types.Operator):
     """ transfer new bones to clothes """
@@ -2065,6 +2010,32 @@ class EntryFileEnumProp:
         self.prop = bpy.props.EnumProperty(
             name=self.name,
             items=lambda x, y:[(i, i, i) for i in collect_resource_files(self.dir_name, self.extension)],
+        )
+        setattr(bpy.types.Scene, self.name, self.prop)
+
+    def on_unregister(self):
+        delattr(bpy.types.Scene, self.name)
+
+    def draw(self, p, col, context, idx: int):
+        p.props[self.name] = col.prop(context.scene, self.name)
+        return idx, col
+
+
+class EntryAdditionalBonesEnumProp:
+    def __init__(self, name: str):
+        self.name = name
+        self.extension = ".json"
+        self.dir_name = "additional_bones"
+
+    def items_provider(self):
+        s: str = bpy.context.scene.get('applied_additional_bones', '')
+        applied:{str} = set(s.split(':'))
+        return [(i, i, i) for i in collect_resource_files(self.dir_name, self.extension) if i not in applied]
+
+    def on_register(self):
+        self.prop = bpy.props.EnumProperty(
+            name=self.name,
+            items=lambda  x, y: self.items_provider(),
         )
         setattr(bpy.types.Scene, self.name, self.prop)
 
