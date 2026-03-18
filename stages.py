@@ -1,9 +1,4 @@
-
-if "bpy" in locals():
-  import imp
-  imp.reload(daz_optim)
-else:
-  from .daz_optim import *
+from .daz_optim import *
 
 import io
 import os
@@ -1543,6 +1538,22 @@ class DazScaleToUnreal(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class SaveMorphs(bpy.types.Operator):
+    """ Generates favourite morphs """
+    bl_idname = "dazoptim.save_fav_morphs"
+    bl_label = "Save favourite morphs"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = 'Q'
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazSaveBlend_operator], [])
+
+    def execute(self, context):
+        DazOptimizer().make_fav_morphs_list()
+        pass_stage(self)
+        return {'FINISHED'}
+
 class LoadMorphs(bpy.types.Operator):
     """ load morphs """
     bl_idname = "dazoptim.load_morphs"
@@ -1552,7 +1563,11 @@ class LoadMorphs(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazSaveBlend_operator], [DazMergeGrografts_operator])
+        if UNLOCK or check_stage(context, [DazSaveBlend_operator], [DazMergeGrografts_operator]):
+            return True
+        if os.path.exists(DazOptimizer().get_fav_morphs_path()):
+            return True
+        return False
 
     def execute(self, context):
         DazOptimizer().load_fav_morphs()

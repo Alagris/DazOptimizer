@@ -57,6 +57,12 @@ def is_female():
 def is_daz_bone(bone_name):
     return bone_name in DAZ_G9_TO_UE5_BONES or bone_name in OTHER_DAZ_BONES
 
+def get_allowed_morph_prefixes():
+    if bpy.context.scene.get('is_nirv_zero'):
+        return ["BaseAnime_", "Nirv_Zero_BaseAnim_", "Nirv_zero_", "Nirv_Zero_", "Nirv_"]
+    elif bpy.context.scene.get('daz_optim_toon'):
+        return ["BaseAnime_"]
+    return []
 
 QUINN_HEIGHT = 1.80169
 MANNY_HEIGHT = 1.80625

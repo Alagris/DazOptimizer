@@ -1,13 +1,7 @@
 
-if "bpy" in locals():
-  import imp
-  imp.reload(util)
-  imp.reload(assets)
-  imp.reload(constants)
-else:
-  from .util import *
-  from .assets import *
-  from .constants import *
+from .util import *
+from .assets import *
+from .constants import *
 import io
 import os
 import re
@@ -30,6 +24,7 @@ class DazOptimizer:
             workdir = os.path.dirname(bpy.data.filepath)
         if name is None:
             name = os.path.basename(bpy.data.filepath)
+            assert '.' in name, '. not in '+name
             name = name[:name.rindex('.')]
         self.name = name
         self.workdir = workdir
@@ -1500,6 +1495,15 @@ class DazOptimizer:
             if parent is not None:
                 bone.parent = original.data.edit_bones[parent]
         bpy.ops.object.mode_set(mode='OBJECT')
+
+
+    def make_fav_morphs_list(self):
+        s = MorphsStore.get_store()
+        s.clear()
+        s.load_current()
+        cats = s.CAT_SETS[bpy.context.scene.morph_profile]
+        prof = s.PROFILES[bpy.context.scene.morph_level]
+        s.make_fav_morphs_list(self.get_fav_morphs_path(),categories_to_include=cats,profiles_to_include=prof)
 
 
     def load_fav_morphs(self):
@@ -3552,11 +3556,6 @@ def run_outside_blender():
     # Image("")
 
 
-bl_info = {
-    "name": "Daz Optimizer",
-    "blender": (2, 80, 0),
-    "category": "Object",
-}
 
 
 class EasyImportPanel(bpy.types.Panel):

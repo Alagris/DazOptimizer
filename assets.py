@@ -3,7 +3,8 @@ import json
 import os
 import re
 import urllib
-
+from . import util
+from . import constants
 import bpy
 import numpy as np
 
@@ -48,10 +49,6 @@ def collect_resource_files(dir_name, extension):
     return [os.path.basename(file)[:-len(extension)] for file in collect_resource_paths(dir_name, extension)]
 
 
-def get_morphs_path(file_name):
-    return get_resource_path(file_name + '.json', 'morphs')
-
-
 def get_eyebrows_and_eyelashes_path():
     return get_resource_path(bpy.context.scene.eyebrows_file + '.png', 'eyebrows')
 
@@ -72,8 +69,6 @@ class AdditionalBone:
         self.indices = j["indices"]
 
     def apply_additional_bone(self, obj):
-        import util
-        import constants
         rig = util.get_rig_of(obj)
         util.select_object(rig)
         bpy.ops.object.mode_set(mode='EDIT')
@@ -99,7 +94,7 @@ class AdditionalBone:
 
     @staticmethod
     def serialize_bone_and_weights(obj, bone_names):
-        import util
+        from . import util
         rig = util.get_rig_of(obj)
         util.select_object(rig)
         bpy.ops.object.mode_set(mode='EDIT')
@@ -174,7 +169,7 @@ class AdditionalBones:
         return abs
 
     def apply(self):
-        import util
+        from . import util
         if self.object == 'g9':
             obj = util.find_body_mesh()
         else:
@@ -256,7 +251,6 @@ class MaskStore:
 class ClothesMeta:
 
     def __init__(self, item):
-        import constants
         self.fingerprint = item['fingerprint']
         self.skin_tight = item.get('skin_tight', -1)
         self.skin_tight = constants.CLOTHES_CONSTANTS.get(self.skin_tight, self.skin_tight)
@@ -348,7 +342,6 @@ class BoneHierarchy:
     @staticmethod
     def get_hierarchy():
         if BoneHierarchy.SINGLETON is None:
-            import constants
             if constants.is_female():
                 return BoneHierarchy.get_quinn()
             else:
@@ -399,7 +392,6 @@ class BoneHierarchy:
 
 
 def is_known_bone(bone_name):
-    import constants
     return AdditionalBones.is_additional_bone(bone_name) or constants.is_daz_bone(bone_name)
 
 
@@ -470,23 +462,26 @@ class MorphsStore:
             'MIN': 0,
         }
         self.MORPH_CATEGORIES = {
-            'BREAST': "Custom/Breasts",
-            'HEAD': "Custom/Head",
-            'ARMS': "Custom/Arms",
-            'LEGS': "Custom/Legs",
-            'BODY': "Custom/Body",
-            'ASS': "Custom/Ass",
-            'GENITALS': "Custom/Genitals",
-            'SPECIAL': "Custom/Special",
-            'FACS': "Facs",
-            'FACSEXPR': "Facsexpr",
-            'FACSDET': "Facsdetails",
-            'JCM': "JCM",
+            'BREAST': ("Custom/Breasts", "Custom"),
+            'HEAD': ("Custom/Head", "Custom"),
+            'ARMS': ("Custom/Arms", "Custom"),
+            'LEGS': ("Custom/Legs", "Custom"),
+            'BODY': ("Custom/Body", "Custom"),
+            'ASS': ("Custom/Ass", "Custom"),
+            'GENITALS': ("Custom/Genitals", "Custom"),
+            'SPECIAL': ("Custom/Special", "Custom"),
+            'FACS': ("Facs", 'Face'),
+            'FACSEXPR': ("Facsexpr", 'Face'),
+            'FACSDET': ("Facsdetails", 'Face'),
+            'JCM': ("JCM", 'JCM'),
         }
         self.CAT_SETS = {
             'BODY': {'BREAST', 'HEAD', 'ARMS', 'LEGS', 'BODY', 'ASS', 'GENITALS', 'SPECIAL'},
             'FACS': {'FACS', 'FACSDET', 'FACSEXPR'},
             'GENITALS': {'GENITALS'},
+            'FACS_GENITALS': {'FACS', 'FACSDET', 'FACSEXPR', 'GENITALS'},
+            'FACS_GENITALS_SPECIAL': {'FACS', 'FACSDET', 'FACSEXPR', 'GENITALS', 'SPECIAL'},
+            'FACS_SPECIAL': {'FACS', 'FACSDET', 'FACSEXPR', 'SPECIAL'},
             'JCM': {'JCM'},
             'SPECIAL': {'SPECIAL'},
             'ALL': None,
@@ -498,6 +493,16 @@ class MorphsStore:
         self.GENERATE_MORPHS_FOR_CLOTHES = True
         self.GENERATE_MORPHS_FOR_HAIR = True
 
+    def clear(self):
+        self.morphs.clear()
+
+    def load_current(self):
+        self.load_file(bpy.context.scene.morphs_file)
+
+    @staticmethod
+    def get_morphs_path(file_name):
+        return get_resource_path(file_name + '.json', 'morphs')
+
     def load_file(self, file_name=None):
         def process_gender(morphs, m, is_male=False, is_female=False):
             for morph_name, morph_meta in m.items():
@@ -507,17 +512,20 @@ class MorphsStore:
                     morph = morphs[morph_name]
                 morph.is_male = morph.is_male or is_male
                 morph.is_female = morph.is_female or is_female
-                profile_meta = morph_meta.get('profile', 9999)
+                profile_meta = morph_meta.get('profile')
+                profile_meta = self.PROFILES.get(profile_meta, 9999)
                 morph.profile = min(profile_meta, morph.profile)
                 fig_meta = self.FIGURES.get(morph_meta.get('figure'), '')
                 morph.figure = ''.join(set(fig_meta + morph.figure))
                 morph.title = morph_meta.get('name', morph.title)
-                morph.category = morph_meta.get('category', morph.category)
+                cat = morph_meta['category']
+                assert cat in self.MORPH_CATEGORIES
+                morph.category = cat
 
         if file_name is None:
-            file_name = bpy.types.Scene.morphs_file
+            file_name = bpy.context.scene.morphs_file
         if self.file_name != file_name:
-            p = get_morphs_path(file_name)
+            p = MorphsStore.get_morphs_path(file_name)
             with open(p, 'r') as f:
                 j = json.load(f)
             self.morphs = {}
@@ -534,19 +542,13 @@ class MorphsStore:
                 process_gender(morphs_for_daz_path, unisex, True, True)
             self.file_name = file_name
 
-    def get_allowed_morph_prefixes(self):
-        if bpy.context.scene.get('is_nirv_zero'):
-            return ["BaseAnime_", "Nirv_Zero_BaseAnim_", "Nirv_zero_", "Nirv_Zero_", "Nirv_"]
-        elif bpy.context.scene.get('daz_optim_toon'):
-            return ["BaseAnime_"]
-        return []
 
     def get_figure(self):
-        return self.FIGURES.get('FIGURE_TOON' if bpy.context.scene.get('daz_optim_toon') else 'FIGURE_G9')
+        return self.FIGURES.get('TOON' if bpy.context.scene.get('daz_optim_toon') else 'G9')
 
     def collect_fav_shape_keys(self, categories_to_include: {str}, profiles_to_include: int) -> {str: Morph}:
-        import util
-        import constants
+        if isinstance(profiles_to_include, str):
+            profiles_to_include = self.PROFILES[profiles_to_include]
         is_fem = constants.is_female()
         shape_keys = {}
         figure = self.get_figure()
@@ -568,10 +570,11 @@ class MorphsStore:
 
     def make_fav_morphs_list(self, fav_morphs_path, categories_to_include: {str}, profiles_to_include: int,
                              load_all_conflicting_morphs=True):
-        import util
+        from . import util
+        from . import constants
         content_dirs = util.get_daz_content_dirs()
         content_dirs = [d[:-1] if d.endswith("/") or d.endswith("\\") else d for d in content_dirs]
-        morph_prefixes = self.get_allowed_morph_prefixes()
+        morph_prefixes = constants.get_allowed_morph_prefixes()
         morph_prefixes_regex = re.compile(r"(" + "|".join(morph_prefixes) + ")?(.+)\.dsf")
         shape_keys = self.collect_fav_shape_keys(categories_to_include, profiles_to_include)
         fav_morphs = {
@@ -629,12 +632,15 @@ class MorphsStore:
                 }
                 for shape_key_name, collected_shape_key in collected_shape_keys.items():
                     filepath = collected_shape_key['filepath']
+                    filepath = urllib.parse.quote(filepath)
+                    if not filepath.startswith("/"):
+                        filepath = '/' + filepath
                     meta = collected_shape_key['meta']
-                    category = "Face" if meta.category.startswith("Facs") else "Custom"
-                    if meta.category not in morphs_dict:
-                        shapes_list = morphs_dict[meta.category] = []
+                    category_key, category = self.MORPH_CATEGORIES[meta.category]
+                    if category_key not in morphs_dict:
+                        shapes_list = morphs_dict[category_key] = []
                     else:
-                        shapes_list = morphs_dict[meta.category]
+                        shapes_list = morphs_dict[category_key]
                     shapes_list.append([filepath, shape_key_name, category])
         with open(fav_morphs_path, 'w+') as f:
             json.dump(fav_morphs, f, indent=2)

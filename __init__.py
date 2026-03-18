@@ -1,9 +1,22 @@
+
+bl_info = {
+    "name": "Daz Optimizer",
+    "blender": (2, 80, 0),
+    "category": "Object",
+}
+
 if "bpy" in locals():
   import imp
   imp.reload(stages)
+  imp.reload(util)
+  imp.reload(assets)
+  imp.reload(constants)
   print("Reloaded multifiles")
 else:
   from .stages import *
+  from . import util
+  from . import assets
+  from . import constants
   print("Imported multifiles")
 
 def install_libraries():
@@ -91,12 +104,16 @@ operators = [
         ("SPECIAL",'only special', ''),
         ("GENITALS",'only genitals', ''),
         ("JCM",'only JCM', ''),
+        ("FACS_GENITALS", "FACS and gentials", ''),
+        ("FACS_GENITALS_SPECIAL", "FACS, genitals and special", ''),
+        ("FACS_SPECIAL", "FACS and special", ''),
     ]),
     EntryProp('morph_level', list,[
-        ("ALL",'full', "Loads morphs at all profile levels"),
+        ("FULL",'full', "Loads morphs at all profile levels"),
         ("MID",'medium', "Loads morphs at medium profile level"),
         ("MIN",'minimal', "Loads only morphs at minimal profile level"),
     ]),
+    EntryOp(SaveMorphs, "Make fav morphs file"),
     EntryOp(LoadMorphs, "Load fav morphs"),
     EntryOp(RebindFavMorphs, "Rebind fav morphs"),
     EntryOp(TransferMorphsToGeografts, "Transfer morphs to geografts"),
