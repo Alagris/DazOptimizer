@@ -773,11 +773,25 @@ class NodesUtils:
     def gen_simple_material(node_tree, filepaths, output_socket=None, shift_x=0, uvs=None):
         ns = node_tree.nodes
         ls = node_tree.links
+
+        is_toon = bpy.context.scene.get('daz_optim_toon')
+        if is_toon:
+            bsdf_node = None
+            ns.clear()
+        else:
+            bsdf_node = NodesUtils.find_by_type(node_tree, bpy.types.ShaderNodeBsdfPrincipled)
+            if bsdf_node is None:
+                ns.clear()
+            else:
+                nodes_to_remove = [n for n in ns if n != bsdf_node]
+                for n in nodes_to_remove:
+                    ns.remove(n)
+
         if output_socket is None:
             output_node = ns.new('ShaderNodeOutputMaterial')
             output_node.location = (shift_x+400, 0)
             output_socket = output_node.inputs['Surface']
-        if bpy.context.scene.get('daz_optim_toon'):
+        if is_toon:
             bsdf_node = ns.new('ShaderNodeGroup')
             bsdf_node.node_tree = bpy.data.node_groups['DAZ Toon Diffuse']
             if 'DAZ Toon Light' in bpy.data.node_groups:
@@ -790,7 +804,8 @@ class NodesUtils:
                 ls.new(output_socket, bsdf_node.outputs['Output'])
             channels = ['Color', 'Normal']
         else:
-            bsdf_node = ns.new('ShaderNodeBsdfPrincipled')
+            if bsdf_node is None:
+                bsdf_node = ns.new('ShaderNodeBsdfPrincipled')
             ls.new(output_socket, bsdf_node.outputs['BSDF'])
             channels = ['Base Color', 'Roughness', 'Normal']
         bsdf_node.location = (shift_x, 0)

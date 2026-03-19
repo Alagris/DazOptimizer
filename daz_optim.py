@@ -152,7 +152,6 @@ class DazOptimizer:
 
     def optimize_eyebrows(self):
 
-        import assets
         EYEBROWS_M = self.get_eyebrows()
         if bpy.context.scene.get('daz_optim_toon'):
             mats = [m for m in EYEBROWS_M.data.materials if not NodesUtils.contains_subgroup(m, "DAZ Transparent")]
@@ -236,7 +235,7 @@ class DazOptimizer:
             n = mat.node_tree.nodes
             l = mat.node_tree.links
             target_texture = n.new('ShaderNodeTexImage')
-            img = bpy.data.images.load(assets.get_eyebrows_and_eyelashes_path())
+            img = bpy.data.images.load(get_eyebrows_and_eyelashes_path())
             target_texture.image = img
             target_texture.name = 'Eyebrows Texture'
             target_texture.location = (0, -300)
@@ -264,7 +263,6 @@ class DazOptimizer:
             transfer_weights_to_object(BODY, obj, g)
 
     def optimize_eyelashes(self):
-        import assets
         EYELASHES_M = self.get_eyelashes_mesh()
         assert EYELASHES_M is not None
         select_object(EYELASHES_M)
@@ -283,7 +281,7 @@ class DazOptimizer:
             me = bpy.context.object.data
             bm = bmesh.from_edit_mesh(me)
             uv_layer = bm.loops.layers.uv.verify()
-            mask = rle_decode(assets.MaskStore.get_store().eyelashes_rle(), MASK_SHAPE)
+            mask = rle_decode(MaskStore.get_store().eyelashes_rle(), MASK_SHAPE)
             for v in bm.verts:
                 v.select = False
             for face in bm.faces:
@@ -305,7 +303,7 @@ class DazOptimizer:
             bmesh.update_edit_mesh(me)
             bpy.ops.object.mode_set(mode='OBJECT')
 
-            eyelashes_img = bpy.data.images.load(assets.get_eyebrows_and_eyelashes_path())
+            eyelashes_img = bpy.data.images.load(get_eyebrows_and_eyelashes_path())
             for mat in EYELASHES_M.data.materials:
                 bsdf = NodesUtils.find_by_type(mat.node_tree, bpy.types.ShaderNodeBsdfPrincipled)
                 texture_nodes = set()
@@ -792,6 +790,7 @@ class DazOptimizer:
         new_uv_layer.active = True
         new_uv_layer.active_render = True
         select_object(EYES_M)
+        selection = np.zeros(len(EYES_M.data.uv_layers.active.data), dtype=bool)
         bpy.ops.object.mode_set(mode='EDIT')
 
         bpy.context.scene.tool_settings.use_uv_select_sync = False
@@ -813,6 +812,9 @@ class DazOptimizer:
                 uv = np.array(loop_uv.uv)
                 is_iris = np.linalg.norm(np.mod(uv, 0.5) - 0.25) < iris_uv_radius
                 full_loop = full_loop and is_iris
+            if full_loop:
+                for loop in face.loops:
+                    selection[loop.index] = True
             face.select_set(full_loop)
 
         # bm.select_mode = {'VERT', 'EDGE', 'FACE'}
@@ -825,10 +827,10 @@ class DazOptimizer:
         bpy.ops.object.mode_set(mode='OBJECT')
         new_uv_layer_np = np.array([v.uv for v in EYES_M.data.uv_layers.active.data])
         # old_uv_layer_np = np.array([v.uv for v in old_uv_layer.data])
-        selection = np.array([not v.select for v in EYES_M.data.uv_layers.active.data], dtype=bool)
+
         # if bpy.context.scene.get('daz_optim_toon'):
         #     selection = np.logical_not(selection)
-        new_uv_layer_np[selection, 1] -= 0.5
+        new_uv_layer_np[selection, 0] += 1
         for v, new_uv in zip(EYES_M.data.uv_layers.active.data, new_uv_layer_np):
             v.uv = new_uv
         # += [0.043945, 0.006836] # top arm
@@ -931,16 +933,19 @@ class DazOptimizer:
         for mat in mats:
             body_part = mat.name.rstrip('0123456789-_.')
             body_part_filepaths = all_filepaths[body_part]
-            mat.node_tree.nodes.clear()
             NodesUtils.gen_simple_material(mat.node_tree, body_part_filepaths)
 
     def collect_bakeable_mats(self):
         BODY_M = self.get_body_mesh()
         MOUTH_M = self.get_mouth_mesh()
+        eyes = self.get_eyes_mesh()
         gp = self.get_gp_mesh()
         is_toon = bpy.context.scene.get('daz_optim_toon')
         mats = list(BODY_M.data.materials)
-        mats.extend(MOUTH_M.data.materials)
+        if MOUTH_M is not None:
+            mats.extend(MOUTH_M.data.materials)
+        if eyes is not None:
+            mats.extend(eyes.data.materials)
         if is_toon:
             mats.extend(gp.data.materials)
         for g in DICK_GEOGRAFTS:
@@ -958,6 +963,7 @@ class DazOptimizer:
         rough = bpy.context.scene.bake_roughness_maps
         all_maps = diffuse and norm and rough
         for mat in mats:
+            print("Baking material: ", mat.name)
             b = MaterialBaker(mat)
             if not all_maps:
                 sockets = DazOptimizer.find_sockets_of_each_map_type(mat)
@@ -2494,10 +2500,9 @@ class DazOptimizer:
                 method.run(hair, rig)
 
     def transfer_missing_bones_to_clothes(self):
-        import assets
         BODY_M = self.get_body_mesh()
         groups = self.get_missing_bones()
-        clothes = [c.obj for c in assets.ClothesStore.get_store().find_all_clothes()]
+        clothes = [c.obj for c in ClothesStore.get_store().find_all_clothes()]
         transfer_weights(BODY_M, clothes, groups)
 
     def transfer_missing_bones_to_cum(self):
