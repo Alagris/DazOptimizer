@@ -933,7 +933,7 @@ class DazOptimizer:
         for mat in mats:
             body_part = mat.name.rstrip('0123456789-_.')
             body_part_filepaths = all_filepaths[body_part]
-            NodesUtils.gen_simple_material(mat.node_tree, body_part_filepaths)
+            NodesUtils.gen_simple_material(mat, body_part_filepaths, clear_all=True)
 
     def collect_bakeable_mats(self):
         BODY_M = self.get_body_mesh()
@@ -982,6 +982,7 @@ class DazOptimizer:
 
     def simplify_materials(self):
         from PIL import Image
+        is_toon = bpy.context.scene.get('daz_optim_toon')
         BODY_M = self.get_body_mesh()
         MOUTH_M = self.get_mouth_mesh()
         gp = self.get_gp_mesh()
@@ -1158,17 +1159,7 @@ class DazOptimizer:
         body_part_filepaths = all_filepaths['Body']
         if gp is not None and not is_toon:
             for mat in gp.data.materials:
-                print("mat=", mat)
-                output_node = NodesUtils.find_by_type(mat.node_tree, bpy.types.ShaderNodeOutputMaterial)
-                bsdf, = NodesUtils.from_socket_backwards_search_for(output_node.inputs['Surface'], bpy.types.ShaderNodeBsdfPrincipled, set())
-                tail = output_node.inputs['Surface'].links[0].from_node
-                while isinstance(tail, bpy.types.ShaderNodeGroup) and 'BSDF' in output_node.inputs:
-                    output_node = tail
-                    tail = output_node.inputs['BSDF'].links[0].from_node
-                print("output_node=", output_node)
-                out_socket = bsdf.outputs['BSDF'].links[0].to_socket
-                NodesUtils.delete_all_before(mat.node_tree, bsdf)
-                NodesUtils.gen_simple_material(mat.node_tree, body_part_filepaths, out_socket, shift_x=output_node.location[0]-300,uvs='Default UVs')
+                NodesUtils.gen_simple_material(mat, body_part_filepaths, uvs='Default UVs', clear_all=True)
 
     def concat_textures(self):
         from PIL import Image
@@ -1408,7 +1399,7 @@ class DazOptimizer:
                         wk_body = m
                     else:
                         all_filepaths = DazOptimizer.find_body_part_textures([m])
-                        NodesUtils.gen_simple_material(m.node_tree, all_filepaths)
+                        NodesUtils.gen_simple_material(m, all_filepaths)
             mesh_body = None
             for m in BODY_M.data.materials:
                 if 'body' in m.name.lower():
@@ -2044,8 +2035,7 @@ class DazOptimizer:
                     filepaths[channel] = bpy.data.images.load(p)
         for mat in mesh.data.materials:
             if mat.name.startswith("GP_"):
-                mat.node_tree.nodes.clear()
-                NodesUtils.gen_simple_material(mat.node_tree, filepaths, uvs=NEW_GP_UV_MAP)
+                NodesUtils.gen_simple_material(mat, filepaths, uvs=NEW_GP_UV_MAP, clear_all=True)
 
 
     def setup_golden_palace_for_baking(self):
@@ -2187,7 +2177,7 @@ class DazOptimizer:
             fp = self.get_concat_image_path(channel)
             filepaths[channel] = [fp] if os.path.exists(fp) else []
         print("unified filepaths", filepaths)
-        NodesUtils.gen_simple_material(mat.node_tree, filepaths)
+        NodesUtils.gen_simple_material(mat, filepaths)
         old_uv_maps = [o.name for o in body_m.data.uv_layers]
         base_uv_layer_name = 'Base Multi UDIM'
         for uv_layer_name in old_uv_maps:

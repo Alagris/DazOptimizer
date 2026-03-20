@@ -1510,7 +1510,7 @@ class LoadMorphs(bpy.types.Operator):
     def poll(cls, context):
         if UNLOCK or check_stage(context, [DazSaveBlend_operator], [DazMergeGrografts_operator]):
             return True
-        if os.path.exists(DazOptimizer().get_fav_morphs_path()):
+        if bpy.data.filepath != '' and os.path.exists(DazOptimizer().get_fav_morphs_path()):
             return True
         return False
 

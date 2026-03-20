@@ -703,8 +703,45 @@ class NodesUtils:
             NodesUtils.collect_all_before(link.from_node, outputs)
 
     @staticmethod
-    def delete_all_before(node_tree, node):
-        for node in NodesUtils.collect_all_before(node, set()):
+    def is_used(node):
+        for o in node.outputs:
+            if o.is_linked:
+                return True
+        return False
+
+    @staticmethod
+    def delete_unused(node_tree):
+        to_visit = set()
+        unused = set()
+        for node in node_tree.nodes:
+            if not isinstance(node, (bpy.types.ShaderNodeOutputMaterial, bpy.types.ShaderNodeOutputAOV)) and not NodesUtils.is_used(node):
+                unused.add(node)
+                to_visit.add(node)
+        while len(to_visit)>0:
+            node = to_visit.pop()
+            is_used = False
+            for o in node.outputs:
+                for l in o.links:
+                    if l.to_node not in unused:
+                        is_used = True
+                        break
+            if not is_used:
+                for input_socket in node.inputs:
+                    for l in input_socket.links:
+                        to_visit.add(l.from_node)
+                unused.add(node)
+        for unused_node in unused:
+            node_tree.nodes.remove(unused_node)
+
+
+
+    @staticmethod
+    def delete_all_before(node_tree, node, inclusive=True):
+        nodes_before = set()
+        NodesUtils.collect_all_before(node, nodes_before)
+        if not inclusive:
+            nodes_before.remove(node)
+        for node in nodes_before:
             node_tree.nodes.remove(node)
 
     @staticmethod
@@ -770,27 +807,38 @@ class NodesUtils:
         return new_mat
 
     @staticmethod
-    def gen_simple_material(node_tree, filepaths, output_socket=None, shift_x=0, uvs=None):
+    def gen_simple_material(node_tree, filepaths, shift_x=0, uvs=None, clear_all=False):
+        print("Simplifying ", node_tree)
+        if isinstance(node_tree, bpy.types.Material):
+            node_tree = node_tree.node_tree
         ns = node_tree.nodes
         ls = node_tree.links
 
-        is_toon = bpy.context.scene.get('daz_optim_toon')
-        if is_toon:
-            bsdf_node = None
-            ns.clear()
-        else:
-            bsdf_node = NodesUtils.find_by_type(node_tree, bpy.types.ShaderNodeBsdfPrincipled)
-            if bsdf_node is None:
-                ns.clear()
+        output_node = NodesUtils.find_by_type(node_tree, bpy.types.ShaderNodeOutputMaterial)
+        output_node.location = (shift_x+400, 0)
+        output_socket = output_node.inputs['Surface']
+        while output_socket.is_linked:
+            prev_node = output_socket.links[0].from_node
+            if isinstance(prev_node, bpy.types.ShaderNodeGroup) and 'Shell' in prev_node.node_tree.name and 'BSDF' in prev_node.inputs:
+                output_node = prev_node
+                output_socket = prev_node.inputs['BSDF']
             else:
-                nodes_to_remove = [n for n in ns if n != bsdf_node]
-                for n in nodes_to_remove:
-                    ns.remove(n)
+                break
 
-        if output_socket is None:
-            output_node = ns.new('ShaderNodeOutputMaterial')
-            output_node.location = (shift_x+400, 0)
-            output_socket = output_node.inputs['Surface']
+        is_toon = bpy.context.scene.get('daz_optim_toon')
+        if clear_all:
+            if is_toon:
+                bsdf_node = None
+                ns.clear()
+                NodesUtils.delete_all_before(node_tree, output_node, inclusive=False)
+            else:
+                bsdf_node = NodesUtils.find_by_type(node_tree, bpy.types.ShaderNodeBsdfPrincipled)
+                if bsdf_node is None:
+                    NodesUtils.delete_all_before(node_tree, output_node, inclusive=False)
+                else:
+                    NodesUtils.delete_all_before(node_tree, bsdf_node, inclusive=False)
+
+
         if is_toon:
             bsdf_node = ns.new('ShaderNodeGroup')
             bsdf_node.node_tree = bpy.data.node_groups['DAZ Toon Diffuse']
@@ -845,7 +893,7 @@ class NodesUtils:
                     ls.new(norm_map_node.inputs['Color'], tex_node.outputs['Color'])
                 else:
                     ls.new(bsdf_node.inputs[channel], tex_node.outputs['Color'])
-
+        NodesUtils.delete_unused(node_tree)
 
 
 def camel_case_to_spaces(text:str)->str:
