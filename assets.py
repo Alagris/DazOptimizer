@@ -477,6 +477,7 @@ class BoneRelation:
         self.parent_name = j.get('parent_name')
 
 
+
 class BoneHierarchy:
     MANNY = None
     QUINN = None

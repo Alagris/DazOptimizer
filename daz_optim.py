@@ -2534,7 +2534,7 @@ class DazOptimizer:
         body_mesh = self.get_body_mesh()
         hierarchy = BoneHierarchy.get_hierarchy()
         height = body_mesh.dimensions[2]
-        ue5_height = QUINN_HEIGHT if self.is_female() else MANNY_HEIGHT
+        ue5_height = QUINN_HEIGHT if is_female() else MANNY_HEIGHT
         scl = height / ue5_height
 
 
@@ -2561,7 +2561,7 @@ class DazOptimizer:
             for bone_name in ['pelvis', 'spine_01', 'spine_02', 'spine_03', 'spine_04', 'spine_05', 'neck_01', 'neck_02']: #
                 if bone_name in rig.data.edit_bones:
                     daz_bone = rig.data.edit_bones.get(bone_name)
-                    ue5_bone = hierarchy[bone_name][0]
+                    ue5_bone = hierarchy[bone_name].start
                     ue5_bone = mathutils.Vector(ue5_bone)/100
                     old_daz_bone = daz_bone.head.copy()
                     daz_bone.head = ue5_bone
@@ -2862,8 +2862,8 @@ class DazOptimizer:
         def recursion(bone, parent_rotation):
             bone_name = bone.name
             if bone_name in DAZ_TO_UE5_POSE_ROTATIONS:
-                _, _, x_axis, y_axis, z_axis, _, _ = hierarchy[bone_name]
-                ue5_y_axis = mathutils.Vector(y_axis)
+                ue5_bone = hierarchy[bone_name]
+                ue5_y_axis = mathutils.Vector(ue5_bone.y_axis)
                 daz_y_axis = mathutils.Vector(bone.y_axis)
                 daz_y_axis.rotate(parent_rotation)
                 quat = daz_y_axis.rotation_difference(ue5_y_axis)
@@ -3119,20 +3119,21 @@ class DazOptimizer:
                 b.new_z_axis = bone.z_axis.copy()
             bones['foot_'+side].new_y_axis = bones['calf_'+side].new_y_axis
         for spine_bone in ['pelvis', 'spine_01', 'spine_02', 'spine_03', 'spine_04', 'spine_05', 'neck_01', 'neck_02']:
-            _, _, x_axis, y_axis, z_axis, _, _ = hierarchy[spine_bone]
+            ue5_bone = hierarchy[spine_bone]
             b = bones[spine_bone]
-            b.new_y_axis = mathutils.Vector(y_axis)
-            b.new_z_axis = mathutils.Vector(z_axis)
+            b.new_y_axis = mathutils.Vector(ue5_bone.y_axis)
+            b.new_z_axis = mathutils.Vector(ue5_bone.z_axis)
         for bone in body_rig.data.edit_bones:
             bone_name = bone.name
             if bone_name in hierarchy:
                 b = bones[bone_name]
                 new_z_axis = b.new_z_axis
                 new_y_axis = b.new_y_axis
-                ue5_start, ue5_tail, x_axis, y_axis, z_axis, roll, parent_name = hierarchy[bone_name]
-                z_axis = mathutils.Vector(z_axis)
-                y_axis = mathutils.Vector(y_axis)
-                ue5_orientation = mathutils.Vector(ue5_tail)-mathutils.Vector(ue5_start)
+                ue5_bone = hierarchy[bone_name]
+                assert isinstance(ue5_bone, BoneRelation)
+                z_axis = mathutils.Vector(ue5_bone.z_axis)
+                y_axis = mathutils.Vector(ue5_bone.y_axis)
+                ue5_orientation = mathutils.Vector(ue5_bone.tail)-mathutils.Vector(ue5_bone.start)
                 ue5_orientation /= 100
                 #if bone_name in DAZ_TO_UE5_POSE_ROTATIONS:
                 length = ue5_orientation.length
@@ -3243,7 +3244,9 @@ class DazOptimizer:
             ik_bone.tail = np.array(ik_bone.head)
             ik_bone.tail.y += 0.2
         for ik_bone_name in UE5_IK_BONES:
-            parent_ik_bone_name = hierarchy[ik_bone_name][-1]
+            ue5_bone = hierarchy[ik_bone_name]
+            assert isinstance(ue5_bone, BoneRelation)
+            parent_ik_bone_name = ue5_bone.parent_name
             if parent_ik_bone_name is not None and parent_ik_bone_name != '':
                 rig.data.edit_bones[ik_bone_name].parent = rig.data.edit_bones[parent_ik_bone_name]
 
@@ -3264,7 +3267,7 @@ class DazOptimizer:
     def scale_to_quinn(self):
         mesh = self.get_body_mesh()
         height = mesh.dimensions[2]
-        ue5_height = QUINN_HEIGHT if self.is_female() else MANNY_HEIGHT
+        ue5_height = QUINN_HEIGHT if is_female() else MANNY_HEIGHT
         rig = self.get_body_rig()
         select_object(rig)
         scl = ue5_height / height
@@ -3285,7 +3288,7 @@ class DazOptimizer:
             loc = None
         else:
             hierarchy = BoneHierarchy.get_hierarchy()
-            ue5_pevis_pos = hierarchy['pelvis'][0]
+            ue5_pevis_pos = hierarchy['pelvis'].start
             loc = (0, ue5_pevis_pos[1] / 100 - root.head.y, 0)
         apply_recursive(rig, location=loc)
 
