@@ -1,3 +1,5 @@
+from typing_extensions import override
+
 from .daz_optim import *
 
 import io
@@ -1089,7 +1091,7 @@ class DazTransferMissingBonesToClothes_operator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage_any(context, BONE_ADDING_OPS, [DazTransferMissingBonesToClothes_operator, RigPhysicsBones])
+        return UNLOCK or check_stage_any(context, BONE_ADDING_OPS, [DazTransferMissingBonesToClothes_operator])
 
     def execute(self, context):
         DazOptimizer().transfer_missing_bones_to_clothes()
@@ -1586,19 +1588,19 @@ class TransferMorphsToCum(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class RigPhysicsBones(bpy.types.Operator):
-    """ rig physics bones """
-    bl_idname = "dazoptim.rig_physics_bones"
-    bl_label = "Rig Physics Bones"
+class ApplyCustomRig(bpy.types.Operator):
+    """ Apply custom rig """
+    bl_idname = "dazoptim.apply_custom_rig"
+    bl_label = "Apply custom rig"
     bl_options = {"REGISTER", "UNDO"}
     stage_id = "6"
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or check_stage(context, [DazMaleLoad_operator], [RigPhysicsBones, DazMergeAllRigs_operator])
+        return UNLOCK or check_stage(context, [DazMaleLoad_operator], [RigPhysicsHair, DazMergeAllRigs_operator])
 
     def execute(self, context):
-        DazOptimizer().rig_physics_bones()
+        DazOptimizer().apply_custom_rig()
         pass_stage(self)
         return {'FINISHED'}
 
@@ -1720,7 +1722,7 @@ class SaveCustomRig(bpy.types.Operator):
         return UNLOCK or check_stage(context, [DazFemaleLoad_operator], [DazMergeGrografts_operator, DazConvertToUe5Skeleton_operator])
 
     def execute(self, context):
-        DazOptimizer().save_custom_rig()
+        DazOptimizer.save_custom_rig()
         return {'FINISHED'}
 
 
@@ -2019,12 +2021,13 @@ class EntryFileEnumProp:
         self.extension = extension
         self.dir_name = dir_name
 
-
+    def items_provider(self):
+        return [(i, i, i) for i in collect_resource_files(self.dir_name, self.extension)]
 
     def on_register(self):
         self.prop = bpy.props.EnumProperty(
             name=self.name,
-            items=lambda x, y:[(i, i, i) for i in collect_resource_files(self.dir_name, self.extension)],
+            items=lambda x, y:self.items_provider(),
         )
         setattr(bpy.types.Scene, self.name, self.prop)
 
@@ -2036,27 +2039,24 @@ class EntryFileEnumProp:
         return idx, col
 
 
-class EntryAdditionalBonesEnumProp:
+class EntryAdditionalBonesEnumProp(EntryFileEnumProp):
     def __init__(self, name: str):
-        self.name = name
-        self.extension = ".json"
-        self.dir_name = "additional_bones"
+        super().__init__(name, "additional_bones")
 
+    @override
     def items_provider(self):
         s: str = bpy.context.scene.get('applied_additional_bones', '')
         applied:{str} = set(s.split(':'))
         return [(i, i, i) for i in collect_resource_files(self.dir_name, self.extension) if i not in applied]
 
-    def on_register(self):
-        self.prop = bpy.props.EnumProperty(
-            name=self.name,
-            items=lambda  x, y: self.items_provider(),
-        )
-        setattr(bpy.types.Scene, self.name, self.prop)
 
-    def on_unregister(self):
-        delattr(bpy.types.Scene, self.name)
+class EntryCustomRigsEnumProp(EntryFileEnumProp):
+    def __init__(self, name: str):
+        super().__init__(name, "rigs")
 
-    def draw(self, p, col, context, idx: int):
-        p.props[self.name] = col.prop(context.scene, self.name)
-        return idx, col
+    @override
+    def items_provider(self):
+        s: str = bpy.context.scene.get('applied_custom_rigs', '')
+        fps = find_all_fingerprints()
+        applied:{str} = set(s.split(':'))
+        return [(i, fps[i].name, i) for i in collect_resource_files(self.dir_name, self.extension) if i not in applied and i in fps]

@@ -53,6 +53,148 @@ def get_eyebrows_and_eyelashes_path():
     return get_resource_path(bpy.context.scene.eyebrows_file + '.png', 'eyebrows')
 
 
+class CustomRig:
+    @staticmethod
+    def get_rig_path(file_name):
+        return get_resource_path(file_name + '.json', 'rigs')
+
+    @staticmethod
+    def apply_custom_rig(fingerprint=None):
+        if fingerprint is None:
+            fingerprint=bpy.context.scene.custom_rig
+        mesh = util.find_by_fingerprint(fingerprint)
+        if mesh is None:
+            raise Exception("Object with fingerprint "+fingerprint+" not found!")
+        rig = util.get_rig_of(mesh)
+        print("Applying custom rig=", fingerprint, 'mesh=', mesh, 'rig=', rig)
+        rig_path = CustomRig.get_rig_path(fingerprint)
+        rig_dir = os.path.dirname(rig_path)
+        with open(rig_path, 'r') as f:
+            json_root = json.load(f)
+        json_bones = json_root['bones']
+        util.select_object(rig)
+        bpy.ops.object.mode_set(mode='EDIT')
+        added_bones = []
+        vertex_count = len(mesh.data.vertices)
+        for bone_name, bone_params in json_bones.items():
+            if bone_name not in rig.data.edit_bones:
+                bone = rig.data.edit_bones.new(bone_name)
+                closest_vertex = bone_params['closest_vertex']
+                vertex_coord = mesh.data.vertices[closest_vertex].co
+                vertex_to_head_displacement = bone_params['vertex_to_head_displacement']
+                head = np.add(vertex_coord, vertex_to_head_displacement)
+                original_head = bone_params['head']
+                original_tail = bone_params['tail']
+                tail_displacement = np.subtract(original_tail, original_head)
+                bone.head = head
+                bone.tail = head + tail_displacement
+                bone.roll = bone_params['roll']
+                added_bones.append(bone_name)
+
+        for bone_name in added_bones:
+            bone_params = json_bones[bone_name]
+            bone = rig.data.edit_bones[bone_name]
+            parent = bone_params.get('parent')
+            parent = rig.data.edit_bones.get(parent)
+            if parent is not None:
+                bone.parent = parent
+            bone.use_connect = bone_params['connect']
+            bone.use_local_location = bone_params['local']
+
+        util.select_object(mesh)
+        weights_dir = os.path.join(rig_dir, fingerprint)
+        for bone_name, bone_params in json_bones.items():
+            weights_file = os.path.join(weights_dir, bone_name + '.npy')
+            weights_indices = np.load(weights_file, allow_pickle=True)
+            weights_indices = weights_indices[()]
+            weights = weights_indices['weights']
+            indices = weights_indices['indices']
+
+            vg = mesh.vertex_groups.get(bone_name)
+            if vg is not None:
+                mesh.vertex_groups.remove(vg) # clear a vertex group if it already existed
+            vg = mesh.vertex_groups.new(name=bone_name)
+
+            for val, idx in zip(weights.tolist(), indices.tolist()):
+                vg.add(index=(idx,), weight=val, type='REPLACE')
+        already_applied = bpy.context.scene.get('applied_custom_rigs', '')
+        if len(already_applied) > 0:
+            already_applied = already_applied + ':'
+        bpy.context.scene['applied_custom_rigs'] = already_applied + fingerprint
+
+    @staticmethod
+    def save_custom_rig():
+        from scipy.spatial import KDTree
+        o = bpy.context.object
+        if isinstance(o.data, bpy.types.Mesh):
+            mesh = o
+            rig = util.get_rig_of(o)
+        elif isinstance(o.data, bpy.types.Armature):
+            rig = o
+            mesh = None
+            for c in o.children:
+                if isinstance(c.data, bpy.types.Mesh) and util.get_rig_of(c)==o:
+                    mesh = c
+                    break
+        else:
+            return
+        if mesh is None or rig is None:
+            return
+        fp = util.get_fingerprint(mesh)
+        print("Fingerprint=", fp, "of", mesh, "and rig", rig)
+        util.select_object(rig)
+        bpy.ops.object.mode_set(mode='EDIT')
+        json_bones = {}
+        # mesh = bpy.data.objects['Braided Low Ponytail Bun Mesh']
+        # bone = bpy.data.objects['Braided Low Ponytail Bun'].data.edit_bones['hair_front']
+
+        vertex_coords = np.array([v.co for v in mesh.data.vertices])
+        kdtree = KDTree(vertex_coords)
+        rig_path = CustomRig.get_rig_path(fp)
+        rig_dir = os.path.dirname(rig_path)
+        selected_bones = []
+        for bone in rig.data.edit_bones:
+            if bone.select:
+                print("Saving ", bone)
+                _, closest_vertex_idx = kdtree.query(bone.head)
+                closest_vertex = vertex_coords[closest_vertex_idx]
+                displacement = np.array(bone.head)-closest_vertex
+                parent_bone = None if bone.parent is None else bone.parent.name
+                bone_name = bone.name
+                selected_bones.append(bone_name)
+                bone_head = list(bone.head)
+                bone_tail = list(bone.tail)
+                json_bones[bone_name] = {
+                    'closest_vertex': int(closest_vertex_idx),
+                    'vertex_to_head_displacement': displacement.tolist(),
+                    'name': bone_name,
+                    'head': bone_head,
+                    'tail': bone_tail,
+                    'parent': parent_bone,
+                    'roll': bone.roll,
+                    'connect': bone.use_connect,
+                    'local': bone.use_local_location
+                }
+        json_root = {
+            "name": mesh.name,
+            "bones": json_bones,
+        }
+        with open(rig_path, 'w+') as f:
+            json.dump(json_root, f)
+        os.makedirs(os.path.join(rig_dir, fp), exist_ok=True)
+        for bone_name in selected_bones:
+            vg = mesh.vertex_groups.get(bone_name)
+            if vg is not None:
+                weights_dense = util.get_weights_as_array(mesh, vg)
+                is_non_zero = weights_dense > 0
+                indices, = np.where(is_non_zero)
+                weights_sparse = weights_dense[indices]
+                weights_path = os.path.join(rig_dir, fp, bone_name+'.npy')
+                np.save(weights_path,{
+                    'weights': weights_sparse,
+                    'indices': indices,
+                })
+
 class AdditionalBone:
 
     def __init__(self, j):

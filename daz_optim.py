@@ -2245,6 +2245,13 @@ class DazOptimizer:
     def apply_additional_bone(bone_names=None):
         AdditionalBones(bone_names).apply()
 
+    @staticmethod
+    def save_custom_rig():
+        CustomRig.save_custom_rig()
+
+    @staticmethod
+    def apply_custom_rig():
+        CustomRig.apply_custom_rig()
 
     def add_single_big_glute_bones(self):
         body_mesh = self.get_body_mesh()
@@ -3375,9 +3382,6 @@ class DazOptimizer:
                                  axis_forward='-Z',
                                  axis_up='Y')
 
-    def save_custom_rig(self):
-
-
     def serialize_extra_bones(self):
         body = self.get_body_mesh()
         rig = self.get_body_rig()
@@ -3511,6 +3515,8 @@ class DazOptimizer:
                     n = n.replace(' ', '_')
                     row = [n, meta.title, n, meta.category, is_female, is_male, b.slider_min, b.slider_max, b.value]
                     print(",".join(map(str,row)))
+
+
 
 def save_blend_file(duf_filepath):
     duf_filepath = os.path.abspath(duf_filepath)

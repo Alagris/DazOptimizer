@@ -1166,13 +1166,30 @@ def find_body_mesh():
     body_rig = find_body_rig()
     return bpy.data.objects[body_rig.name + ' Mesh']
 
+def get_fingerprint(o):
+    if isinstance(o, bpy.types.Object):
+        o = o.data
+    if isinstance(o, bpy.types.Mesh):
+        return o.daz_importer.DazFingerPrint
+    return None
+
 def find_by_fingerprint(fingerprint):
     for o in bpy.data.objects:
-        if isinstance(o, bpy.types.Mesh):
+        if isinstance(o.data, bpy.types.Mesh):
             mesh = o.data
             if mesh.daz_importer.DazFingerPrint == fingerprint:
-                return mesh
+                return o
     return None
+
+def find_all_fingerprints():
+    s = {}
+    for o in bpy.data.meshes:
+        try:
+            fp = o.daz_importer.DazFingerPrint
+            s[fp] = o
+        except AttributeError:
+            pass
+    return s
 
 def is_toon(body_mesh):
     for mat in body_mesh.data.materials:
