@@ -807,7 +807,7 @@ class NodesUtils:
         return new_mat
 
     @staticmethod
-    def gen_simple_material(node_tree, filepaths, shift_x=0, uvs=None, clear_all=False):
+    def gen_simple_material(node_tree, filepaths, shift_x=0, uvs=None, clear_all=False, keep_shells=True):
         print("Simplifying ", node_tree)
         if isinstance(node_tree, bpy.types.Material):
             node_tree = node_tree.node_tree
@@ -815,15 +815,20 @@ class NodesUtils:
         ls = node_tree.links
 
         output_node = NodesUtils.find_by_type(node_tree, bpy.types.ShaderNodeOutputMaterial)
+        if output_node is None:
+            output_node = ns.new('ShaderNodeOutputMaterial')
         output_node.location = (shift_x+400, 0)
         output_socket = output_node.inputs['Surface']
-        while output_socket.is_linked:
-            prev_node = output_socket.links[0].from_node
-            if isinstance(prev_node, bpy.types.ShaderNodeGroup) and 'Shell' in prev_node.node_tree.name and 'BSDF' in prev_node.inputs:
-                output_node = prev_node
-                output_socket = prev_node.inputs['BSDF']
-            else:
-                break
+        if keep_shells:
+            while output_socket.is_linked:
+                prev_node = output_socket.links[0].from_node
+                if isinstance(prev_node, bpy.types.ShaderNodeGroup) and 'Shell' in prev_node.node_tree.name and 'BSDF' in prev_node.inputs:
+                    output_node = prev_node
+                    output_socket = prev_node.inputs['BSDF']
+                else:
+                    break
+        else:
+            NodesUtils.remove_all_input_links(node_tree, output_node)
 
         is_toon = bpy.context.scene.get('daz_optim_toon')
         if clear_all:
@@ -894,6 +899,12 @@ class NodesUtils:
                 else:
                     ls.new(bsdf_node.inputs[channel], tex_node.outputs['Color'])
         NodesUtils.delete_unused(node_tree)
+
+    @staticmethod
+    def remove_all_input_links(node_tree, node):
+        for i in  node.inputs:
+            for l in i.links:
+                node_tree.links.remove(l)
 
 
 def camel_case_to_spaces(text:str)->str:

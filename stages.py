@@ -1708,6 +1708,21 @@ class DazExportHairFbx(bpy.types.Operator):
         DazOptimizer().export_hair_to_fbx()
         return {'FINISHED'}
 
+class SaveCustomRig(bpy.types.Operator):
+    """ Save custom rig """
+    bl_idname = "dazoptim.save_custom_rig"
+    bl_label = "Save custom rig"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazFemaleLoad_operator], [DazMergeGrografts_operator, DazConvertToUe5Skeleton_operator])
+
+    def execute(self, context):
+        DazOptimizer().save_custom_rig()
+        return {'FINISHED'}
+
 
 class SerializeExtraBones(bpy.types.Operator):
     """ Print morph csv """

@@ -830,14 +830,9 @@ class DazOptimizer:
 
         # if bpy.context.scene.get('daz_optim_toon'):
         #     selection = np.logical_not(selection)
-        new_uv_layer_np[selection, 0] += 1
+        new_uv_layer_np[selection, 1] += 1
         for v, new_uv in zip(EYES_M.data.uv_layers.active.data, new_uv_layer_np):
             v.uv = new_uv
-        # += [0.043945, 0.006836] # top arm
-        # += [-0.072266 , 0.085937] # obttom arm
-        # += [0.008526, 0.019377] # torso
-        # *= 0.25# nails
-        # -= 0.5 # nails
 
     def find_body_parts_textures(self):
         BODY_M = self.get_body_mesh()
@@ -1365,7 +1360,7 @@ class DazOptimizer:
                 assign_img(mouth_tile, s2 - s4, s2, s+s4, s + s4*2)
             if eyes_tile is not None:
                 assign_img(eyes_tile[:s8], s2 - s4 - s8, s2 - s4, s + s4 * 1, s + s4 * 2)
-                assign_img(eyes_tile[s8:], s2 - s4 - s8, s2 - s4, s + s4 * 2, s + s4 * 3)
+                assign_img(eyes_tile[:s8], s2 - s4 - s8, s2 - s4, s + s4 * 2, s + s4 * 3)
             if genital_tile is not None:
                 assign_img(genital_tile, s2 - s4, s2, s + s4 * 2, s + s4 * 3)
             if eyelashes_tile is not None:
@@ -2035,7 +2030,7 @@ class DazOptimizer:
                     filepaths[channel] = bpy.data.images.load(p)
         for mat in mesh.data.materials:
             if mat.name.startswith("GP_"):
-                NodesUtils.gen_simple_material(mat, filepaths, uvs=NEW_GP_UV_MAP, clear_all=True)
+                NodesUtils.gen_simple_material(mat, filepaths, uvs=NEW_GP_UV_MAP, clear_all=True, keep_shells=False)
 
 
     def setup_golden_palace_for_baking(self):
@@ -3379,6 +3374,9 @@ class DazOptimizer:
                                  use_metadata=True,
                                  axis_forward='-Z',
                                  axis_up='Y')
+
+    def save_custom_rig(self):
+
 
     def serialize_extra_bones(self):
         body = self.get_body_mesh()
