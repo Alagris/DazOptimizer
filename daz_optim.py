@@ -114,9 +114,6 @@ class DazOptimizer:
     def get_pixel_coords(self, layer_name='Base Multi UDIM'):
         return DazOptimizer.base_layer_to_pixel_coords(self.get_base_uv_layer_np(layer_name))
 
-    def get_base_uv_layer_selection_np(self):
-        return np.array([v.select for v in self.get_base_uv_layer().data], dtype=bool)
-
     def update_base_uv_layer(self, base_layer_np: np.ndarray):
         for v, new_uv in zip(self.get_base_uv_layer().data, base_layer_np):
             v.uv = new_uv
@@ -785,7 +782,6 @@ class DazOptimizer:
             EYES_M = self.get_toon_floating_iris_mesh()
         if EYES_M is None:
             return
-        old_uv_layer = EYES_M.data.uv_layers.active
         new_uv_layer = EYES_M.data.uv_layers.new(name=NEW_EYES_UV_MAP)
         new_uv_layer.active = True
         new_uv_layer.active_render = True
@@ -1677,8 +1673,8 @@ class DazOptimizer:
         is_arms = np.logical_and(3 < base_layer_np[:, 0], base_layer_np[:, 0] < 4)
         is_nails = np.logical_and(4 < base_layer_np[:, 0], base_layer_np[:, 0] < 5)
         is_eyes = np.logical_and(5 < base_layer_np[:, 0], base_layer_np[:, 0] < 6)
-        is_eyes_sclera = np.logical_and(is_eyes, base_layer_np[:, 1] > 0.5)
-        is_eyes_iris = np.logical_and(is_eyes, base_layer_np[:, 1] < 0.5)
+        is_eyes_sclera = np.logical_and(is_eyes, base_layer_np[:, 1] < 1)
+        is_eyes_iris = np.logical_and(is_eyes, base_layer_np[:, 1] > 1)
         is_mouth = np.logical_and(6 < base_layer_np[:, 0], base_layer_np[:, 0] < 7)
         pixel_coords = DazOptimizer.base_layer_to_pixel_coords(base_layer_np)
 
@@ -1745,7 +1741,7 @@ class DazOptimizer:
         base_layer_np[is_body] += BODY_TRANS
         base_layer_np[is_nails] = np.mod(nails_np, 1) / 8 + [s, 0]
         base_layer_np[is_eyes_sclera] = np.mod(sclera_np, 1) / 8 + [s + s4 * 1, s4 - s8]
-        base_layer_np[is_eyes_iris] = np.mod(iris_np, 1) / 8 + [s + s4 * 2, s4]
+        base_layer_np[is_eyes_iris] = np.mod(iris_np, 1) / 8 + [s + s4 * 2, s4 - s8]
         base_layer_np[is_mouth_cavity] = base_layer_np[is_mouth_cavity]/2 + MOUTH_CAVITY_SCALED_TRANS # + np.add(MOUTH_CAVITY_CENTERING_TRANS, MOUTH_CAVITY_TRANS)
         if is_floating_iris:
             eye_socket_np = base_layer_np[is_eye_socket]
@@ -1770,8 +1766,8 @@ class DazOptimizer:
         BODY_M = self.get_body_mesh()
         # pack UVs
         select_object(BODY_M)
+        base_layer_np = self.get_base_uv_layer_np()
         bpy.ops.object.mode_set(mode='EDIT')
-
 
         bpy.context.scene.tool_settings.use_uv_select_sync = False
         bpy.ops.uv.select_all(action='DESELECT')
@@ -1780,10 +1776,11 @@ class DazOptimizer:
         me = bpy.context.object.data
         bm = bmesh.from_edit_mesh(me)
         uv_layer = bm.loops.layers.uv.verify()
-
+        selection = np.zeros(len(base_layer_np), dtype=bool)
         # for v in bm.verts:
         #    v.select_set(False)
         uv_mask = rle_decode(MaskStore.get_store().lip_rle(), MASK_SHAPE)
+
         for face in bm.faces:
             full_loop = True
             for loop in face.loops:
@@ -1798,6 +1795,9 @@ class DazOptimizer:
                 full_loop = full_loop and matched
                 # if matched:
                 #    loop.vert.select_set(True)
+            if full_loop:
+                for loop in face.loops:
+                    selection[loop.index] = True
             face.select_set(full_loop)
 
         # bm.select_mode = {'VERT', 'EDGE', 'FACE'}
@@ -1809,9 +1809,8 @@ class DazOptimizer:
 
         bpy.ops.object.mode_set(mode='OBJECT')
         #  def separate_lips(self):
-        base_layer_np = self.get_base_uv_layer_np()
+
         # pixel_class = get_pixel_class()
-        selection = self.get_base_uv_layer_selection_np()
         base_layer_np[selection] = base_layer_np[selection] + LIP_TRANS
         self.update_base_uv_layer(base_layer_np)
         # += [0.043945, 0.006836] # top arm
@@ -1963,16 +1962,21 @@ class DazOptimizer:
     def unify_golden_palace_uvs(self):
         mesh = self.select_gp_or_body()
         if NEW_GP_UV_MAP not in mesh.data.uv_layers:
+            print("Creating new Golden Palace UVs")
             gp_labia_majora = mesh.data.uv_layers.get('Golden Palace 2')
             gp_labia_minora = mesh.data.uv_layers['Golden Palace']
             new_uv_layer = mesh.data.uv_layers.new(name=NEW_GP_UV_MAP)
+            print("Reading old Golden Palace labia UVs")
             gp_labia_minora_np = np.array([v.uv for v in gp_labia_minora.data])
             if gp_labia_majora is None:
                 new_uv_layer_np = gp_labia_minora_np
             else:
                 gp_labia_majora.active = True
+                print("Reading new_uv_layer.data")
                 new_uv_layer_np = np.array([v.uv for v in new_uv_layer.data])
+                print("Reading gp_labia_majora.data")
                 gp_labia_majora_np = np.array([v.uv for v in gp_labia_majora.data])
+                print("Calculating new UVs")
                 is_majora = np.all(gp_labia_majora_np > 0, axis=1)
                 is_minora = np.all(gp_labia_minora_np > 0, axis=1)
                 gp_labia_majora_np = np.mod(gp_labia_majora_np, 1)
@@ -2014,6 +2018,7 @@ class DazOptimizer:
                 new_uv_layer_np[is_labia_minora] = gp_labia_minora_np[is_labia_minora] - [vagina_margin, 0]
                 new_uv_layer_np[is_labia_majora] = gp_labia_majora_np[is_labia_majora] + [1 - 0.72, 0]
                 new_uv_layer_np[is_insides] = gp_labia_minora_np[is_insides] * (1 / 8) + [vagina_half_width * 2 - vagina_margin, 0]
+            print("Applying new Golden Palace UVs")
             for v, new_uv in zip(new_uv_layer.data, new_uv_layer_np):
                 v.uv = new_uv
 
@@ -2021,13 +2026,14 @@ class DazOptimizer:
         mesh = self.select_gp_or_body()
         filepaths = {}
         for channel in ['Base Color', 'Roughness', 'Normal']:
-            name = 'GP_Baked_' + channel
-            if name in bpy.data.images:
-                filepaths[channel] = bpy.data.images[name]
-            else:
-                p = os.path.join(self.workdir, self.name + "_" + channel + '_gp_baked.png')
-                if os.path.exists(p):
-                    filepaths[channel] = bpy.data.images.load(p)
+            if not bpy.context.scene.get('gp_lacks_' + channel, False):
+                name = 'GP_Baked_' + channel
+                if name in bpy.data.images:
+                    filepaths[channel] = bpy.data.images[name]
+                else:
+                    p = os.path.join(self.workdir, self.name + "_" + channel + '_gp_baked.png')
+                    if os.path.exists(p):
+                        filepaths[channel] = bpy.data.images.load(p)
         for mat in mesh.data.materials:
             if mat.name.startswith("GP_"):
                 NodesUtils.gen_simple_material(mat, filepaths, uvs=NEW_GP_UV_MAP, clear_all=True, keep_shells=False)

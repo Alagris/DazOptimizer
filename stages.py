@@ -1597,6 +1597,8 @@ class ApplyCustomRig(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
+        if bpy.context.scene.custom_rig == '':
+            return False
         return UNLOCK or check_stage(context, [DazMaleLoad_operator], [RigPhysicsHair, DazMergeAllRigs_operator])
 
     def execute(self, context):

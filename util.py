@@ -831,9 +831,9 @@ class NodesUtils:
             NodesUtils.remove_all_input_links(node_tree, output_node)
 
         is_toon = bpy.context.scene.get('daz_optim_toon')
+        bsdf_node = None
         if clear_all:
             if is_toon:
-                bsdf_node = None
                 ns.clear()
                 NodesUtils.delete_all_before(node_tree, output_node, inclusive=False)
             else:
