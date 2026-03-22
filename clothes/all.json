@@ -644,5 +644,20 @@
         "skin_tight": -1,
         "panties": false,
         "dont_resize":true
+    },
+    "SU Gymnastics Clothes G9": {
+        "fingerprint":"13226-26280-13052",
+        "skin_tight":-1,
+        "panties":false
+    },
+    "SU Gymnastics Shorts G9": {
+        "fingerprint":"6076-12028-5951",
+        "skin_tight":-1,
+        "panties":false
+    },
+    "SU JK Suit Shirt G9": {
+        "fingerprint":"19814-39286-19470",
+        "skin_tight":-1,
+        "panties":false
     }
 }

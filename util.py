@@ -1013,6 +1013,10 @@ def find_child_meshes(o):
     find_child_meshes_recursive(o)
     return out
 
+def remove_unnecessary_bones(obj):
+    rig = get_rig_of(obj)
+    mesh = obj.data
+
 
 def remove_unnecessary_shape_keys(objs=None, tolerance=0.001):
     if objs is None:

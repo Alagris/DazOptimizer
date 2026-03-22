@@ -281,7 +281,6 @@ class AdditionalBone:
 
 
 class AdditionalBones:
-    APPLIED_BONES = set()
     def __init__(self, bones):
         if isinstance(bones, str):
             import json
@@ -291,6 +290,16 @@ class AdditionalBones:
         self.object = bones['object']
         bones = [AdditionalBone(b) for b in bones['bones']]
         self.bones = {b.bone_name: b for b in bones}
+
+    @staticmethod
+    def get_applied_bones():
+        applied_bones = bpy.context.scene.get('applied_additional_bones','')
+        new_bones = set()
+        for applied_bones in applied_bones.split(':'):
+            applied_bones = AdditionalBones(applied_bones)
+            if applied_bones.object == 'g9':
+                new_bones.update(applied_bones.bones.keys())
+        return new_bones
 
     @staticmethod
     def get_additional_bones_path(file_name):
@@ -319,13 +328,8 @@ class AdditionalBones:
             obj = util.find_by_fingerprint(self.object)
         if obj is not None:
             for b in self.bones.values():
-                if self.object == 'g9':
-                    AdditionalBones.APPLIED_BONES.add(b.bone_name)
                 b.apply_additional_bone(obj)
 
-    @staticmethod
-    def is_additional_bone(bone_name):
-        return bone_name in AdditionalBones.APPLIED_BONES
 
 class MaskStore:
     SINGLETON = None
@@ -535,8 +539,8 @@ class BoneHierarchy:
         return self.bones[item]
 
 
-def is_known_bone(bone_name):
-    return AdditionalBones.is_additional_bone(bone_name) or constants.is_daz_bone(bone_name)
+def is_known_bone(bone_name, applied_bones):
+    return bone_name in applied_bones or constants.is_daz_bone(bone_name)
 
 
 def is_hair(obj):

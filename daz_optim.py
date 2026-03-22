@@ -1752,8 +1752,8 @@ class DazOptimizer:
             base_layer_np[is_eye_socket] = eye_socket_np
         if gp_np is not None:
             base_layer_np[is_gp] = np.mod(gp_np, 1) / 8 + [s + s4 * 2, 0]
-            if not use_full_gp:
-                base_layer_np[is_outer_gp] += np.array([0.5,0]) + BODY_TRANS
+            #if not use_full_gp:
+            #    base_layer_np[is_outer_gp] += np.array([0.5,0]) + BODY_TRANS
         base_layer_np[is_mouth] = np.mod(mouth_np, 1) / 8 + [s + s4, 0]
         if eyelashes_np is not None:
             if TRANSPARENT_TOON_EYELASHES_MAT_NAME in BODY_M.material_slots or TRANSPARENT_TOON_EYEBROWS_MAT_NAME in BODY_M.material_slots:
@@ -2360,7 +2360,8 @@ class DazOptimizer:
 
     def get_missing_bones(self):
         BODY_M = self.get_body_mesh()
-        groups = set(b for b in AdditionalBones.APPLIED_BONES if b in BODY_M.vertex_groups)
+        applied_additional_bones = AdditionalBones.get_applied_bones()
+        groups = set(b for b in applied_additional_bones if b in BODY_M.vertex_groups)
         def add_subdivided(name):
             i = 1
             while True:
@@ -3264,9 +3265,12 @@ class DazOptimizer:
                                 space.clip_end = 100000
         self.scale(z)
 
-    def scale_to_quinn(self):
-        mesh = self.get_body_mesh()
-        height = mesh.dimensions[2]
+    def scale_to_quinn(self, relative_to_base_daz=True):
+        if relative_to_base_daz:
+            height = 1.7000360488891602
+        else:
+            mesh = self.get_body_mesh()
+            height = mesh.dimensions[2]
         ue5_height = QUINN_HEIGHT if is_female() else MANNY_HEIGHT
         rig = self.get_body_rig()
         select_object(rig)
@@ -3320,6 +3324,7 @@ class DazOptimizer:
                     if bone.name not in bones_to_keep:
                         rig.data.edit_bones.remove(bone)
                 translate(rig, -head_pos)
+            remove_unnecessary_bones()
 
     def export_body_to_fbx(self):
         body = self.get_body_mesh()
@@ -3395,12 +3400,9 @@ class DazOptimizer:
         body = self.get_body_mesh()
         rig = self.get_body_rig()
         select_object(rig)
-        bones = [bone.name for bone in rig.data.bones if not is_known_bone(bone.name)]
+        applied_additional_bones = AdditionalBones.get_applied_bones()
+        bones = [bone.name for bone in rig.data.bones if not is_known_bone(bone.name, applied_additional_bones)]
         AdditionalBone.serialize_bone_and_weights(body, bones).save()
-
-    @staticmethod
-    def save_weights_and_bones_of_selected_obj():
-        bpy.context.selected_objects
 
 
     def serialize_extra_clothes(self):
@@ -3460,6 +3462,7 @@ class DazOptimizer:
         if rig is None:
             rig = get_rig_of(obj)
         select_object(rig)
+        hide_object(obj, False)
         obj.select_set(True)
         bpy.ops.export_scene.fbx(filepath=path,
                                  check_existing=False,
