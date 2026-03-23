@@ -97,6 +97,8 @@ class DazOptimizer:
 
     @staticmethod
     def get_mesh_by_name(suffix):
+        if suffix in bpy.data.objects:
+            return bpy.data.objects[suffix]
         for b in bpy.data.objects:
             n = re.sub(r' \([0-9]+\) ',' ',b.name)
             if n.endswith(suffix):
@@ -709,6 +711,7 @@ class DazOptimizer:
                     o.modifiers.remove(m)
 
     def merge_all_rigs(self):
+        bpy.ops.object.hide_view_clear() # this seems important. Otherwise things might glitch
         body_rig = self.get_body_rig()
         select_object(body_rig)
         meshes = []
@@ -834,8 +837,9 @@ class DazOptimizer:
         BODY_M = self.get_body_mesh()
         mats = list(BODY_M.data.materials)
         for g in DICK_GEOGRAFTS:
-            if g+' Mesh' in bpy.data.objects:
-                mats.extend(bpy.data.objects[g+' Mesh'].data.materials)
+            dick = DazOptimizer.get_mesh_by_name(g+' Mesh')
+            if dick is not None:
+                mats.extend(dick.data.materials)
         return DazOptimizer.find_body_part_textures(mats)
 
     @staticmethod
@@ -940,8 +944,9 @@ class DazOptimizer:
         if is_toon:
             mats.extend(gp.data.materials)
         for g in DICK_GEOGRAFTS:
-            if g + ' Mesh' in bpy.data.objects:
-                mats.extend(bpy.data.objects[g + ' Mesh'].data.materials)
+            dick = DazOptimizer.get_mesh_by_name(g + ' Mesh')
+            if dick is not None:
+                mats.extend(dick.data.materials)
         return set(mats)
 
     def bake_materials(self, active_only=False):
@@ -1142,9 +1147,9 @@ class DazOptimizer:
                 all_filepaths[toenails_body_part]['Base Color'] = [nails_img]
 
         for n in BREAST_GEOGRAFTS + MALE_ONLY_GEOGRAFTS:
-            n = n + ' Mesh'
-            if n in bpy.data.objects:
-                mats.extend(bpy.data.objects[n].data.materials)
+            o = DazOptimizer.get_mesh_by_name(n + ' Mesh')
+            if o is not None:
+                mats.update(o.data.materials)
         DazOptimizer.gen_simple_materials(mats, all_filepaths)
 
         body_part_filepaths = all_filepaths['Body']
@@ -1378,8 +1383,8 @@ class DazOptimizer:
         BODY_M = self.get_body_mesh()
         BODY_RIG = self.get_body_rig()
         select_object(BODY_M)
-        if 'Wet Kitty TOON Mesh' in bpy.data.objects:
-            wk = bpy.data.objects['Wet Kitty TOON Mesh']
+        wk = DazOptimizer.get_mesh_by_name('Wet Kitty TOON Mesh')
+        if wk is not None:
             labia_minora = wk.data.materials.get('Labia_Minora')
             vagina = wk.data.materials.get('Vagina')
             rectum = wk.data.materials.get('Rectum')
@@ -1413,27 +1418,29 @@ class DazOptimizer:
         BODY_M = self.get_body_mesh()
         BODY_RIG = self.get_body_rig()
         select_object(BODY_M)
-
+        rigs = set()
+        grafts = []
         # merge meshes
         anything = False
         for g in GEOGRAFTS:
             if g not in DICK_GEOGRAFTS:
-                if g+' Mesh' in bpy.data.objects:
-                    g_m = bpy.data.objects[g+' Mesh']
+                g_m = DazOptimizer.get_mesh_by_name(g+" Mesh")
+                if g_m is not None:
                     g_m.select_set(True)
+                    rigs.add(get_rig_of(g_m))
+                    grafts.append(g_m)
                     anything = True
         if anything:
             bpy.ops.daz.merge_geografts()
-
+            rigs.remove(BODY_RIG)
             # merge bones
-            for g in GEOGRAFTS:
-                if g in bpy.data.objects:
-                    o = bpy.data.objects[g]
-                    self.merge_two_rigs(BODY_RIG, o)
-                    bpy.data.objects.remove(o)
-                if g+' Mesh' in bpy.data.objects:
-                    o = bpy.data.objects[g+" Mesh"]
-                    bpy.data.objects.remove(o)
+            for rig in rigs:
+                if rig in bpy.data.objects.values():
+                    self.merge_two_rigs(BODY_RIG, rig)
+                    bpy.data.objects.remove(rig)
+                #if g+' Mesh' in bpy.data.objects:
+                #    o = bpy.data.objects[g+" Mesh"]
+                #    bpy.data.objects.remove(o)
 
     def transfer_morphs_to_geografts(self):
         BODY_M = self.get_body_mesh()
@@ -1444,8 +1451,8 @@ class DazOptimizer:
             #selection = [shape for shapes in MORPHS['__base__']['shapes'].values() for shape in shapes]
 
             for g in GEOGRAFTS:
-                if g + ' Mesh' in bpy.data.objects:
-                    g_m = bpy.data.objects[g + ' Mesh']
+                g_m = DazOptimizer.get_mesh_by_name(g + ' Mesh')
+                if g_m is not None:
                     g_m.select_set(True)
             bpy.ops.daz.transfer_shapekeys('INVOKE_DEFAULT', bodypart='NoFace', useOverwrite=False) #, selection=selection)
 
@@ -1921,9 +1928,9 @@ class DazOptimizer:
         vgs = [v.name for v in vgs]
         grafts = []
         for o_name in BREAST_GEOGRAFTS:
-            o_name = o_name + ' Mesh'
-            if o_name in bpy.data.objects:
-                grafts.append(bpy.data.objects[o_name])
+            o = DazOptimizer.get_mesh_by_name(o_name + ' Mesh')
+            if o is not None:
+                grafts.append(o)
         transfer_weights(BODY_M, grafts, vgs)
 
 
@@ -1938,7 +1945,7 @@ class DazOptimizer:
         bpy.ops.daz.save_local_textures()
 
     def select_gp(self):
-        mesh = bpy.data.objects['GoldenPalace_G9 Mesh']
+        mesh = DazOptimizer.get_mesh_by_name('GoldenPalace_G9 Mesh')
         select_object(mesh)
         return mesh
 
@@ -1948,9 +1955,8 @@ class DazOptimizer:
         return mesh
 
     def get_gp_or_body(self):
-        if 'GoldenPalace_G9 Mesh' in bpy.data.objects:
-            mesh = bpy.data.objects['GoldenPalace_G9 Mesh']
-        else:
+        mesh = DazOptimizer.get_mesh_by_name('GoldenPalace_G9 Mesh')
+        if mesh is None:
             mesh = self.get_body_mesh()
         return mesh
 
@@ -2192,8 +2198,8 @@ class DazOptimizer:
                 for uv_node in NodesUtils.find_all_by_type(nt, bpy.types.ShaderNodeUVMap):
                     nt.nodes.remove(uv_node)
         for g in DICK_GEOGRAFTS:
-            if g+' Mesh' in bpy.data.objects:
-                dick = bpy.data.objects[g+' Mesh']
+            dick = DazOptimizer.get_mesh_by_name(g + ' Mesh')
+            if dick is not None:
                 bpy.context.view_layer.objects.active = dick
                 l = dick.data.uv_layers[0]
                 l.active = True
@@ -2204,6 +2210,9 @@ class DazOptimizer:
                 bpy.context.object.data.materials.clear()
                 dick.data.materials.append(mat)
 
+    def apply_all_transforms(self):
+        root = self.get_body_rig()
+        apply_recursive(root)
 
     def add_thigh_bones(self):
         body_rig = self.get_body_rig()
@@ -2603,7 +2612,7 @@ class DazOptimizer:
 
     @staticmethod
     def get_gp_mesh():
-        gp = bpy.data.objects.get('GoldenPalace_G9 Mesh')
+        gp = DazOptimizer.get_mesh_by_name('GoldenPalace_G9 Mesh')
         return gp
 
     def remove_tentacles(self):

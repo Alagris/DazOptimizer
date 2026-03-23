@@ -236,7 +236,7 @@ class DazSaveTextures_operator(bpy.types.Operator):
 
 
 def has_gp():
-    return 'GoldenPalace_G9 Mesh' in bpy.data.objects
+    return DazOptimizer.get_mesh_by_name('GoldenPalace_G9 Mesh') is not None
 
 def had_gp():
     return bpy.context.scene.get('daz_optim_gp')
@@ -1313,7 +1313,7 @@ class DazOptimizeGoldenPalaceUVs(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return UNLOCK or (has_gp() and check_stage(context, [DazMaleLoad_operator], [DazOptimizeGoldenPalaceUVs]))
+        return UNLOCK or (bpy.context.scene.get('daz_optim_gp') and check_stage(context, [DazMaleLoad_operator], [DazOptimizeGoldenPalaceUVs]))
 
     def execute(self, context):
         DazOptimizer().unify_golden_palace_uvs()
@@ -1727,6 +1727,20 @@ class SaveCustomRig(bpy.types.Operator):
         DazOptimizer.save_custom_rig()
         return {'FINISHED'}
 
+class ApplyAllTransforms(bpy.types.Operator):
+    """ Apply all transforms """
+    bl_idname = "dazoptim.apply_all_transforms"
+    bl_label = "Apply all transforms to all objects"
+    bl_options = {"REGISTER", "UNDO"}
+    stage_id = None
+
+    @classmethod
+    def poll(cls, context):
+        return UNLOCK or check_stage(context, [DazFemaleLoad_operator], [DazMergeGrografts_operator, DazConvertToUe5Skeleton_operator])
+
+    def execute(self, context):
+        DazOptimizer().apply_all_transforms()
+        return {'FINISHED'}
 
 class SerializeExtraBones(bpy.types.Operator):
     """ Print morph csv """

@@ -1362,7 +1362,7 @@ def apply_recursive(obj, location=None, rotation=None, scale=None):
             select_object(obj)
         except RuntimeError:
             continue
-        bpy.ops.object.transform_apply(location=location is not None, rotation=rotation is not None, scale=scale is not None)
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
         for child in obj.children:
             if child not in visited:
                 visited.add(child)

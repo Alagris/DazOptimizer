@@ -208,6 +208,7 @@ operators = [
     EntryOp(BakeAction, "Bake current daz action to ue5"),
     EntryOp(ExportAction, "Export action to fbx"),
     EntryLabel("Utilities", -1),
+    EntryOp(ApplyAllTransforms, "Apply all transforms"),
     EntryOp(SaveCustomRig, "Save custom rig"),
     EntryOp(DazCompareToUe5Skeleton_operator, "Compare to UE5 Skeleton"),
     EntryOp(HideAllClothes, "Hide all clothes"),
