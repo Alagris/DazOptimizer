@@ -77,19 +77,20 @@ class CustomRig:
         added_bones = []
         vertex_count = len(mesh.data.vertices)
         for bone_name, bone_params in json_bones.items():
-            if bone_name not in rig.data.edit_bones:
-                bone = rig.data.edit_bones.new(bone_name)
-                closest_vertex = bone_params['closest_vertex']
-                vertex_coord = mesh.data.vertices[closest_vertex].co
-                vertex_to_head_displacement = bone_params['vertex_to_head_displacement']
-                head = np.add(vertex_coord, vertex_to_head_displacement)
-                original_head = bone_params['head']
-                original_tail = bone_params['tail']
-                tail_displacement = np.subtract(original_tail, original_head)
-                bone.head = head
-                bone.tail = head + tail_displacement
-                bone.roll = bone_params['roll']
-                added_bones.append(bone_name)
+            if not bone_params.get('clear', False):
+                if bone_name not in rig.data.edit_bones:
+                    bone = rig.data.edit_bones.new(bone_name)
+                    closest_vertex = bone_params['closest_vertex']
+                    vertex_coord = mesh.data.vertices[closest_vertex].co
+                    vertex_to_head_displacement = bone_params['vertex_to_head_displacement']
+                    head = np.add(vertex_coord, vertex_to_head_displacement)
+                    original_head = bone_params['head']
+                    original_tail = bone_params['tail']
+                    tail_displacement = np.subtract(original_tail, original_head)
+                    bone.head = head
+                    bone.tail = head + tail_displacement
+                    bone.roll = bone_params['roll']
+                    added_bones.append(bone_name)
 
         for bone_name in added_bones:
             bone_params = json_bones[bone_name]
@@ -105,18 +106,23 @@ class CustomRig:
         weights_dir = os.path.join(rig_dir, fingerprint)
         for bone_name, bone_params in json_bones.items():
             weights_file = os.path.join(weights_dir, bone_name + '.npy')
-            weights_indices = np.load(weights_file, allow_pickle=True)
-            weights_indices = weights_indices[()]
-            weights = weights_indices['weights']
-            indices = weights_indices['indices']
+            if bone_params.get('clear', False):
+                vg = mesh.vertex_groups.get(bone_name)
+                if vg is not None:
+                    mesh.vertex_groups.remove(vg)
+            else:
+                weights_indices = np.load(weights_file, allow_pickle=True)
+                weights_indices = weights_indices[()]
+                weights = weights_indices['weights']
+                indices = weights_indices['indices']
 
-            vg = mesh.vertex_groups.get(bone_name)
-            if vg is not None:
-                mesh.vertex_groups.remove(vg) # clear a vertex group if it already existed
-            vg = mesh.vertex_groups.new(name=bone_name)
+                vg = mesh.vertex_groups.get(bone_name)
+                if vg is not None:
+                    mesh.vertex_groups.remove(vg)  # clear a vertex group if it already existed
+                vg = mesh.vertex_groups.new(name=bone_name)
 
-            for val, idx in zip(weights.tolist(), indices.tolist()):
-                vg.add(index=(idx,), weight=val, type='REPLACE')
+                for val, idx in zip(weights.tolist(), indices.tolist()):
+                    vg.add(index=(idx,), weight=val, type='REPLACE')
         already_applied = bpy.context.scene.get('applied_custom_rigs', '')
         if len(already_applied) > 0:
             already_applied = already_applied + ':'
@@ -154,27 +160,34 @@ class CustomRig:
         rig_dir = os.path.dirname(rig_path)
         selected_bones = []
         for bone in rig.data.edit_bones:
+            bone_name = bone.name
             if bone.select:
-                print("Saving ", bone)
-                _, closest_vertex_idx = kdtree.query(bone.head)
-                closest_vertex = vertex_coords[closest_vertex_idx]
-                displacement = np.array(bone.head)-closest_vertex
-                parent_bone = None if bone.parent is None else bone.parent.name
-                bone_name = bone.name
-                selected_bones.append(bone_name)
-                bone_head = list(bone.head)
-                bone_tail = list(bone.tail)
-                json_bones[bone_name] = {
-                    'closest_vertex': int(closest_vertex_idx),
-                    'vertex_to_head_displacement': displacement.tolist(),
-                    'name': bone_name,
-                    'head': bone_head,
-                    'tail': bone_tail,
-                    'parent': parent_bone,
-                    'roll': bone.roll,
-                    'connect': bone.use_connect,
-                    'local': bone.use_local_location
-                }
+                vg = mesh.vertex_groups.get(bone_name)
+                if vg is None:
+                    json_bones[bone_name] = {
+                        'clear': True
+                    }
+                else:
+                    print("Saving ", bone)
+                    _, closest_vertex_idx = kdtree.query(bone.head)
+                    closest_vertex = vertex_coords[closest_vertex_idx]
+                    displacement = np.array(bone.head)-closest_vertex
+                    parent_bone = None if bone.parent is None else bone.parent.name
+
+                    selected_bones.append(bone_name)
+                    bone_head = list(bone.head)
+                    bone_tail = list(bone.tail)
+                    json_bones[bone_name] = {
+                        'closest_vertex': int(closest_vertex_idx),
+                        'vertex_to_head_displacement': displacement.tolist(),
+                        'name': bone_name,
+                        'head': bone_head,
+                        'tail': bone_tail,
+                        'parent': parent_bone,
+                        'roll': bone.roll,
+                        'connect': bone.use_connect,
+                        'local': bone.use_local_location
+                    }
         json_root = {
             "name": mesh.name,
             "bones": json_bones,
