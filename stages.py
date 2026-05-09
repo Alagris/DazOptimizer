@@ -1593,7 +1593,7 @@ class ApplyCustomRig(bpy.types.Operator):
     bl_idname = "dazoptim.apply_custom_rig"
     bl_label = "Apply custom rig"
     bl_options = {"REGISTER", "UNDO"}
-    stage_id = "6"
+    stage_id = 'D'
 
     @classmethod
     def poll(cls, context):

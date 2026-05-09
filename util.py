@@ -1016,6 +1016,8 @@ def find_child_meshes(o):
 def remove_unnecessary_bones(obj):
     rig = get_rig_of(obj)
     mesh = obj.data
+    unused = set()
+
 
 
 def remove_unnecessary_shape_keys(objs=None, tolerance=0.001):

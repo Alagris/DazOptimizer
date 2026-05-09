@@ -881,8 +881,8 @@ class DazOptimizer:
         all_filepaths: {str: {str: DazOptimizer.FindImagesResult}} = {}
         for mat in mats:
             body_part = mat.name.rstrip('0123456789-_.')
-            assert body_part not in all_filepaths
-            all_filepaths[body_part] = DazOptimizer.find_images_of_each_map_type(mat)
+            if body_part not in all_filepaths: # sometimes there can be duplicates. Doesn't matter
+                all_filepaths[body_part] = DazOptimizer.find_images_of_each_map_type(mat)
 
         for body_part_name, body_part_filepaths in all_filepaths.items():
             occurrences = {}
@@ -1317,13 +1317,16 @@ class DazOptimizer:
                     mask = np.flipud(mask)
                     img = np.flipud(img)
                 img = prepare_channels(img)
-                print("img.shape=",img.shape,"\nnew_img.shape=",new_img.shape,"\nmask.shape=",mask.shape, "\nnew_img[y0:y1, x0:x1].shape=", new_img[y0:y1, x0:x1].shape, "\nimg[mask].shape=", img[mask].shape, "\nnew_img[y0:y1, x0:x1][mask]=",new_img[y0:y1, x0:x1][mask].shape)
+                print("\nimg.shape=",img.shape," dtype=",dtp,"\nnew_img.shape=",new_img.shape,"\nmask.shape=",mask.shape, "\nnew_img[y0:y1, x0:x1].shape=", new_img[y0:y1, x0:x1].shape, "\nimg[mask].shape=", img[mask].shape, "\nnew_img[y0:y1, x0:x1][mask]=",new_img[y0:y1, x0:x1][mask].shape)
                 new_img[y0:y1, x0:x1][mask] = img[mask]
                 if scale!=1:
-                    resized = Image.fromarray(new_img).resize([merged_shape[1]//scale, merged_shape[0]//scale])
+                    resized = np.squeeze(new_img, axis=2) if new_img.shape[2] == 1 else new_img
+                    resized = Image.fromarray(resized).resize([merged_shape[1]//scale, merged_shape[0]//scale])
                     resized = np.array(resized)
                     print("Resizing ", new_img.shape, " to ", resized.shape)
                     new_img.fill(0)
+                    if new_img.shape[2] == 1:
+                        resized = resized[:,:,None]
                     np.copyto(new_img[-resized.shape[0]:, :resized.shape[1]], resized)
 
                 x, y = np.int32(np.array(translation) * s2)
@@ -1443,6 +1446,7 @@ class DazOptimizer:
                 #    bpy.data.objects.remove(o)
 
     def transfer_morphs_to_geografts(self):
+        self.apply_all_transforms()
         BODY_M = self.get_body_mesh()
         # BODY_RIG = self.get_body_rig()
         select_object(BODY_M)
@@ -3333,7 +3337,7 @@ class DazOptimizer:
                     if bone.name not in bones_to_keep:
                         rig.data.edit_bones.remove(bone)
                 translate(rig, -head_pos)
-            remove_unnecessary_bones()
+            remove_unnecessary_bones(hair)
 
     def export_body_to_fbx(self):
         body = self.get_body_mesh()
